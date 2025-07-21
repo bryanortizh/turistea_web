@@ -1,51 +1,21 @@
-HELP.md
-target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
-.vscode/
-# See http://help.github.com/ignore-files/ for more about ignoring files.
-
-# compiled output
+# Compiled output
 /dist
-gull/dist
 /tmp
 /out-tsc
+/bazel-out
 
-# dependencies
-node_modules
-gull/node_modules
-gull/package-lock.json
+# Node
+/node_modules
+npm-debug.log
+yarn-error.log
+
+# profiling files
+chrome-profiler-events*.json
 
 # IDEs and editors
-/.idea
+.idea/
 .project
 .classpath
 .c9/
@@ -53,27 +23,24 @@ gull/package-lock.json
 .settings/
 *.sublime-workspace
 
-# IDE - VSCode
+# Visual Studio Code
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+.history/*
 
-# misc
+# Miscellaneous
+.npmrc
 /.angular/cache
-/.sass-cache
+.sass-cache/
 /connect.lock
 /coverage
 /libpeerconnection.log
-npm-debug.log
 testem.log
 /typings
 
-# e2e
-/e2e/*.js
-/e2e/*.map
-
-# System Files
+# System files
 .DS_Store
 Thumbs.db

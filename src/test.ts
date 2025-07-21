@@ -10,5 +10,6 @@ import {
 // First, initialize the Angular testing environment.
 getTestBed().initTestEnvironment(
   BrowserDynamicTestingModule,
-  platformBrowserDynamicTesting()
+  platformBrowserDynamicTesting(),
+  { teardown: { destroyAfterEach: true }},
 );
