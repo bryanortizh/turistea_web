@@ -1,9 +1,8 @@
 {
-  "name": "coreui-free-angular-admin-template",
-  "version": "5.5.5",
-  "copyright": "Copyright 2025 creativeLabs Łukasz Holeczek",
+  "name": "turistea-web",
+  "version": "0.0.1",
   "license": "MIT",
-  "author": "The CoreUI Team (https://github.com/orgs/coreui/people) and contributors",
+  "author": "Bryan Ortiz",
   "homepage": "https://coreui.io/angular",
   "config": {
     "theme": "default",
