@@ -22,6 +22,8 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../data/services/auth.service';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-login',
@@ -42,6 +44,10 @@ import { Router } from '@angular/router';
     FormControlDirective,
     ButtonDirective,
     NgStyle,
+    HttpClientModule
+  ],
+  providers: [AuthService,
+    HttpClient,
   ],
 })
 export class LoginComponent {
@@ -50,10 +56,32 @@ export class LoginComponent {
     password: new FormControl('', [Validators.required]),
   });
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authService: AuthService) {}
 
   signIn() {
-    console.log(this.formControl.value);
-    this.formControl.valid && this.router.navigate(['/dashboard']);
+    if (this.formControl.invalid) {
+      this.formControl.markAllAsTouched();
+      return;
+    }
+    this.authService
+      .login(
+        this.formControl.get('email')?.value || '',
+        this.formControl.get('password')?.value || ''
+      )
+      .subscribe({
+        next: async (userResponse: any) => {
+          this.formControl.reset();
+          this.router.navigate(['/dashboard']);
+          localStorage.setItem('token_turistea', userResponse['JWT']);
+        },
+        error: (error) => {
+          console.log(error);
+         /*  this.toastr.error(error.error.message, 'Acceso denegado', {
+            timeOut: environment.timeOutmessage,
+            closeButton: true,
+            progressBar: true,
+          }); */
+        }
+      });
   }
 }
