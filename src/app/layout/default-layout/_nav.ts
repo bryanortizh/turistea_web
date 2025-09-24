@@ -15,14 +15,23 @@ export const navItems: INavData[] = [
     name: 'Modulos',
   },
   {
+    name: 'Administradores',
+    url: '/admin',
+    iconComponent: { name: 'cil-user' },
+  },
+   {
     name: 'Usuarios',
     url: '/user',
     iconComponent: { name: 'cil-user' },
   },
-  /* {
-    name: 'Docs',
-    url: 'https://coreui.io/angular/docs/',
-    iconComponent: { name: 'cil-description' },
-    attributes: { target: '_blank' },
-  }, */
+  {
+    name: 'Conductores',
+    url: '/driver',
+    iconComponent: { name: 'cil-car' },
+  },
+  {
+    name: 'Ofertas Turisticas',
+    url: '/offers',
+    iconComponent: { name: 'cil-star' },
+  }
 ];

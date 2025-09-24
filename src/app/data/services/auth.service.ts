@@ -6,13 +6,12 @@ import {
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 import { ToasterService } from '@coreui/angular';
-import { Auth } from '../interfaces/auth';
+import { Auth } from '../interfaces/auth.interface';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  // API path
   URL_BACKEND = 'http://localhost:4001';
   timeOutmessage = 3000;
   constructor(
@@ -34,7 +33,7 @@ export class AuthService {
     headers = headers.set('Content-type', 'application/json');
     headers = headers.set(
       'Authorization',
-      'Bearer ' + localStorage.getItem('map_control')
+      'Bearer ' + localStorage.getItem('token_turistea')
     );
     this.http
       .get(this.URL_BACKEND + '/api/signout', {
@@ -48,7 +47,7 @@ export class AuthService {
             progressBar: true,
           }); */
 
-          localStorage.removeItem('map_control');
+          localStorage.removeItem('token_turistea');
           localStorage.clear();
 
           // this.router.navigateByUrl('/login');
@@ -61,10 +60,9 @@ export class AuthService {
             progressBar: true,
           });
  */
-          localStorage.removeItem('map_control');
+          localStorage.removeItem('token_turistea');
           localStorage.clear();
 
-          // this.router.navigateByUrl('/login');
           this.router.navigate([`/auth/login`]);
         }
       );
@@ -75,7 +73,7 @@ export class AuthService {
       progressBar: true,
     }); */
 
-    /*   localStorage.removeItem("map_control");
+    /*   localStorage.removeItem("token_turistea");
     localStorage.clear();
     this.router.navigate([`/auth/login`]); */
   }
@@ -85,7 +83,7 @@ export class AuthService {
     headers = headers.set('Content-type', 'application/json');
     headers = headers.set(
       'Authorization',
-      'Basic ' + localStorage.getItem('map_control')
+      'Basic ' + localStorage.getItem('token_turistea')
     );
 
     return this.http.post(this.URL_BACKEND + '/api/signup', customer, {
@@ -105,7 +103,7 @@ export class AuthService {
     headers = headers.set('Content-type', 'application/json');
     headers = headers.set(
       'Authorization',
-      'Bearer ' + localStorage.getItem('map_control')
+      'Bearer ' + localStorage.getItem('token_turistea')
     );
 
     return this.http.get<any>(this.URL_BACKEND + '/api/admins/profile', {

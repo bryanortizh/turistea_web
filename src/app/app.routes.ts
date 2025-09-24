@@ -20,10 +20,29 @@ export const routes: Routes = [
           import('./views/dashboard/routes').then((m) => m.routes),
       },
       {
+        path: 'admin',
+        loadComponent: () =>
+          import('./views/pages/user/user.component').then((m) => m.UserComponent),
+      },
+      {
         path: 'user',
         loadComponent: () =>
-          import('./views/user/user.component').then((m) => m.UserComponent),
+          import('./views/pages/user-client/user-client.component').then((m) => m.UserClientComponent),
       },
+      {
+        path: 'driver',
+        loadComponent: () =>
+          import('./views/pages/driver/driver.component').then(
+            (m) => m.DriverComponent
+          ),
+      },
+      {
+        path: 'offers',
+        loadComponent: () =>
+          import('./views/pages/offerts/offerts.component').then(
+            (m) => m.OffertsComponent
+          ),
+      }
     ],
   },
   {

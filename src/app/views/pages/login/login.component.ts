@@ -43,23 +43,24 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
     IconDirective,
     FormControlDirective,
     ButtonDirective,
-    NgStyle,
-    HttpClientModule
+    HttpClientModule,
   ],
-  providers: [AuthService,
-    HttpClient,
-  ],
+  providers: [AuthService, HttpClient],
 })
 export class LoginComponent {
   formControl: FormGroup = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [Validators.required]),
   });
+  loginLoading: boolean = false;
 
   constructor(private router: Router, private authService: AuthService) {}
 
   signIn() {
+    this.loginLoading = true;
+
     if (this.formControl.invalid) {
+      this.loginLoading = false;
       this.formControl.markAllAsTouched();
       return;
     }
@@ -70,18 +71,20 @@ export class LoginComponent {
       )
       .subscribe({
         next: async (userResponse: any) => {
+          this.loginLoading = true;
           this.formControl.reset();
           this.router.navigate(['/dashboard']);
           localStorage.setItem('token_turistea', userResponse['JWT']);
         },
         error: (error) => {
+          this.loginLoading = false;
           console.log(error);
-         /*  this.toastr.error(error.error.message, 'Acceso denegado', {
+          /*  this.toastr.error(error.error.message, 'Acceso denegado', {
             timeOut: environment.timeOutmessage,
             closeButton: true,
             progressBar: true,
           }); */
-        }
+        },
       });
   }
 }
