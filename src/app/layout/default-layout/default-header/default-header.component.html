@@ -1,4 +1,3 @@
-<!--<c-header class="mb-4 d-print-none" position="sticky">-->
 <ng-container>
   <c-container [fluid]="true" class="border-bottom px-4">
     <button [cSidebarToggle]="sidebarId()" cHeaderToggler class="btn" toggle="visible"
@@ -18,7 +17,7 @@
       </a>
     </c-header-nav> -->
 
-    <c-header-nav class="ms-auto ms-md-0">
+    <!--  <c-header-nav class="ms-auto ms-md-0">
       <div class="nav-item py-1">
         <div class="vr h-100 mx-2 text-body text-opacity-75"></div>
       </div>
@@ -26,27 +25,27 @@
       <div class="nav-item py-1">
         <div class="vr h-100 mx-2 text-body text-opacity-75"></div>
       </div>
-    </c-header-nav>
+    </c-header-nav> -->
 
     <c-header-nav class="mx-0">
       <ng-container *ngTemplateOutlet="userDropdown" />
     </c-header-nav>
 
   </c-container>
- 
+
 </ng-container>
 <!--</c-header>-->
 
-<ng-template #userDropdown >
+<ng-template #userDropdown>
   <c-dropdown [popperOptions]="{ placement: 'bottom-start' }" variant="nav-item" *ngIf="dataUser">
     <button [caret]="false" cDropdownToggle class="py-0 pe-0" aria-label="Open user menu">
       <c-avatar shape="rounded-1" size="md" [src]="dataUser.path" status="success" textColor="primary"
         alt="User avatar" />
     </button>
-    <ul cDropdownMenu class="pt-0 w-auto" >
+    <ul cDropdownMenu class="pt-0 w-auto">
       <li>
         <h6 cDropdownHeader class="bg-body-secondary text-body-secondary fw-semibold py-2 rounded-top">
-          Panel de Control - {{ dataUser.admin_role.rol }}
+          {{ dataUser.name }} {{ dataUser.lastname }} - {{ dataUser.admin_role.rol }}
         </h6>
       </li>
       <!--  <li>
@@ -123,15 +122,15 @@
           <svg cIcon class="me-2" name="cilLockLocked"></svg>
           Lock Account
         </a>
+      </li>-->
+      <li>
+        <a cDropdownItem (click)="openModalPassword()">
+          <svg cIcon class="me-2" name="cil-description"></svg>
+          Cambiar contraseña
+        </a>
       </li>
       <li>
-        <a cDropdownItem routerLink="">
-          <svg cIcon class="me-2" name="cilAccountLogout"></svg>
-          Logout
-        </a>
-      </li> -->
-      <li >
-        <a cDropdownItem (click)="closeSession()" >
+        <a cDropdownItem (click)="closeSession()">
           <svg cIcon class="me-2" name="cilAccountLogout"></svg>
           Cerrar sesión
         </a>
@@ -156,3 +155,75 @@
     </div>
   </c-dropdown>
 </ng-template>
+
+
+
+<c-modal backdrop="static" [visible]="visiblePassword">
+  <c-modal-header>
+    <h5 cModalTitle>Cambiar contraseña</h5>
+    <button (click)="closePasswordModal()" cButtonClose></button>
+  </c-modal-header>
+  <form [formGroup]="passwordForm">
+    <c-modal-body>
+      <c-input-group class="mb-3">
+        <input [type]="showOld ? 'text' : 'password'" id="oldPassword" class="form-control"
+          formControlName="oldPassword" placeholder="Contraseña actual" aria-label="Contraseña actual" />
+        <span cInputGroupText>
+          <button type="button" class="eye-btn" (click)="showOld = !showOld" tabindex="-1">
+            <span class="material-symbols-outlined text-black">
+              {{ showOld ? 'visibility' : 'visibility_off' }}
+            </span>
+          </button>
+        </span>
+      </c-input-group>
+      <div *ngIf="passwordForm.get('oldPassword')?.invalid && passwordForm.get('oldPassword')?.touched"
+        class="text-danger small mb-2">
+        <div *ngIf="passwordForm.get('oldPassword')?.errors?.['required']">La contraseña actual es requerida.</div>
+      </div>
+
+      <c-input-group class="mb-3">
+        <input [type]="showNew ? 'text' : 'password'" id="newPassword" class="form-control"
+          formControlName="newPassword" placeholder="Nueva contraseña" aria-label="Nueva contraseña" />
+        <span cInputGroupText>
+          <button type="button" class="eye-btn" (click)="showNew = !showNew" tabindex="-1">
+            <span class="material-symbols-outlined text-black">
+              {{ showNew ? 'visibility' : 'visibility_off' }}
+            </span>
+          </button>
+        </span>
+      </c-input-group>
+      <div *ngIf="passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched"
+        class="text-danger small mb-2">
+        <div *ngIf="passwordForm.get('newPassword')?.errors?.['required']">La nueva contraseña es requerida.</div>
+        <div *ngIf="passwordForm.get('newPassword')?.errors?.['minlength']">Mínimo 6 caracteres.</div>
+      </div>
+
+      <c-input-group class="mb-3">
+        <input [type]="showRepeat ? 'text' : 'password'" id="repeatPassword" class="form-control"
+          formControlName="repeatPassword" placeholder="Repetir nueva contraseña"
+          aria-label="Repetir nueva contraseña" />
+        <span cInputGroupText>
+          <button type="button" class="eye-btn" (click)="showRepeat = !showRepeat" tabindex="-1">
+            <span class="material-symbols-outlined text-black">
+              {{ showRepeat ? 'visibility' : 'visibility_off' }}
+            </span>
+          </button>
+        </span>
+      </c-input-group>
+      <div *ngIf="passwordForm.get('repeatPassword')?.invalid && passwordForm.get('repeatPassword')?.touched"
+        class="text-danger small mb-2">
+        <div *ngIf="passwordForm.get('repeatPassword')?.errors?.['required']">Debe repetir la nueva contraseña.</div>
+        <div *ngIf="passwordForm.errors?.['passwordMismatch']">Las contraseñas deben ser iguales.</div>
+      </div>
+    </c-modal-body>
+    <c-modal-footer>
+      <button cButton color="danger" size="sm" class="text-white" (click)="closePasswordModal()">
+        Cancelar
+      </button>
+      <button cButton type="submit" color="info" size="sm" class="text-white" [disabled]="passwordForm.invalid"
+        (click)="updatePassword()">
+        Cambiar contraseña
+      </button>
+    </c-modal-footer>
+  </form>
+</c-modal>

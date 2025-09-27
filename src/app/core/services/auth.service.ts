@@ -5,8 +5,8 @@ import {
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
+import { Auth } from '../../data/interfaces/auth.interface';
 import { ToasterService } from '@coreui/angular';
-import { Auth } from '../interfaces/auth.interface';
 
 @Injectable({
   providedIn: 'root',

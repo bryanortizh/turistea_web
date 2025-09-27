@@ -22,8 +22,9 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../../../data/services/auth.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-login',
@@ -53,8 +54,12 @@ export class LoginComponent {
     password: new FormControl('', [Validators.required]),
   });
   loginLoading: boolean = false;
-
-  constructor(private router: Router, private authService: AuthService) {}
+  timeOutmessage = 5000;
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+    private toastr: ToastrService
+  ) {}
 
   signIn() {
     this.loginLoading = true;
@@ -72,6 +77,11 @@ export class LoginComponent {
       .subscribe({
         next: async (userResponse: any) => {
           this.loginLoading = true;
+          this.toastr.success('Sesión iniciada con éxito', 'Realizado', {
+            timeOut: this.timeOutmessage,
+            closeButton: true,
+            progressBar: true,
+          });
           this.formControl.reset();
           this.router.navigate(['/dashboard']);
           localStorage.setItem('token_turistea', userResponse['JWT']);
@@ -79,11 +89,11 @@ export class LoginComponent {
         error: (error) => {
           this.loginLoading = false;
           console.log(error);
-          /*  this.toastr.error(error.error.message, 'Acceso denegado', {
-            timeOut: environment.timeOutmessage,
+          this.toastr.error(error.error.message, 'Acceso denegado', {
+            timeOut: this.timeOutmessage,
             closeButton: true,
             progressBar: true,
-          }); */
+          });
         },
       });
   }

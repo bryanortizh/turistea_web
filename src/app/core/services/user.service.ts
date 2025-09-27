@@ -3,8 +3,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 import { ToasterService } from '@coreui/angular';
-import { PaginationParams } from '../interfaces/pagination.interface';
-import { AdminResponse } from '../interfaces/admin.interface';
+import { PaginationParams } from '../../data/interfaces/pagination.interface';
+import { AdminResponse } from '../../data/interfaces/admin.interface';
 
 @Injectable({
   providedIn: 'root',

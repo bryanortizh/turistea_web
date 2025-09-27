@@ -1,0 +1,9 @@
+<c-toaster [placement]="position" class="p-3" position="fixed">
+    <c-toast (timer)="onTimerChange($event)" (visibleChange)="onVisibleChange($event)" [visible]="visible">
+        <c-toast-header>
+            CoreUI for Angular
+        </c-toast-header>
+        <c-toast-body>
+            {{message}}</c-toast-body>
+    </c-toast>
+</c-toaster>

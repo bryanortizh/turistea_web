@@ -11,7 +11,6 @@ import {
   TableColorDirective,
   TableDirective,
 } from '@coreui/angular';
-import { AdminService } from '../../../data/services/user.service';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import {
   Pagination,
@@ -25,6 +24,8 @@ import {
   Validators,
 } from '@angular/forms';
 import { AdminResponse } from '../../../data/interfaces/admin.interface';
+import { AdminService } from '../../../core/services/user.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-user',
@@ -57,8 +58,13 @@ export class UserComponent {
   selectedUserId: number | null = null;
   visible = false;
   visibleEdit = false;
+  timeOutmessage = 5000;
 
-  constructor(private adminService: AdminService, private fb: FormBuilder) {
+  constructor(
+    private adminService: AdminService,
+    private fb: FormBuilder,
+    private toastr: ToastrService
+  ) {
     this.adminForm = this.fb.group({
       name: [
         '',
@@ -170,15 +176,32 @@ export class UserComponent {
     const formData = this.adminForm.value;
     this.adminService.createAdmin(formData).subscribe({
       next: (data) => {
+          this.toastr.success(
+              'Se creo el administrador con exito',
+              'Realizado',
+              {
+                timeOut: this.timeOutmessage,
+                closeButton: true,
+                progressBar: true,
+              }
+            );
         this.loadUsers();
         this.AddModalClose();
       },
       error: (error) => {
-        console.error('There was an error!', error);
+        this.toastr.error(
+          'Error al crear el administrador',
+          'Error',
+          {
+            timeOut: this.timeOutmessage,
+            closeButton: true,
+            progressBar: true,
+          }
+        );
       },
     });
   }
-  
+
   updateAdmin() {
     if (this.editForm.invalid || this.selectedUserId === null) {
       this.editForm.markAllAsTouched();
@@ -187,11 +210,28 @@ export class UserComponent {
     const formData = this.editForm.value;
     this.adminService.updateAdmin(this.selectedUserId, formData).subscribe({
       next: (data) => {
+        this.toastr.success(
+          'Se actualizo el administrador con exito',
+          'Realizado',
+          {
+            timeOut: this.timeOutmessage,
+            closeButton: true,
+            progressBar: true,
+          }
+        );
         this.loadUsers();
         this.closeEditModal();
       },
       error: (error) => {
-        console.error('There was an error!', error);
+        this.toastr.error(
+          'Error al actualizar el administrador',
+          'Error',
+          {
+            timeOut: this.timeOutmessage,
+            closeButton: true,
+            progressBar: true,
+          }
+        );
       },
     });
   }
