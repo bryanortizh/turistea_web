@@ -54,7 +54,7 @@ export class DriverComponent {
   editDriver: FormGroup;
   visibleDriverModal = false;
   selectedDriver: any = null;
-
+  visibleAddDriverModal = false;
   timeOutmessage = 5000;
 
   constructor(
@@ -63,55 +63,30 @@ export class DriverComponent {
     private toastr: ToastrService
   ) {
     this.driverForm = this.fb.group({
-      name: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(3),
-          Validators.maxLength(100),
-        ],
-      ],
-      lastname: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(3),
-          Validators.maxLength(100),
-        ],
-      ],
+      name: ['', [Validators.required, Validators.minLength(2)]],
+      lastname: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
       cellphone: ['', [Validators.required, Validators.pattern(/^\d{9}$/)]],
-      admin_rol_id: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
+      type_document: ['', [Validators.required]],
+      number_document: ['', [Validators.required, Validators.minLength(8)]],
+      number_plate: ['', [Validators.required, Validators.minLength(6)]],
+      brand_car: ['', [Validators.required]],
+      model_car: ['', [Validators.required]],
+      name_district: ['', [Validators.required]],
+      name_province: ['', [Validators.required]],
+      name_region: ['', [Validators.required]],
+      image_car: ['', [Validators.required]],
+      image_document: ['', [Validators.required]],
     });
 
-    this.editDriver = this.fb.group({
-      name: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(3),
-          Validators.maxLength(100),
-        ],
-      ],
-      lastname: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(3),
-          Validators.maxLength(100),
-        ],
-      ],
-      email: ['', [Validators.required, Validators.email]],
-      cellphone: ['', [Validators.required, Validators.pattern(/^\d{9}$/)]],
-      admin_rol_id: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
-    });
+    this.editDriver = this.fb.group({});
   }
 
   ngOnInit(): void {
-    this.loadUsers();
+    this.loadDrivers();
   }
 
-  loadUsers(): void {
+  loadDrivers(): void {
     let body: PaginationParams = {
       page: this.page,
       state: this.state,
@@ -133,14 +108,14 @@ export class DriverComponent {
   showClientsBlock(): void {
     this.state = this.state === 1 ? 0 : 1;
     this.page = 1;
-    this.loadUsers();
+    this.loadDrivers();
   }
 
   changePage(newPage: number): void {
     if (newPage < 1 || newPage > this.pageTotal || newPage === this.page)
       return;
     this.page = newPage;
-    this.loadUsers();
+    this.loadDrivers();
   }
 
   openDriverModal(index: number) {
@@ -152,19 +127,92 @@ export class DriverComponent {
     this.visibleDriverModal = false;
     this.selectedDriver = null;
   }
+
   blockUser(id: number): void {
-    const state = this.dataDriver.find(user => user.id === id)?.state === true ? false : true;
+    const state =
+      this.dataDriver.find((user) => user.id === id)?.state === true
+        ? false
+        : true;
     this.driverService.blockDriver(id, state).subscribe({
       next: (data) => {
-        this.toastr.success(`Conductor ${state ? 'desbloqueado' : 'bloqueado'} con éxito`, 'Éxito', {
+        this.toastr.success(
+          `Conductor ${state ? 'desbloqueado' : 'bloqueado'} con éxito`,
+          'Éxito',
+          {
+            timeOut: this.timeOutmessage,
+            closeButton: true,
+            progressBar: true,
+          }
+        );
+        this.loadDrivers();
+      },
+      error: (error) => {
+        this.toastr.error('Error al bloquear el conductor', 'Error', {
           timeOut: this.timeOutmessage,
           closeButton: true,
           progressBar: true,
         });
-        this.loadUsers();
+      },
+    });
+  }
+
+  saveDriver() {
+    this.visibleAddDriverModal = true;
+  }
+
+  closeAddDriverModal() {
+    this.visibleAddDriverModal = false;
+    this.driverForm.reset();
+  }
+
+ onFileSelect(event: any, fieldName: string) {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64String = e.target?.result as string;
+      const base64 = base64String;
+      
+      this.driverForm.patchValue({
+        [fieldName]: base64,
+      });
+      this.driverForm.get(fieldName)?.updateValueAndValidity();
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+  onSubmitDriver() {
+    if (this.driverForm.valid) {
+      const formData = new FormData();
+      Object.keys(this.driverForm.value).forEach((key) => {
+        formData.append(key, this.driverForm.value[key]);
+      });
+
+      this.closeAddDriverModal();
+    } else {
+      this.driverForm.markAllAsTouched();
+    }
+  }
+
+  createDriver() {
+    if (this.driverForm.invalid) {
+      this.driverForm.markAllAsTouched();
+      return;
+    }
+    const formData = this.driverForm.value;
+    this.driverService.createDriver(formData).subscribe({
+      next: (data) => {
+        this.toastr.success('Se creo el conductor con exito', 'Realizado', {
+          timeOut: this.timeOutmessage,
+          closeButton: true,
+          progressBar: true,
+        });
+        this.loadDrivers();
+        this.closeAddDriverModal();
       },
       error: (error) => {
-        this.toastr.error('Error al bloquear el conductor', 'Error', {
+        this.toastr.error('Error al crear el conductor', 'Error', {
           timeOut: this.timeOutmessage,
           closeButton: true,
           progressBar: true,

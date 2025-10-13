@@ -38,6 +38,18 @@ export class DriverService {
     );
   }
 
+  createDriver(body: any): Observable<any> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Content-type', 'application/json');
+    headers = headers.set(
+      'Authorization',
+      'Bearer ' + localStorage.getItem('token_turistea')
+    );
+    return this.http.post<any>(this.URL_BACKEND + '/api/admins/drivers', body, {
+      headers: headers,
+    });
+  }
+
   blockDriver(id: number, state: boolean): Observable<any> {
     let headers = new HttpHeaders();
     headers = headers.set('Content-type', 'application/json');
