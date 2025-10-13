@@ -88,7 +88,6 @@ export class LoginComponent {
         },
         error: (error) => {
           this.loginLoading = false;
-          console.log(error);
           this.toastr.error(error.error.message, 'Acceso denegado', {
             timeOut: this.timeOutmessage,
             closeButton: true,

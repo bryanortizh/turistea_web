@@ -122,8 +122,6 @@ export class DefaultHeaderComponent extends HeaderComponent {
         this.dataUser = userResponse;
       },
       error: (error) => {
-        console.log(error);
-        
       },
     });
   }
@@ -150,7 +148,6 @@ export class DefaultHeaderComponent extends HeaderComponent {
   }
 
   handlePasswordModalChange(event: boolean) {
-    console.log('event', event);
     this.visiblePassword = event;
   }
 

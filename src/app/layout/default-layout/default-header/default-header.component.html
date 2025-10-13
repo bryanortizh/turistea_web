@@ -45,7 +45,7 @@
     <ul cDropdownMenu class="pt-0 w-auto">
       <li>
         <h6 cDropdownHeader class="bg-body-secondary text-body-secondary fw-semibold py-2 rounded-top">
-          {{ dataUser.name }} {{ dataUser.lastname }} - {{ dataUser.admin_role.rol }}
+          {{ dataUser.name }} {{ dataUser.lastname }} - {{ dataUser.admin_role?.rol ? dataUser.admin_role?.rol : 'Sin rol' }}
         </h6>
       </li>
       <!--  <li>

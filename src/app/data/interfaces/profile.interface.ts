@@ -4,7 +4,7 @@ export interface Profile {
   path: string;
   email: string;
   created: string | null;
-  admin_role: {
+  admin_role?: {
     id: number;
     rol: string;
   };

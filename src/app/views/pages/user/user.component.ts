@@ -130,7 +130,6 @@ export class UserComponent {
         );
       },
       error: (error) => {
-        console.error('There was an error!', error);
       },
     });
   }
