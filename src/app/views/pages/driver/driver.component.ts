@@ -75,6 +75,7 @@ export class DriverComponent {
       name_district: ['', [Validators.required]],
       name_province: ['', [Validators.required]],
       name_region: ['', [Validators.required]],
+      sexo: ['', [Validators.required]],
       image_car: ['', [Validators.required]],
       image_document: ['', [Validators.required]],
     });
@@ -128,12 +129,13 @@ export class DriverComponent {
     this.selectedDriver = null;
   }
 
-  blockUser(id: number): void {
+  blockUser(user: DriverResponse): void {
     const state =
-      this.dataDriver.find((user) => user.id === id)?.state === true
+      this.dataDriver.find((u) => u.id === user.id)?.state === true
         ? false
         : true;
-    this.driverService.blockDriver(id, state).subscribe({
+
+    this.driverService.blockDriver(user, state).subscribe({
       next: (data) => {
         this.toastr.success(
           `Conductor ${state ? 'desbloqueado' : 'bloqueado'} con éxito`,

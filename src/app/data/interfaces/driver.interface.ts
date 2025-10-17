@@ -15,6 +15,7 @@ export interface DriverResponse {
     name_district: string;
     name_province: string;
     name_region: string;
+    sexo: string;
     state: boolean;
     created: string; 
     updated: string; 

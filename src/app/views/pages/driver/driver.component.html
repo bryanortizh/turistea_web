@@ -4,7 +4,7 @@
 
     <div class="d-flex justify-content-end mb-3">
         <button cButton color="primary" size="sm" class="text-white" (click)="showClientsBlock()">
-            Ver conductores {{ state === 1 ? 'bloqueados' : 'activos' }}
+            Ver conductores {{ state === 1 ? 'desactivados' : 'activos' }}
         </button>
         <button cButton color="secondary" size="sm" class="ms-2 text-white" (click)="saveDriver()">
             Agregar
@@ -34,8 +34,8 @@
                             Ver datos </button>
 
                         <button cButton [color]="user.state === true ? 'danger' : 'success'" size="sm"
-                            class="me-2 text-white" (click)="blockUser(user.id)">
-                            {{ user?.state === true ? 'Bloquear' : 'Desbloquear' }}
+                            class="me-2 text-white" (click)="blockUser(user)">
+                            {{ user?.state === true ? 'Desactivar' : 'Activar' }}
                         </button>
                     </td>
                 </tr>
@@ -117,7 +117,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-6 mb-3">
+                <div class="col-md-4 mb-3">
                     <label for="type_document" class="form-label">Tipo de documento *</label>
                     <select id="type_document" class="form-select" formControlName="type_document">
                         <option value="">Seleccione tipo</option>
@@ -132,7 +132,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-6 mb-3">
+                <div class="col-md-4 mb-3">
                     <label for="number_document" class="form-label">Número de documento *</label>
                     <input type="text" id="number_document" class="form-control" formControlName="number_document" />
                     <div *ngIf="driverForm.get('number_document')?.invalid && driverForm.get('number_document')?.touched"
@@ -143,6 +143,20 @@
                     </div>
                 </div>
 
+                <div class="col-md-4 mb-3">
+                    <label for="sexo" class="form-label">Sexo *</label>
+                    <select id="sexo" class="form-select" formControlName="sexo">
+                        <option value="">Seleccione sexo</option>
+                        <option value="hombre">Masculino</option>
+                        <option value="mujer">Femenino</option>
+                        <option value="no especificado">Otro</option>
+                    </select>
+                    <div *ngIf="driverForm.get('sexo')?.invalid && driverForm.get('sexo')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="driverForm.get('sexo')?.errors?.['required']">El sexo es requerido.</div>
+                    </div>
+                </div>
+
                 <!-- Placa -->
                 <div class="col-md-6 mb-3">
                     <label for="number_plate" class="form-label">Placa del vehículo *</label>
@@ -150,8 +164,10 @@
                         style="text-transform: uppercase;" />
                     <div *ngIf="driverForm.get('number_plate')?.invalid && driverForm.get('number_plate')?.touched"
                         class="text-danger small">
-                        <div *ngIf="driverForm.get('number_plate')?.errors?.['required']">La placa es requerida.</div>
-                        <div *ngIf="driverForm.get('number_plate')?.errors?.['minlength']">Mínimo 6 caracteres.</div>
+                        <div *ngIf="driverForm.get('number_plate')?.errors?.['required']">La placa es requerida.
+                        </div>
+                        <div *ngIf="driverForm.get('number_plate')?.errors?.['minlength']">Mínimo 6 caracteres.
+                        </div>
                     </div>
                 </div>
 
@@ -188,7 +204,8 @@
                     <input type="text" id="name_province" class="form-control" formControlName="name_province" />
                     <div *ngIf="driverForm.get('name_province')?.invalid && driverForm.get('name_province')?.touched"
                         class="text-danger small">
-                        <div *ngIf="driverForm.get('name_province')?.errors?.['required']">La provincia es requerida.
+                        <div *ngIf="driverForm.get('name_province')?.errors?.['required']">La provincia es
+                            requerida.
                         </div>
                     </div>
                 </div>
@@ -198,7 +215,8 @@
                     <input type="text" id="name_region" class="form-control" formControlName="name_region" />
                     <div *ngIf="driverForm.get('name_region')?.invalid && driverForm.get('name_region')?.touched"
                         class="text-danger small">
-                        <div *ngIf="driverForm.get('name_region')?.errors?.['required']">La región es requerida.</div>
+                        <div *ngIf="driverForm.get('name_region')?.errors?.['required']">La región es requerida.
+                        </div>
                     </div>
                 </div>
 
@@ -219,7 +237,8 @@
                         (change)="onFileSelect($event, 'image_document')" accept="image/*" />
                     <div *ngIf="driverForm.get('image_document')?.invalid && driverForm.get('image_document')?.touched"
                         class="text-danger small">
-                        <div *ngIf="driverForm.get('image_document')?.errors?.['required']">La imagen del documento es
+                        <div *ngIf="driverForm.get('image_document')?.errors?.['required']">La imagen del documento
+                            es
                             requerida.</div>
                     </div>
                 </div>
@@ -227,7 +246,8 @@
         </c-modal-body>
         <c-modal-footer>
             <button type="button" cButton color="secondary" (click)="closeAddDriverModal()">Cancelar</button>
-            <button type="submit" cButton color="primary" [disabled]="driverForm.invalid" (click)="createDriver()">Registrar conductor</button>
+            <button type="submit" cButton color="primary" [disabled]="driverForm.invalid"
+                (click)="createDriver()">Registrar conductor</button>
         </c-modal-footer>
     </form>
 </c-modal>
@@ -254,11 +274,14 @@
             <div class="col-6 mb-2">
                 <strong>Celular:</strong> {{ selectedDriver.cellphone }}
             </div>
-            <div class="col-6 mb-2">
+            <div class="col-4 mb-2">
                 <strong>Tipo documento:</strong> {{ selectedDriver.type_document }}
             </div>
-            <div class="col-6 mb-2">
+            <div class="col-4 mb-2">
                 <strong>N° documento:</strong> {{ selectedDriver.number_document }}
+            </div>
+            <div class="col-4 mb-2">
+                <strong>Sexo:</strong> {{ selectedDriver.sexo }}
             </div>
             <div class="col-6 mb-2">
                 <strong>Placa:</strong> {{ selectedDriver.number_plate }}
@@ -286,6 +309,17 @@
             </div>
             <div class="col-6 mb-2">
                 <strong>Actualizado:</strong> {{ selectedDriver.updated | date:'short' }}
+            </div>
+            <div class="col-6 mb-2">
+                <strong>Imagen vehículo:</strong><br />
+                <img *ngIf="selectedDriver.path_car" [src]="selectedDriver.path_car" alt="Imagen del vehículo"
+                    class="img-fluid mt-2" style="max-width: 200px; border: 1px solid #ccc; padding: 5px;" />
+            </div>
+            <div class="col-6 mb-2">
+                <strong>Imagen documento:</strong><br />
+                <img *ngIf="selectedDriver.path_document" [src]="selectedDriver.path_document"
+                    alt="Imagen del documento" class="img-fluid mt-2"
+                    style="max-width: 200px; border: 1px solid #ccc; padding: 5px;" />
             </div>
         </div>
     </c-modal-body>

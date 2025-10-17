@@ -50,7 +50,7 @@ export class DriverService {
     });
   }
 
-  blockDriver(id: number, state: boolean): Observable<any> {
+  blockDriver(user: DriverResponse, state: boolean): Observable<any> {
     let headers = new HttpHeaders();
     headers = headers.set('Content-type', 'application/json');
     headers = headers.set(
@@ -59,8 +59,8 @@ export class DriverService {
     );
 
     return this.http.put<any>(
-      this.URL_BACKEND + '/api/admins/drivers-inactive/' + id,
-      { state: state },
+      this.URL_BACKEND + '/api/admins/drivers-inactive/' + user.id,
+      { state: state, email: user.email },
       { headers: headers }
     );
   }
