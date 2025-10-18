@@ -16,7 +16,10 @@ import {
 } from '@coreui/angular';
 
 import { DefaultFooterComponent, DefaultHeaderComponent } from './';
-import { navItems } from './_nav';
+import { navItems, navItemsDriver, navItemsSupport } from './_nav';
+import { ProfileService } from '../../core/services/profile.service';
+import { Profile } from '../../data/interfaces/profile.interface';
+import { HttpClient } from '@angular/common/http';
 
 function isOverflown(element: HTMLElement) {
   return (
@@ -46,7 +49,42 @@ function isOverflown(element: HTMLElement) {
     RouterLink,
     ShadowOnScrollDirective,
   ],
+  providers: [ProfileService, HttpClient],
 })
 export class DefaultLayoutComponent {
-  public navItems = [...navItems];
+  public navItems = [];
+  dataUser!: Profile;
+
+  constructor(private profileService: ProfileService) {
+    this.getProfile();
+  }
+
+  getProfile() {
+    this.profileService.getProfile().subscribe({
+      next: async (userResponse: Profile) => {
+        this.dataUser = userResponse;
+        this.setNavItems(this.dataUser);
+      },
+    });
+  }
+
+  setNavItems(user: Profile) {
+    const role = user?.admin_role?.rol || '';
+    switch (role) {
+      case 'Super Admin':
+        this.navItems = [...navItems] as unknown as [];
+        break;
+      case 'Administrador':
+        this.navItems = [...navItems] as unknown as [];
+        break;
+      case 'Soporte':
+        this.navItems = [...navItemsSupport] as unknown as [];
+        break;
+      case 'Conductores':
+        this.navItems = [...navItemsDriver] as unknown as [];
+        break;
+      default:
+        this.navItems = [];
+    }
+  }
 }

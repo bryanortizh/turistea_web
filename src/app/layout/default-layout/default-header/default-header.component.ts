@@ -1,5 +1,5 @@
 import { CommonModule, NgFor, NgIf, NgTemplateOutlet } from '@angular/common';
-import { Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, Input, input } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
 import {
@@ -75,12 +75,12 @@ import { ToastrService } from 'ngx-toastr';
 export class DefaultHeaderComponent extends HeaderComponent {
   readonly #colorModeService = inject(ColorModeService);
   readonly colorMode = this.#colorModeService.colorMode;
+  @Input() dataUser!: Profile;
   visiblePassword = false;
   showOld = false;
   showNew = false;
   showRepeat = false;
   passwordForm: FormGroup;
-  dataUser: Profile = {} as Profile;
   sidebarId = input('sidebar1');
   showSuccess = false;
   timeOutmessage = 5000;
@@ -105,7 +105,6 @@ export class DefaultHeaderComponent extends HeaderComponent {
     private toastr: ToastrService
   ) {
     super();
-    this.getProfile();
     this.passwordForm = this.fb.group(
       {
         oldPassword: ['', [Validators.required]],
@@ -116,26 +115,18 @@ export class DefaultHeaderComponent extends HeaderComponent {
     );
   }
 
-  getProfile() {
-    this.profileService.getProfile().subscribe({
-      next: async (userResponse: Profile) => {
-        this.dataUser = userResponse;
-      },
-      error: (error) => {
-      },
-    });
-  }
-
-  closeSession() {
+    closeSession() {
     this.profileService.closeSession().subscribe({
       next: () => {
         this.toastr.success('Sesión cerrada con éxito', 'Realizado');
         localStorage.removeItem('token_turistea');
+        localStorage.removeItem('profile_turistea');
         this.router.navigate(['/login']);
       },
       error: () => {
         this.toastr.success('Sesión cerrada con éxito', 'Realizado');
         localStorage.removeItem('token_turistea');
+        localStorage.removeItem('profile_turistea');
         this.router.navigate(['/login']);
       },
     });
