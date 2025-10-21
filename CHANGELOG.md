@@ -2,6 +2,7 @@
 
 ### [0.0.4] - 18-10-2025
 -feat: implements permissions navbar rol
+-feat: new desing login
 
 ### [0.0.3] - 15-08-2025 
 -feat: implements api service in admin
