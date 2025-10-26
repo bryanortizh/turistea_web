@@ -30,6 +30,11 @@ export const navItems: INavData[] = [
     iconComponent: { name: 'cil-car' },
   },
   {
+    name: 'Guias Turisticos',
+    url: '/guides',
+    iconComponent: { name: 'cil-star' },
+  },
+  {
     name: 'Ofertas Turisticas',
     url: '/offers',
     iconComponent: { name: 'cil-star' },

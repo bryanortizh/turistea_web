@@ -22,12 +22,16 @@ export const routes: Routes = [
       {
         path: 'admin',
         loadComponent: () =>
-          import('./views/pages/user/user.component').then((m) => m.UserComponent),
+          import('./views/pages/user/user.component').then(
+            (m) => m.UserComponent
+          ),
       },
       {
         path: 'user',
         loadComponent: () =>
-          import('./views/pages/user-client/user-client.component').then((m) => m.UserClientComponent),
+          import('./views/pages/user-client/user-client.component').then(
+            (m) => m.UserClientComponent
+          ),
       },
       {
         path: 'driver',
@@ -37,12 +41,19 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'guides',
+        loadComponent: () =>
+          import('./views/pages/guides/guides.component').then(
+            (m) => m.GuideComponent
+          ),
+      },
+      {
         path: 'offers',
         loadComponent: () =>
           import('./views/pages/offerts/offerts.component').then(
             (m) => m.OffertsComponent
           ),
-      }
+      },
     ],
   },
   {

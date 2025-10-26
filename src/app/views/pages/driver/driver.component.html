@@ -32,7 +32,9 @@
                     <td>
                         <button cButton color="success" size="sm" class="me-2 text-white" (click)="openDriverModal(i)">
                             Ver datos </button>
-
+                        <button cButton color="info" size="sm" class="me-2 text-white" (click)="openEditDriverModal(i)">
+                            Editar
+                        </button>
                         <button cButton [color]="user.state === true ? 'danger' : 'success'" size="sm"
                             class="me-2 text-white" (click)="blockUser(user)">
                             {{ user?.state === true ? 'Desactivar' : 'Activar' }}
@@ -64,7 +66,6 @@
     </nav>
 </div>
 
-<!-- Modal para registrar conductor -->
 <c-modal [visible]="visibleAddDriverModal" (visibleChange)="visibleAddDriverModal = $event" size="lg">
     <c-modal-header>
         <h5 cModalTitle>Registrar conductor</h5>
@@ -248,6 +249,187 @@
             <button type="button" cButton color="secondary" (click)="closeAddDriverModal()">Cancelar</button>
             <button type="submit" cButton color="primary" [disabled]="driverForm.invalid"
                 (click)="createDriver()">Registrar conductor</button>
+        </c-modal-footer>
+    </form>
+</c-modal>
+
+<c-modal [visible]="visibleEditDriverModal" (visibleChange)="visibleEditDriverModal = $event" size="lg">
+    <c-modal-header>
+        <h5 cModalTitle>Editar conductor</h5>
+        <button cButtonClose (click)="closeEditDriverModal()"></button>
+    </c-modal-header>
+    <form [formGroup]="editDriverForm">
+        <c-modal-body>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="edit_name" class="form-label">Nombre *</label>
+                    <input type="text" id="edit_name" class="form-control" formControlName="name" />
+                    <div *ngIf="editDriverForm.get('name')?.invalid && editDriverForm.get('name')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="editDriverForm.get('name')?.errors?.['required']">El nombre es requerido.</div>
+                        <div *ngIf="editDriverForm.get('name')?.errors?.['minlength']">Mínimo 2 caracteres.</div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="edit_lastname" class="form-label">Apellido *</label>
+                    <input type="text" id="edit_lastname" class="form-control" formControlName="lastname" />
+                    <div *ngIf="editDriverForm.get('lastname')?.invalid && editDriverForm.get('lastname')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="editDriverForm.get('lastname')?.errors?.['required']">El apellido es requerido.
+                        </div>
+                        <div *ngIf="editDriverForm.get('lastname')?.errors?.['minlength']">Mínimo 2 caracteres.</div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="edit_email" class="form-label">Correo electrónico *</label>
+                    <input type="email" id="edit_email" class="form-control" formControlName="email" />
+                    <div *ngIf="editDriverForm.get('email')?.invalid && editDriverForm.get('email')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="editDriverForm.get('email')?.errors?.['required']">El correo es requerido.</div>
+                        <div *ngIf="editDriverForm.get('email')?.errors?.['email']">Correo inválido.</div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="edit_cellphone" class="form-label">Celular *</label>
+                    <input type="text" id="edit_cellphone" class="form-control" formControlName="cellphone"
+                        maxlength="9" />
+                    <div *ngIf="editDriverForm.get('cellphone')?.invalid && editDriverForm.get('cellphone')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="editDriverForm.get('cellphone')?.errors?.['required']">El celular es requerido.
+                        </div>
+                        <div *ngIf="editDriverForm.get('cellphone')?.errors?.['pattern']">Solo números.</div>
+                        <div
+                            *ngIf="editDriverForm.get('cellphone')?.errors?.['minlength'] || editDriverForm.get('cellphone')?.errors?.['maxlength']">
+                            Debe tener 9 dígitos.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label for="edit_type_document" class="form-label">Tipo de documento *</label>
+                    <select id="edit_type_document" class="form-select" formControlName="type_document">
+                        <option value="">Seleccione tipo</option>
+                        <option value="DNI">DNI</option>
+                        <option value="CE">Carnet de Extranjería</option>
+                        <option value="Pasaporte">Pasaporte</option>
+                    </select>
+                    <div *ngIf="editDriverForm.get('type_document')?.invalid && editDriverForm.get('type_document')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="editDriverForm.get('type_document')?.errors?.['required']">El tipo de documento es
+                            requerido.</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label for="edit_number_document" class="form-label">Número de documento *</label>
+                    <input type="text" id="edit_number_document" class="form-control"
+                        formControlName="number_document" />
+                    <div *ngIf="editDriverForm.get('number_document')?.invalid && editDriverForm.get('number_document')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="editDriverForm.get('number_document')?.errors?.['required']">El número de documento
+                            es requerido.</div>
+                        <div *ngIf="editDriverForm.get('number_document')?.errors?.['minlength']">Mínimo 8 caracteres.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label for="edit_sexo" class="form-label">Sexo *</label>
+                    <select id="edit_sexo" class="form-select" formControlName="sexo">
+                        <option value="">Seleccione sexo</option>
+                        <option value="hombre">Masculino</option>
+                        <option value="mujer">Femenino</option>
+                        <option value="no especificado">Otro</option>
+                    </select>
+                    <div *ngIf="editDriverForm.get('sexo')?.invalid && editDriverForm.get('sexo')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="editDriverForm.get('sexo')?.errors?.['required']">El sexo es requerido.</div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="edit_number_plate" class="form-label">Placa del vehículo *</label>
+                    <input type="text" id="edit_number_plate" class="form-control" formControlName="number_plate"
+                        style="text-transform: uppercase;" />
+                    <div *ngIf="editDriverForm.get('number_plate')?.invalid && editDriverForm.get('number_plate')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="editDriverForm.get('number_plate')?.errors?.['required']">La placa es requerida.
+                        </div>
+                        <div *ngIf="editDriverForm.get('number_plate')?.errors?.['minlength']">Mínimo 6 caracteres.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="edit_brand_car" class="form-label">Marca del vehículo *</label>
+                    <input type="text" id="edit_brand_car" class="form-control" formControlName="brand_car" />
+                    <div *ngIf="editDriverForm.get('brand_car')?.invalid && editDriverForm.get('brand_car')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="editDriverForm.get('brand_car')?.errors?.['required']">La marca es requerida.</div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="edit_model_car" class="form-label">Modelo del vehículo *</label>
+                    <input type="text" id="edit_model_car" class="form-control" formControlName="model_car" />
+                    <div *ngIf="editDriverForm.get('model_car')?.invalid && editDriverForm.get('model_car')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="editDriverForm.get('model_car')?.errors?.['required']">El modelo es requerido.</div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="edit_name_district" class="form-label">Distrito *</label>
+                    <input type="text" id="edit_name_district" class="form-control" formControlName="name_district" />
+                    <div *ngIf="editDriverForm.get('name_district')?.invalid && editDriverForm.get('name_district')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="editDriverForm.get('name_district')?.errors?.['required']">El distrito es requerido.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="edit_name_province" class="form-label">Provincia *</label>
+                    <input type="text" id="edit_name_province" class="form-control" formControlName="name_province" />
+                    <div *ngIf="editDriverForm.get('name_province')?.invalid && editDriverForm.get('name_province')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="editDriverForm.get('name_province')?.errors?.['required']">La provincia es
+                            requerida.</div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="edit_name_region" class="form-label">Región *</label>
+                    <input type="text" id="edit_name_region" class="form-control" formControlName="name_region" />
+                    <div *ngIf="editDriverForm.get('name_region')?.invalid && editDriverForm.get('name_region')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="editDriverForm.get('name_region')?.errors?.['required']">La región es requerida.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="edit_image_car" class="form-label">Nueva imagen del vehículo (opcional)</label>
+                    <input type="file" id="edit_image_car" class="form-control"
+                        (change)="onFileSelectEdit($event, 'image_car')" accept="image/*" />
+                    <small class="text-muted">Deja vacío si no quieres cambiar la imagen</small>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="edit_image_document" class="form-label">Nueva imagen del documento (opcional)</label>
+                    <input type="file" id="edit_image_document" class="form-control"
+                        (change)="onFileSelectEdit($event, 'image_document')" accept="image/*" />
+                    <small class="text-muted">Deja vacío si no quieres cambiar la imagen</small>
+                </div>
+            </div>
+        </c-modal-body>
+        <c-modal-footer>
+            <button type="button" cButton color="secondary" (click)="closeEditDriverModal()">Cancelar</button>
+            <button type="submit" cButton color="primary" [disabled]="editDriverForm.invalid"
+                (click)="updateDriver()">Actualizar conductor</button>
         </c-modal-footer>
     </form>
 </c-modal>

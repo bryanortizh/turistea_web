@@ -1,0 +1,373 @@
+<div class="mb-4">
+    <h2>Guías</h2>
+    <p class="text-medium-emphasis">Lista de guías del sistema</p>
+
+    <div class="d-flex justify-content-end mb-3">
+        <button cButton color="primary" size="sm" class="text-white" (click)="showClientsBlock()">
+            Ver guías {{ state === 1 ? 'desactivadas' : 'activas' }}
+        </button>
+        <button cButton color="secondary" size="sm" class="ms-2 text-white" (click)="saveGuide()">
+            Agregar
+        </button>
+    </div>
+    <div class="table-responsive">
+        <table cTable class="table align-middle">
+            <thead cTableColor="dark">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Nombres</th>
+                    <th scope="col">Correo</th>
+                    <th scope="col">Teléfono</th>
+                    <th scope="col">Fecha de creación</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let user of dataGuide; let i = index">
+                    <th scope="row">{{user?.id}}</th>
+                    <td>{{user?.name}}</td>
+                    <td>{{user?.email}}</td>
+                    <td>{{user?.cellphone}}</td>
+                    <td>{{user?.created | date: 'short'}}</td>
+                    <td>
+                        <button cButton color="success" size="sm" class="me-2 text-white" (click)="openGuideModal(i)">
+                            Ver datos </button>
+                        <button cButton color="info" size="sm" class="me-2 text-white" (click)="openEditGuideModal(i)">
+                            Editar
+                        </button>
+                        <button cButton [color]="user.state === true ? 'danger' : 'success'" size="sm"
+                            class="me-2 text-white" (click)="blockUser(user)">
+                            {{ user?.state === true ? 'Desactivar' : 'Activar' }}
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div *ngIf="dataGuide.length === 0" class="alert alert-info" role="alert">
+        No se encontraron guíaes.
+    </div>
+
+    <nav class="mt-3" *ngIf="pageTotal > 1 && dataGuide.length > 0">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" [class.disabled]="page === 1">
+                <button class="page-link" (click)="changePage(page - 1)" [disabled]="page === 1">Anterior</button>
+            </li>
+            <li class="page-item" *ngFor="let p of [].constructor(pageTotal); let i = index"
+                [class.active]="page === i + 1">
+                <button class="page-link" (click)="changePage(i + 1)">{{ i + 1 }}</button>
+            </li>
+            <li class="page-item" [class.disabled]="page === pageTotal">
+                <button class="page-link" (click)="changePage(page + 1)"
+                    [disabled]="page === pageTotal">Siguiente</button>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<c-modal [visible]="visibleAddGuideModal" (visibleChange)="visibleAddGuideModal = $event" size="lg">
+    <c-modal-header>
+        <h5 cModalTitle>Registrar guía</h5>
+        <button cButtonClose (click)="closeAddGuideModal()"></button>
+    </c-modal-header>
+    <form [formGroup]="guideForm">
+        <c-modal-body>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="name" class="form-label">Nombre *</label>
+                    <input type="text" id="name" class="form-control" formControlName="name" />
+                    <div *ngIf="guideForm.get('name')?.invalid && guideForm.get('name')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="guideForm.get('name')?.errors?.['required']">El nombre es requerido.</div>
+                        <div *ngIf="guideForm.get('name')?.errors?.['minlength']">Mínimo 2 caracteres.</div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="lastname" class="form-label">Apellido *</label>
+                    <input type="text" id="lastname" class="form-control" formControlName="lastname" />
+                    <div *ngIf="guideForm.get('lastname')?.invalid && guideForm.get('lastname')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="guideForm.get('lastname')?.errors?.['required']">El apellido es requerido.</div>
+                        <div *ngIf="guideForm.get('lastname')?.errors?.['minlength']">Mínimo 2 caracteres.</div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="email" class="form-label">Correo electrónico *</label>
+                    <input type="email" id="email" class="form-control" formControlName="email" />
+                    <div *ngIf="guideForm.get('email')?.invalid && guideForm.get('email')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="guideForm.get('email')?.errors?.['required']">El correo es requerido.</div>
+                        <div *ngIf="guideForm.get('email')?.errors?.['email']">Correo inválido.</div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="cellphone" class="form-label">Celular *</label>
+                    <input type="text" id="cellphone" class="form-control" formControlName="cellphone" maxlength="9" />
+                    <div *ngIf="guideForm.get('cellphone')?.invalid && guideForm.get('cellphone')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="guideForm.get('cellphone')?.errors?.['required']">El celular es requerido.</div>
+                        <div *ngIf="guideForm.get('cellphone')?.errors?.['pattern']">Solo números.</div>
+                        <div
+                            *ngIf="guideForm.get('cellphone')?.errors?.['minlength'] || guideForm.get('cellphone')?.errors?.['maxlength']">
+                            Debe tener 9 dígitos.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label for="type_document" class="form-label">Tipo de documento *</label>
+                    <select id="type_document" class="form-select" formControlName="type_document">
+                        <option value="">Seleccione tipo</option>
+                        <option value="DNI">DNI</option>
+                        <option value="CE">Carnet de Extranjería</option>
+                        <option value="Pasaporte">Pasaporte</option>
+                    </select>
+                    <div *ngIf="guideForm.get('type_document')?.invalid && guideForm.get('type_document')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="guideForm.get('type_document')?.errors?.['required']">El tipo de documento es
+                            requerido.</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label for="number_document" class="form-label">Número de documento *</label>
+                    <input type="text" id="number_document" class="form-control" formControlName="number_document" />
+                    <div *ngIf="guideForm.get('number_document')?.invalid && guideForm.get('number_document')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="guideForm.get('number_document')?.errors?.['required']">El número de documento es
+                            requerido.</div>
+                        <div *ngIf="guideForm.get('number_document')?.errors?.['minlength']">Mínimo 8 caracteres.</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label for="sexo" class="form-label">Sexo *</label>
+                    <select id="sexo" class="form-select" formControlName="sexo">
+                        <option value="">Seleccione sexo</option>
+                        <option value="hombre">Masculino</option>
+                        <option value="mujer">Femenino</option>
+                        <option value="no especificado">Otro</option>
+                    </select>
+                    <div *ngIf="guideForm.get('sexo')?.invalid && guideForm.get('sexo')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="guideForm.get('sexo')?.errors?.['required']">El sexo es requerido.</div>
+                    </div>
+                </div>
+
+
+                <div class="col-md-6 mb-3">
+                    <label for="image_photo" class="form-label">Imagen del vehículo *</label>
+                    <input type="file" id="image_photo" class="form-control" (change)="onFileSelect($event, 'image_photo')"
+                        accept="image/*" />
+                    <div *ngIf="guideForm.get('image_photo')?.invalid && guideForm.get('image_photo')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="guideForm.get('image_photo')?.errors?.['required']">La imagen del vehículo es
+                            requerida.</div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="image_document" class="form-label">Imagen del documento *</label>
+                    <input type="file" id="image_document" class="form-control"
+                        (change)="onFileSelect($event, 'image_document')" accept="image/*" />
+                    <div *ngIf="guideForm.get('image_document')?.invalid && guideForm.get('image_document')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="guideForm.get('image_document')?.errors?.['required']">La imagen del documento
+                            es
+                            requerida.</div>
+                    </div>
+                </div>
+            </div>
+        </c-modal-body>
+        <c-modal-footer>
+            <button type="button" cButton color="secondary" (click)="closeAddGuideModal()">Cancelar</button>
+            <button type="submit" cButton color="primary" [disabled]="guideForm.invalid"
+                (click)="createGuide()">Registrar guía</button>
+        </c-modal-footer>
+    </form>
+</c-modal>
+
+<c-modal [visible]="visibleEditGuideModal" (visibleChange)="visibleEditGuideModal = $event" size="lg">
+    <c-modal-header>
+        <h5 cModalTitle>Editar guía</h5>
+        <button cButtonClose (click)="closeEditGuideModal()"></button>
+    </c-modal-header>
+    <form [formGroup]="editGuideForm">
+        <c-modal-body>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="edit_name" class="form-label">Nombre *</label>
+                    <input type="text" id="edit_name" class="form-control" formControlName="name" />
+                    <div *ngIf="editGuideForm.get('name')?.invalid && editGuideForm.get('name')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="editGuideForm.get('name')?.errors?.['required']">El nombre es requerido.</div>
+                        <div *ngIf="editGuideForm.get('name')?.errors?.['minlength']">Mínimo 2 caracteres.</div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="edit_lastname" class="form-label">Apellido *</label>
+                    <input type="text" id="edit_lastname" class="form-control" formControlName="lastname" />
+                    <div *ngIf="editGuideForm.get('lastname')?.invalid && editGuideForm.get('lastname')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="editGuideForm.get('lastname')?.errors?.['required']">El apellido es requerido.
+                        </div>
+                        <div *ngIf="editGuideForm.get('lastname')?.errors?.['minlength']">Mínimo 2 caracteres.</div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="edit_email" class="form-label">Correo electrónico *</label>
+                    <input type="email" id="edit_email" class="form-control" formControlName="email" />
+                    <div *ngIf="editGuideForm.get('email')?.invalid && editGuideForm.get('email')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="editGuideForm.get('email')?.errors?.['required']">El correo es requerido.</div>
+                        <div *ngIf="editGuideForm.get('email')?.errors?.['email']">Correo inválido.</div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="edit_cellphone" class="form-label">Celular *</label>
+                    <input type="text" id="edit_cellphone" class="form-control" formControlName="cellphone"
+                        maxlength="9" />
+                    <div *ngIf="editGuideForm.get('cellphone')?.invalid && editGuideForm.get('cellphone')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="editGuideForm.get('cellphone')?.errors?.['required']">El celular es requerido.
+                        </div>
+                        <div *ngIf="editGuideForm.get('cellphone')?.errors?.['pattern']">Solo números.</div>
+                        <div
+                            *ngIf="editGuideForm.get('cellphone')?.errors?.['minlength'] || editGuideForm.get('cellphone')?.errors?.['maxlength']">
+                            Debe tener 9 dígitos.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label for="edit_type_document" class="form-label">Tipo de documento *</label>
+                    <select id="edit_type_document" class="form-select" formControlName="type_document">
+                        <option value="">Seleccione tipo</option>
+                        <option value="DNI">DNI</option>
+                        <option value="CE">Carnet de Extranjería</option>
+                        <option value="Pasaporte">Pasaporte</option>
+                    </select>
+                    <div *ngIf="editGuideForm.get('type_document')?.invalid && editGuideForm.get('type_document')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="editGuideForm.get('type_document')?.errors?.['required']">El tipo de documento es
+                            requerido.</div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label for="edit_number_document" class="form-label">Número de documento *</label>
+                    <input type="text" id="edit_number_document" class="form-control"
+                        formControlName="number_document" />
+                    <div *ngIf="editGuideForm.get('number_document')?.invalid && editGuideForm.get('number_document')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="editGuideForm.get('number_document')?.errors?.['required']">El número de documento
+                            es requerido.</div>
+                        <div *ngIf="editGuideForm.get('number_document')?.errors?.['minlength']">Mínimo 8 caracteres.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label for="edit_sexo" class="form-label">Sexo *</label>
+                    <select id="edit_sexo" class="form-select" formControlName="sexo">
+                        <option value="">Seleccione sexo</option>
+                        <option value="hombre">Masculino</option>
+                        <option value="mujer">Femenino</option>
+                        <option value="no especificado">Otro</option>
+                    </select>
+                    <div *ngIf="editGuideForm.get('sexo')?.invalid && editGuideForm.get('sexo')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="editGuideForm.get('sexo')?.errors?.['required']">El sexo es requerido.</div>
+                    </div>
+                </div>
+
+
+                <div class="col-md-6 mb-3">
+                    <label for="edit_image_photo" class="form-label">Nueva imagen del vehículo (opcional)</label>
+                    <input type="file" id="edit_image_photo" class="form-control"
+                        (change)="onFileSelectEdit($event, 'image_photo')" accept="image/*" />
+                    <small class="text-muted">Deja vacío si no quieres cambiar la imagen</small>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="edit_image_document" class="form-label">Nueva imagen del documento (opcional)</label>
+                    <input type="file" id="edit_image_document" class="form-control"
+                        (change)="onFileSelectEdit($event, 'image_document')" accept="image/*" />
+                    <small class="text-muted">Deja vacío si no quieres cambiar la imagen</small>
+                </div>
+            </div>
+        </c-modal-body>
+        <c-modal-footer>
+            <button type="button" cButton color="secondary" (click)="closeEditGuideModal()">Cancelar</button>
+            <button type="submit" cButton color="primary" [disabled]="editGuideForm.invalid"
+                (click)="updateGuide()">Actualizar guía</button>
+        </c-modal-footer>
+    </form>
+</c-modal>
+
+<c-modal [visible]="visibleGuideModal" (visibleChange)="visibleGuideModal = $event">
+    <c-modal-header>
+        <h5 cModalTitle>Datos del guía</h5>
+        <button cButtonClose (click)="closeGuideModal()"></button>
+    </c-modal-header>
+    <c-modal-body *ngIf="selectedGuide">
+        <div class="row">
+            <div class="col-6 mb-2">
+                <strong>ID:</strong> {{ selectedGuide.id }}
+            </div>
+            <div class="col-6 mb-2">
+                <strong>Nombre:</strong> {{ selectedGuide.name }}
+            </div>
+            <div class="col-6 mb-2">
+                <strong>Apellido:</strong> {{ selectedGuide.lastname }}
+            </div>
+            <div class="col-6 mb-2">
+                <strong>Correo:</strong> {{ selectedGuide.email }}
+            </div>
+            <div class="col-6 mb-2">
+                <strong>Celular:</strong> {{ selectedGuide.cellphone }}
+            </div>
+            <div class="col-6 mb-2">
+                <strong>Tipo documento:</strong> {{ selectedGuide.type_document }}
+            </div>
+            <div class="col-6 mb-2">
+                <strong>N° documento:</strong> {{ selectedGuide.number_document }}
+            </div>
+            <div class="col-6 mb-2">
+                <strong>Sexo:</strong> {{ selectedGuide.sexo }}
+            </div>
+            <div class="col-6 mb-2">
+                <strong>Estado:</strong> {{ selectedGuide.state ? 'Activo' : 'Bloqueado' }}
+            </div>
+            <div class="col-6 mb-2">
+                <strong>Creado:</strong> {{ selectedGuide.created | date:'short' }}
+            </div>
+            <div class="col-6 mb-2">
+                <strong>Actualizado:</strong> {{ selectedGuide.updated | date:'short' }}
+            </div>
+            <div class="row">
+                <div class="col-6 mb-2">
+                    <strong>Imagen vehículo:</strong><br />
+                    <img *ngIf="selectedGuide.path_photo" [src]="selectedGuide.path_photo" alt="Imagen del vehículo"
+                        class="img-fluid mt-2" style="max-width: 200px; border: 1px solid #ccc; padding: 5px;" />
+                </div>
+                <div class="col-6 mb-2">
+                    <strong>Imagen documento:</strong><br />
+                    <img *ngIf="selectedGuide.path_document" [src]="selectedGuide.path_document"
+                        alt="Imagen del documento" class="img-fluid mt-2"
+                        style="max-width: 200px; border: 1px solid #ccc; padding: 5px;" />
+                </div>
+            </div>
+        </div>
+    </c-modal-body>
+    <c-modal-footer>
+        <button cButton color="secondary" (click)="closeGuideModal()">Cerrar</button>
+    </c-modal-footer>
+</c-modal>

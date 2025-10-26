@@ -1,24 +1,19 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import {  HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Router } from '@angular/router';
-import { ToasterService } from '@coreui/angular';
 import { PaginationParams } from '../../data/interfaces/pagination.interface';
 import { DriverResponse } from '../../data/interfaces/driver.interface';
+import { GuideResponse } from '../../data/interfaces/guide.interface';
 
 @Injectable({
   providedIn: 'root',
 })
-export class DriverService {
+export class GuideServices {
   URL_BACKEND = 'http://localhost:4001';
   timeOutmessage = 3000;
-  constructor(
-    public http: HttpClient,
-    private toastr: ToasterService,
-    private router: Router
-  ) {}
+  constructor(public http: HttpClient) {}
 
-  getClient(body: PaginationParams): Observable<DriverResponse> {
+  getGuide(body: PaginationParams): Observable<GuideResponse> {
     let headers = new HttpHeaders();
     headers = headers.set('Content-type', 'application/json');
     headers = headers.set(
@@ -26,8 +21,8 @@ export class DriverService {
       'Bearer ' + localStorage.getItem('token_turistea')
     );
 
-    return this.http.get<DriverResponse>(
-      this.URL_BACKEND + '/api/admins/drivers',
+    return this.http.get<GuideResponse>(
+      this.URL_BACKEND + '/api/admins/guides',
       {
         headers: headers,
         params: {
@@ -38,19 +33,19 @@ export class DriverService {
     );
   }
 
-  createDriver(body: any): Observable<any> {
+  createGuide(body: any): Observable<any> {
     let headers = new HttpHeaders();
     headers = headers.set('Content-type', 'application/json');
     headers = headers.set(
       'Authorization',
       'Bearer ' + localStorage.getItem('token_turistea')
     );
-    return this.http.post<any>(this.URL_BACKEND + '/api/admins/drivers', body, {
+    return this.http.post<any>(this.URL_BACKEND + '/api/admins/guides', body, {
       headers: headers,
     });
   }
 
-  updateDriver(id: number, body: any): Observable<any> {
+  updateGuide(id: number, body: any): Observable<any> {
     let headers = new HttpHeaders();
     headers = headers.set('Content-type', 'application/json');
     headers = headers.set(
@@ -58,7 +53,7 @@ export class DriverService {
       'Bearer ' + localStorage.getItem('token_turistea')
     );
     return this.http.put<any>(
-      this.URL_BACKEND + '/api/admins/drivers/' + id,
+      this.URL_BACKEND + '/api/admins/guides/' + id,
       body,
       {
         headers: headers,
@@ -66,7 +61,7 @@ export class DriverService {
     );
   }
 
-  blockDriver(user: DriverResponse, state: boolean): Observable<any> {
+  blockGuide(user: GuideResponse, state: boolean): Observable<any> {
     let headers = new HttpHeaders();
     headers = headers.set('Content-type', 'application/json');
     headers = headers.set(
@@ -75,7 +70,7 @@ export class DriverService {
     );
 
     return this.http.put<any>(
-      this.URL_BACKEND + '/api/admins/drivers-inactive/' + user.id,
+      this.URL_BACKEND + '/api/admins/guides-inactive/' + user.id,
       { state: state, email: user.email },
       { headers: headers }
     );

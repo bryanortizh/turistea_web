@@ -1,12 +1,10 @@
 import { Component } from '@angular/core';
-import { DriverResponse } from '../../../data/interfaces/driver.interface';
 import {
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { DriverService } from '../../../core/services/driver.service';
 import { ToastrService } from 'ngx-toastr';
 import {
   Pagination,
@@ -24,9 +22,11 @@ import {
   TableDirective,
 } from '@coreui/angular';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { GuideServices } from '../../../core/services/guide.service';
+import { GuideResponse } from '../../../data/interfaces/guide.interface';
 
 @Component({
-  selector: 'app-driver',
+  selector: 'app-guide',
   imports: [
     CommonModule,
     TableDirective,
@@ -40,50 +40,43 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
     ModalBodyComponent,
     ModalFooterComponent,
   ],
-  providers: [DriverService, HttpClient],
-  templateUrl: './driver.component.html',
-  styleUrl: './driver.component.scss',
+  providers: [GuideServices, HttpClient],
+  templateUrl: './guides.component.html',
+  styleUrl: './guides.component.scss',
   standalone: true,
 })
-export class DriverComponent {
+export class GuideComponent {
   page: number = 1;
   state: number = 1;
   pageTotal: number = 1;
-  dataDriver: DriverResponse[] = [];
-  driverForm: FormGroup;
-  editDriverForm: FormGroup;
-  visibleDriverModal = false;
-  selectedDriver: any = null;
-  visibleAddDriverModal = false;
-  visibleEditDriverModal = false;
-  selectedDriverId: number = 0;
-
+  dataGuide: GuideResponse[] = [];
+  guideForm: FormGroup;
+  editGuideForm: FormGroup;
+  visibleGuideModal = false;
+  selectedGuide: any = null;
+  visibleAddGuideModal = false;
+  visibleEditGuideModal = false;
+  selectedGuideId: number = 0;
   timeOutmessage = 5000;
 
   constructor(
-    private driverService: DriverService,
+    private guideService: GuideServices,
     private fb: FormBuilder,
     private toastr: ToastrService
   ) {
-    this.driverForm = this.fb.group({
+    this.guideForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       lastname: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
       cellphone: ['', [Validators.required, Validators.pattern(/^\d{9}$/)]],
       type_document: ['', [Validators.required]],
       number_document: ['', [Validators.required, Validators.minLength(8)]],
-      number_plate: ['', [Validators.required, Validators.minLength(6)]],
-      brand_car: ['', [Validators.required]],
-      model_car: ['', [Validators.required]],
-      name_district: ['', [Validators.required]],
-      name_province: ['', [Validators.required]],
-      name_region: ['', [Validators.required]],
       sexo: ['', [Validators.required]],
-      image_car: ['', [Validators.required]],
+      image_photo: ['', [Validators.required]],
       image_document: ['', [Validators.required]],
     });
 
-    this.editDriverForm = this.fb.group({
+    this.editGuideForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       lastname: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
@@ -91,34 +84,28 @@ export class DriverComponent {
       type_document: ['', [Validators.required]],
       number_document: ['', [Validators.required, Validators.minLength(8)]],
       sexo: ['', [Validators.required]],
-      number_plate: ['', [Validators.required, Validators.minLength(6)]],
-      brand_car: ['', [Validators.required]],
-      model_car: ['', [Validators.required]],
-      name_district: ['', [Validators.required]],
-      name_province: ['', [Validators.required]],
-      name_region: ['', [Validators.required]],
-      image_car: [''],
+      image_photo: [''],
       image_document: [''],
     });
   }
 
   ngOnInit(): void {
-    this.loadDrivers();
+    this.loadGuides();
   }
 
-  loadDrivers(): void {
+  loadGuides(): void {
     let body: PaginationParams = {
       page: this.page,
       state: this.state,
     };
     const pageSize = 12;
 
-    this.driverService.getClient(body).subscribe({
+    this.guideService.getGuide(body).subscribe({
       next: (data) => {
         let driverData: Pagination = data as unknown as Pagination;
-        this.dataDriver = driverData.rows;
+        this.dataGuide = driverData.rows;
         this.pageTotal = Math.ceil(
-          (driverData.count || this.dataDriver.length) / pageSize
+          (driverData.count || this.dataGuide.length) / pageSize
         );
       },
       error: (error) => {},
@@ -128,36 +115,36 @@ export class DriverComponent {
   showClientsBlock(): void {
     this.state = this.state === 1 ? 0 : 1;
     this.page = 1;
-    this.loadDrivers();
+    this.loadGuides();
   }
 
   changePage(newPage: number): void {
     if (newPage < 1 || newPage > this.pageTotal || newPage === this.page)
       return;
     this.page = newPage;
-    this.loadDrivers();
+    this.loadGuides();
   }
 
-  openDriverModal(index: number) {
-    this.selectedDriver = this.dataDriver[index];
-    this.visibleDriverModal = true;
+  openGuideModal(index: number) {
+    this.selectedGuide = this.dataGuide[index];
+    this.visibleGuideModal = true;
   }
 
-  closeDriverModal() {
-    this.visibleDriverModal = false;
-    this.selectedDriver = null;
+  closeGuideModal() {
+    this.visibleGuideModal = false;
+    this.selectedGuide = null;
   }
 
-  blockUser(user: DriverResponse): void {
+  blockUser(user: GuideResponse): void {
     const state =
-      this.dataDriver.find((u) => u.id === user.id)?.state === true
+      this.dataGuide.find((u) => u.id === user.id)?.state === true
         ? false
         : true;
 
-    this.driverService.blockDriver(user, state).subscribe({
+    this.guideService.blockGuide(user, state).subscribe({
       next: (data) => {
         this.toastr.success(
-          `Conductor ${state ? 'desbloqueado' : 'bloqueado'} con éxito`,
+          `Guía ${state ? 'desbloqueada' : 'bloqueada'} con éxito`,
           'Éxito',
           {
             timeOut: this.timeOutmessage,
@@ -165,10 +152,10 @@ export class DriverComponent {
             progressBar: true,
           }
         );
-        this.loadDrivers();
+        this.loadGuides();
       },
       error: (error) => {
-        this.toastr.error('Error al bloquear el conductor', 'Error', {
+        this.toastr.error('Error al bloquear el guía', 'Error', {
           timeOut: this.timeOutmessage,
           closeButton: true,
           progressBar: true,
@@ -177,13 +164,13 @@ export class DriverComponent {
     });
   }
 
-  saveDriver() {
-    this.visibleAddDriverModal = true;
+  saveGuide() {
+    this.visibleAddGuideModal = true;
   }
 
-  closeAddDriverModal() {
-    this.visibleAddDriverModal = false;
-    this.driverForm.reset();
+  closeAddGuideModal() {
+    this.visibleAddGuideModal = false;
+    this.guideForm.reset();
   }
 
   onFileSelect(event: any, fieldName: string) {
@@ -194,46 +181,46 @@ export class DriverComponent {
         const base64String = e.target?.result as string;
         const base64 = base64String;
 
-        this.driverForm.patchValue({
+        this.guideForm.patchValue({
           [fieldName]: base64,
         });
-        this.driverForm.get(fieldName)?.updateValueAndValidity();
+        this.guideForm.get(fieldName)?.updateValueAndValidity();
       };
       reader.readAsDataURL(file);
     }
   }
 
-  onSubmitDriver() {
-    if (this.driverForm.valid) {
+  onSubmitGuide() {
+    if (this.guideForm.valid) {
       const formData = new FormData();
-      Object.keys(this.driverForm.value).forEach((key) => {
-        formData.append(key, this.driverForm.value[key]);
+      Object.keys(this.guideForm.value).forEach((key) => {
+        formData.append(key, this.guideForm.value[key]);
       });
 
-      this.closeAddDriverModal();
+      this.closeAddGuideModal();
     } else {
-      this.driverForm.markAllAsTouched();
+      this.guideForm.markAllAsTouched();
     }
   }
 
-  createDriver() {
-    if (this.driverForm.invalid) {
-      this.driverForm.markAllAsTouched();
+  createGuide() {
+    if (this.guideForm.invalid) {
+      this.guideForm.markAllAsTouched();
       return;
     }
-    const formData = this.driverForm.value;
-    this.driverService.createDriver(formData).subscribe({
+    const formData = this.guideForm.value;
+    this.guideService.createGuide(formData).subscribe({
       next: (data) => {
-        this.toastr.success('Se creo el conductor con exito', 'Realizado', {
+        this.toastr.success('Se creo el guía con exito', 'Realizado', {
           timeOut: this.timeOutmessage,
           closeButton: true,
           progressBar: true,
         });
-        this.loadDrivers();
-        this.closeAddDriverModal();
+        this.loadGuides();
+        this.closeAddGuideModal();
       },
       error: (error) => {
-        this.toastr.error('Error al crear el conductor', 'Error', {
+        this.toastr.error('Error al crear el guía', 'Error', {
           timeOut: this.timeOutmessage,
           closeButton: true,
           progressBar: true,
@@ -242,11 +229,11 @@ export class DriverComponent {
     });
   }
 
-  openEditDriverModal(index: number) {
-    const driver = this.dataDriver[index];
-    this.selectedDriverId = driver.id;
+  openEditGuideModal(index: number) {
+    const driver = this.dataGuide[index];
+    this.selectedGuideId = driver.id;
 
-    this.editDriverForm.patchValue({
+    this.editGuideForm.patchValue({
       name: driver.name,
       lastname: driver.lastname,
       email: driver.email,
@@ -254,21 +241,15 @@ export class DriverComponent {
       type_document: driver.type_document,
       number_document: driver.number_document,
       sexo: driver.sexo,
-      number_plate: driver.number_plate,
-      brand_car: driver.brand_car,
-      model_car: driver.model_car,
-      name_district: driver.name_district,
-      name_province: driver.name_province,
-      name_region: driver.name_region,
     });
 
-    this.visibleEditDriverModal = true;
+    this.visibleEditGuideModal = true;
   }
 
-  closeEditDriverModal() {
-    this.visibleEditDriverModal = false;
-    this.editDriverForm.reset();
-    this.selectedDriverId = 0;
+  closeEditGuideModal() {
+    this.visibleEditGuideModal = false;
+    this.editGuideForm.reset();
+    this.selectedGuideId = 0;
   }
 
   onFileSelectEdit(event: any, fieldName: string) {
@@ -279,33 +260,33 @@ export class DriverComponent {
         const base64String = e.target?.result as string;
         const base64 = base64String.split(',')[1];
 
-        this.editDriverForm.patchValue({
+        this.editGuideForm.patchValue({
           [fieldName]: base64,
         });
-        this.editDriverForm.get(fieldName)?.updateValueAndValidity();
+        this.editGuideForm.get(fieldName)?.updateValueAndValidity();
       };
       reader.readAsDataURL(file);
     }
   }
 
-  updateDriver() {
-    if (this.editDriverForm.invalid) {
-      this.editDriverForm.markAllAsTouched();
+  updateGuide() {
+    if (this.editGuideForm.invalid) {
+      this.editGuideForm.markAllAsTouched();
       return;
     }
-    const formData = this.editDriverForm.value;
-    this.driverService.updateDriver(this.selectedDriverId, formData).subscribe({
+    const formData = this.editGuideForm.value;
+    this.guideService.updateGuide(this.selectedGuideId, formData).subscribe({
       next: (data) => {
-        this.toastr.success('Se edito el conductor con exito', 'Realizado', {
+        this.toastr.success('Se edito el guía con exito', 'Realizado', {
           timeOut: this.timeOutmessage,
           closeButton: true,
           progressBar: true,
         });
-        this.loadDrivers();
-        this.closeEditDriverModal();
+        this.loadGuides();
+        this.closeEditGuideModal();
       },
       error: (error) => {
-        this.toastr.error('Error al editar el conductor', 'Error', {
+        this.toastr.error('Error al editar el guía', 'Error', {
           timeOut: this.timeOutmessage,
           closeButton: true,
           progressBar: true,
