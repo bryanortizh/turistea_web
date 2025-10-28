@@ -1,12 +1,12 @@
 <div class="mb-4">
     <h2>Paquetes</h2>
-    <p class="text-medium-emphasis">Lista de paquetes por conductor</p>
+    <p class="text-medium-emphasis">Lista de paquetes turisticos</p>
 
     <div class="d-flex justify-content-end mb-3">
         <button cButton color="primary" size="sm" class="text-white" (click)="showClientsBlock()">
             Ver paquetes {{ state === 1 ? 'desactivados' : 'activos' }}
         </button>
-        <button cButton color="secondary" size="sm" class="ms-2 text-white" (click)="saveDriver()">
+        <button cButton color="secondary" size="sm" class="ms-2 text-white" (click)="savePackage()">
             Agregar
         </button>
     </div>
@@ -16,21 +16,17 @@
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col">Nombres</th>
-                    <th scope="col">Correo</th>
-                    <th scope="col">Teléfono</th>
                     <th scope="col">Fecha de creación</th>
                     <th scope="col">Acciones</th>
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let user of dataDriver; let i = index">
+                <tr *ngFor="let user of dataPackage; let i = index">
                     <th scope="row">{{user?.id}}</th>
-                    <td>{{user?.name}}</td>
-                    <td>{{user?.email}}</td>
-                    <td>{{user?.cellphone}}</td>
+                    <td>{{user?.title}}</td>
                     <td>{{user?.created | date: 'short'}}</td>
                     <td>
-                        <button cButton color="success" size="sm" class="me-2 text-white" (click)="openDriverModal(i)">
+                        <button cButton color="success" size="sm" class="me-2 text-white" (click)="openPackageModal(i)">
                             Ver datos </button>
 
                         <button cButton [color]="user.state === true ? 'danger' : 'success'" size="sm"
@@ -43,11 +39,11 @@
         </table>
     </div>
 
-    <div *ngIf="dataDriver.length === 0" class="alert alert-info" role="alert">
+    <div *ngIf="dataPackage.length === 0" class="alert alert-info" role="alert">
         No se encontraron conductores.
     </div>
 
-    <nav class="mt-3" *ngIf="pageTotal > 1 && dataDriver.length > 0">
+    <nav class="mt-3" *ngIf="pageTotal > 1 && dataPackage.length > 0">
         <ul class="pagination justify-content-center">
             <li class="page-item" [class.disabled]="page === 1">
                 <button class="page-link" (click)="changePage(page - 1)" [disabled]="page === 1">Anterior</button>
@@ -64,261 +60,219 @@
     </nav>
 </div>
 
-<!-- Modal para registrar conductor -->
-<c-modal [visible]="visibleAddDriverModal" (visibleChange)="visibleAddDriverModal = $event" size="lg">
+<!-- Modal para registrar paquete turístico -->
+<c-modal [visible]="visibleAddPackageModal" (visibleChange)="visibleAddPackageModal = $event" size="lg">
     <c-modal-header>
-        <h5 cModalTitle>Registrar conductor</h5>
-        <button cButtonClose (click)="closeAddDriverModal()"></button>
+        <h5 cModalTitle>Registrar paquete turístico</h5>
+        <button cButtonClose (click)="closeAddPackageModal()"></button>
     </c-modal-header>
-    <form [formGroup]="driverForm">
+    <form [formGroup]="packageForm">
         <c-modal-body>
             <div class="row">
+                <!-- Título -->
                 <div class="col-md-6 mb-3">
-                    <label for="name" class="form-label">Nombre *</label>
-                    <input type="text" id="name" class="form-control" formControlName="name" />
-                    <div *ngIf="driverForm.get('name')?.invalid && driverForm.get('name')?.touched"
+                    <label for="title" class="form-label">Título del paquete *</label>
+                    <input type="text" id="title" class="form-control" formControlName="title" />
+                    <div *ngIf="packageForm.get('title')?.invalid && packageForm.get('title')?.touched"
                         class="text-danger small">
-                        <div *ngIf="driverForm.get('name')?.errors?.['required']">El nombre es requerido.</div>
-                        <div *ngIf="driverForm.get('name')?.errors?.['minlength']">Mínimo 2 caracteres.</div>
+                        <div *ngIf="packageForm.get('title')?.errors?.['required']">El título es requerido.</div>
+                        <div *ngIf="packageForm.get('title')?.errors?.['minlength']">Mínimo 3 caracteres.</div>
                     </div>
                 </div>
 
+                <!-- ID del conductor -->
                 <div class="col-md-6 mb-3">
-                    <label for="lastname" class="form-label">Apellido *</label>
-                    <input type="text" id="lastname" class="form-control" formControlName="lastname" />
-                    <div *ngIf="driverForm.get('lastname')?.invalid && driverForm.get('lastname')?.touched"
-                        class="text-danger small">
-                        <div *ngIf="driverForm.get('lastname')?.errors?.['required']">El apellido es requerido.</div>
-                        <div *ngIf="driverForm.get('lastname')?.errors?.['minlength']">Mínimo 2 caracteres.</div>
-                    </div>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label for="email" class="form-label">Correo electrónico *</label>
-                    <input type="email" id="email" class="form-control" formControlName="email" />
-                    <div *ngIf="driverForm.get('email')?.invalid && driverForm.get('email')?.touched"
-                        class="text-danger small">
-                        <div *ngIf="driverForm.get('email')?.errors?.['required']">El correo es requerido.</div>
-                        <div *ngIf="driverForm.get('email')?.errors?.['email']">Correo inválido.</div>
-                    </div>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label for="cellphone" class="form-label">Celular *</label>
-                    <input type="text" id="cellphone" class="form-control" formControlName="cellphone" maxlength="9" />
-                    <div *ngIf="driverForm.get('cellphone')?.invalid && driverForm.get('cellphone')?.touched"
-                        class="text-danger small">
-                        <div *ngIf="driverForm.get('cellphone')?.errors?.['required']">El celular es requerido.</div>
-                        <div *ngIf="driverForm.get('cellphone')?.errors?.['pattern']">Solo números.</div>
-                        <div
-                            *ngIf="driverForm.get('cellphone')?.errors?.['minlength'] || driverForm.get('cellphone')?.errors?.['maxlength']">
-                            Debe tener 9 dígitos.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4 mb-3">
-                    <label for="type_document" class="form-label">Tipo de documento *</label>
-                    <select id="type_document" class="form-select" formControlName="type_document">
-                        <option value="">Seleccione tipo</option>
-                        <option value="DNI">DNI</option>
-                        <option value="CE">Carnet de Extranjería</option>
-                        <option value="Pasaporte">Pasaporte</option>
+                    <label for="id_driver" class="form-label">Conductor *</label>
+                    <!--  <select id="id_driver" class="form-select" formControlName="id_driver">
+                        <option value="">Seleccione un conductor</option>
+                        <option *ngFor="let driver of dataDriver" [value]="driver.id">
+                            {{driver.name}} {{driver.lastname}} - {{driver.number_plate}}
+                        </option>
                     </select>
-                    <div *ngIf="driverForm.get('type_document')?.invalid && driverForm.get('type_document')?.touched"
+                    <div *ngIf="packageForm.get('id_driver')?.invalid && packageForm.get('id_driver')?.touched"
                         class="text-danger small">
-                        <div *ngIf="driverForm.get('type_document')?.errors?.['required']">El tipo de documento es
-                            requerido.</div>
-                    </div>
+                        <div *ngIf="packageForm.get('id_driver')?.errors?.['required']">El conductor es requerido.</div>
+                    </div> -->
+
+                    <input [options]="dataDriver" [searchNoResultsLabel]="'No results found'" cAutocomplete cleaner
+                        highlightOptionsOnSearch indicator placeholder="Search technologies..." search="global"
+                        showHints type="text" [value]="1" id="ac-02" />
                 </div>
 
-                <div class="col-md-4 mb-3">
-                    <label for="number_document" class="form-label">Número de documento *</label>
-                    <input type="text" id="number_document" class="form-control" formControlName="number_document" />
-                    <div *ngIf="driverForm.get('number_document')?.invalid && driverForm.get('number_document')?.touched"
-                        class="text-danger small">
-                        <div *ngIf="driverForm.get('number_document')?.errors?.['required']">El número de documento es
-                            requerido.</div>
-                        <div *ngIf="driverForm.get('number_document')?.errors?.['minlength']">Mínimo 8 caracteres.</div>
-                    </div>
-                </div>
-
-                <div class="col-md-4 mb-3">
-                    <label for="sexo" class="form-label">Sexo *</label>
-                    <select id="sexo" class="form-select" formControlName="sexo">
-                        <option value="">Seleccione sexo</option>
-                        <option value="hombre">Masculino</option>
-                        <option value="mujer">Femenino</option>
-                        <option value="no especificado">Otro</option>
-                    </select>
-                    <div *ngIf="driverForm.get('sexo')?.invalid && driverForm.get('sexo')?.touched"
-                        class="text-danger small">
-                        <div *ngIf="driverForm.get('sexo')?.errors?.['required']">El sexo es requerido.</div>
-                    </div>
-                </div>
-
-                <!-- Placa -->
+                <!-- ID del conductor con autocomplete -->
                 <div class="col-md-6 mb-3">
-                    <label for="number_plate" class="form-label">Placa del vehículo *</label>
-                    <input type="text" id="number_plate" class="form-control" formControlName="number_plate"
-                        style="text-transform: uppercase;" />
-                    <div *ngIf="driverForm.get('number_plate')?.invalid && driverForm.get('number_plate')?.touched"
-                        class="text-danger small">
-                        <div *ngIf="driverForm.get('number_plate')?.errors?.['required']">La placa es requerida.
+                    <label for="id_driver" class="form-label">Conductor *</label>
+                    <div class="position-relative">
+                        <input type="text" id="id_driver" class="form-control" formControlName="driverSearch"
+                            placeholder="Buscar conductor por nombre, apellido o placa..."
+                            (input)="getDriverSearch($event)" (focus)="showDropdown = true" (blur)="hideDropdown()"
+                            autocomplete="off" />
+                        <!-- Dropdown de resultados -->
+                        <div *ngIf="showDropdown && filteredDrivers.length > 0"
+                            class="dropdown-menu show position-absolute w-100"
+                            style="z-index: 1050; max-height: 200px; overflow-y: auto;">
+                            <button type="button" *ngFor="let driver of filteredDrivers" class="dropdown-item"
+                                (mousedown)="selectDriver(driver)" style="cursor: pointer;">
+                                <div class="d-flex justify-content-between">
+                                    <span>{{driver.name}} {{driver.lastname}}</span>
+                                    <small class="text-muted">{{driver.number_plate}}</small>
+                                </div>
+                                <small class="text-muted">{{driver.email}}</small>
+                            </button>
                         </div>
-                        <div *ngIf="driverForm.get('number_plate')?.errors?.['minlength']">Mínimo 6 caracteres.
+                        <!-- Mensaje cuando no hay resultados -->
+                        <div *ngIf="showDropdown && filteredDrivers.length === 0 && packageForm.get('driverSearch')?.value"
+                            class="dropdown-menu show position-absolute w-100" style="z-index: 1050;">
+                            <div class="dropdown-item-text text-muted">
+                                No se encontraron conductores
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label for="brand_car" class="form-label">Marca del vehículo *</label>
-                    <input type="text" id="brand_car" class="form-control" formControlName="brand_car" />
-                    <div *ngIf="driverForm.get('brand_car')?.invalid && driverForm.get('brand_car')?.touched"
+                    <div *ngIf="packageForm.get('id_driver')?.invalid && packageForm.get('id_driver')?.touched"
                         class="text-danger small">
-                        <div *ngIf="driverForm.get('brand_car')?.errors?.['required']">La marca es requerida.</div>
+                        <div *ngIf="packageForm.get('id_driver')?.errors?.['required']">El conductor es requerido.</div>
+                    </div>
+                    <!-- Mostrar conductor seleccionado -->
+                    <div *ngIf="selectedDriverInfo" class="mt-2 p-2 bg-light rounded">
+                        <small class="text-success">
+                            <strong>Seleccionado:</strong> {{selectedDriverInfo.name}} {{selectedDriverInfo.lastname}} -
+                            {{selectedDriverInfo.number_plate}}
+                        </small>
                     </div>
                 </div>
 
-                <div class="col-md-6 mb-3">
-                    <label for="model_car" class="form-label">Modelo del vehículo *</label>
-                    <input type="text" id="model_car" class="form-control" formControlName="model_car" />
-                    <div *ngIf="driverForm.get('model_car')?.invalid && driverForm.get('model_car')?.touched"
+                <!-- Descripción -->
+                <div class="col-md-12 mb-3">
+                    <label for="description" class="form-label">Descripción *</label>
+                    <textarea id="description" class="form-control" formControlName="description" rows="4"></textarea>
+                    <div *ngIf="packageForm.get('description')?.invalid && packageForm.get('description')?.touched"
                         class="text-danger small">
-                        <div *ngIf="driverForm.get('model_car')?.errors?.['required']">El modelo es requerido.</div>
+                        <div *ngIf="packageForm.get('description')?.errors?.['required']">La descripción es requerida.
+                        </div>
+                        <div *ngIf="packageForm.get('description')?.errors?.['minlength']">Mínimo 10 caracteres.</div>
                     </div>
                 </div>
 
-                <div class="col-md-6 mb-3">
+                <!-- Distrito -->
+                <div class="col-md-4 mb-3">
                     <label for="name_district" class="form-label">Distrito *</label>
                     <input type="text" id="name_district" class="form-control" formControlName="name_district" />
-                    <div *ngIf="driverForm.get('name_district')?.invalid && driverForm.get('name_district')?.touched"
+                    <div *ngIf="packageForm.get('name_district')?.invalid && packageForm.get('name_district')?.touched"
                         class="text-danger small">
-                        <div *ngIf="driverForm.get('name_district')?.errors?.['required']">El distrito es requerido.
+                        <div *ngIf="packageForm.get('name_district')?.errors?.['required']">El distrito es requerido.
                         </div>
                     </div>
                 </div>
 
-                <div class="col-md-6 mb-3">
+                <!-- Provincia -->
+                <div class="col-md-4 mb-3">
                     <label for="name_province" class="form-label">Provincia *</label>
                     <input type="text" id="name_province" class="form-control" formControlName="name_province" />
-                    <div *ngIf="driverForm.get('name_province')?.invalid && driverForm.get('name_province')?.touched"
+                    <div *ngIf="packageForm.get('name_province')?.invalid && packageForm.get('name_province')?.touched"
                         class="text-danger small">
-                        <div *ngIf="driverForm.get('name_province')?.errors?.['required']">La provincia es
-                            requerida.
+                        <div *ngIf="packageForm.get('name_province')?.errors?.['required']">La provincia es requerida.
                         </div>
                     </div>
                 </div>
 
-                <div class="col-md-6 mb-3">
+                <!-- Región -->
+                <div class="col-md-4 mb-3">
                     <label for="name_region" class="form-label">Región *</label>
                     <input type="text" id="name_region" class="form-control" formControlName="name_region" />
-                    <div *ngIf="driverForm.get('name_region')?.invalid && driverForm.get('name_region')?.touched"
+                    <div *ngIf="packageForm.get('name_region')?.invalid && packageForm.get('name_region')?.touched"
                         class="text-danger small">
-                        <div *ngIf="driverForm.get('name_region')?.errors?.['required']">La región es requerida.
-                        </div>
+                        <div *ngIf="packageForm.get('name_region')?.errors?.['required']">La región es requerida.</div>
                     </div>
                 </div>
 
-                <div class="col-md-6 mb-3">
-                    <label for="image_car" class="form-label">Imagen del vehículo *</label>
-                    <input type="file" id="image_car" class="form-control" (change)="onFileSelect($event, 'image_car')"
+                <!-- Imagen de fondo -->
+                <div class="col-md-12 mb-3">
+                    <label for="image_bg" class="form-label">Imagen de fondo del paquete *</label>
+                    <input type="file" id="image_bg" class="form-control" (change)="onFileSelect($event, 'image_bg')"
                         accept="image/*" />
-                    <div *ngIf="driverForm.get('image_car')?.invalid && driverForm.get('image_car')?.touched"
+                    <div *ngIf="packageForm.get('image_bg')?.invalid && packageForm.get('image_bg')?.touched"
                         class="text-danger small">
-                        <div *ngIf="driverForm.get('image_car')?.errors?.['required']">La imagen del vehículo es
-                            requerida.</div>
-                    </div>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label for="image_document" class="form-label">Imagen del documento *</label>
-                    <input type="file" id="image_document" class="form-control"
-                        (change)="onFileSelect($event, 'image_document')" accept="image/*" />
-                    <div *ngIf="driverForm.get('image_document')?.invalid && driverForm.get('image_document')?.touched"
-                        class="text-danger small">
-                        <div *ngIf="driverForm.get('image_document')?.errors?.['required']">La imagen del documento
-                            es
-                            requerida.</div>
+                        <div *ngIf="packageForm.get('image_bg')?.errors?.['required']">La imagen de fondo es requerida.
+                        </div>
                     </div>
                 </div>
             </div>
         </c-modal-body>
         <c-modal-footer>
-            <button type="button" cButton color="secondary" (click)="closeAddDriverModal()">Cancelar</button>
-            <button type="submit" cButton color="primary" [disabled]="driverForm.invalid"
-                (click)="createDriver()">Registrar conductor</button>
+            <button type="button" cButton color="secondary" (click)="closeAddPackageModal()">Cancelar</button>
+            <button type="submit" cButton color="primary" [disabled]="packageForm.invalid"
+                (click)="createPackage()">Registrar paquete</button>
         </c-modal-footer>
     </form>
 </c-modal>
 
-<c-modal [visible]="visibleDriverModal" (visibleChange)="visibleDriverModal = $event">
+<c-modal [visible]="visiblePackageModal" (visibleChange)="visiblePackageModal = $event">
     <c-modal-header>
         <h5 cModalTitle>Datos del conductor</h5>
-        <button cButtonClose (click)="closeDriverModal()"></button>
+        <button cButtonClose (click)="closePackageModal()"></button>
     </c-modal-header>
-    <c-modal-body *ngIf="selectedDriver">
+    <c-modal-body *ngIf="selectedPackage">
         <div class="row">
             <div class="col-6 mb-2">
-                <strong>ID:</strong> {{ selectedDriver.id }}
+                <strong>ID:</strong> {{ selectedPackage.id }}
             </div>
             <div class="col-6 mb-2">
-                <strong>Nombre:</strong> {{ selectedDriver.name }}
+                <strong>Nombre:</strong> {{ selectedPackage.name }}
             </div>
             <div class="col-6 mb-2">
-                <strong>Apellido:</strong> {{ selectedDriver.lastname }}
+                <strong>Apellido:</strong> {{ selectedPackage.lastname }}
             </div>
             <div class="col-6 mb-2">
-                <strong>Correo:</strong> {{ selectedDriver.email }}
+                <strong>Correo:</strong> {{ selectedPackage.email }}
             </div>
             <div class="col-6 mb-2">
-                <strong>Celular:</strong> {{ selectedDriver.cellphone }}
+                <strong>Celular:</strong> {{ selectedPackage.cellphone }}
             </div>
             <div class="col-6 mb-2">
-                <strong>Tipo documento:</strong> {{ selectedDriver.type_document }}
+                <strong>Tipo documento:</strong> {{ selectedPackage.type_document }}
             </div>
             <div class="col-6 mb-2">
-                <strong>N° documento:</strong> {{ selectedDriver.number_document }}
+                <strong>N° documento:</strong> {{ selectedPackage.number_document }}
             </div>
             <div class="col-6 mb-2">
-                <strong>Sexo:</strong> {{ selectedDriver.sexo }}
+                <strong>Sexo:</strong> {{ selectedPackage.sexo }}
             </div>
             <div class="col-6 mb-2">
-                <strong>Placa:</strong> {{ selectedDriver.number_plate }}
+                <strong>Placa:</strong> {{ selectedPackage.number_plate }}
             </div>
             <div class="col-6 mb-2">
-                <strong>Marca auto:</strong> {{ selectedDriver.brand_car }}
+                <strong>Marca auto:</strong> {{ selectedPackage.brand_car }}
             </div>
             <div class="col-6 mb-2">
-                <strong>Modelo auto:</strong> {{ selectedDriver.model_car }}
+                <strong>Modelo auto:</strong> {{ selectedPackage.model_car }}
             </div>
             <div class="col-6 mb-2">
-                <strong>Distrito:</strong> {{ selectedDriver.name_district }}
+                <strong>Distrito:</strong> {{ selectedPackage.name_district }}
             </div>
             <div class="col-6 mb-2">
-                <strong>Provincia:</strong> {{ selectedDriver.name_province }}
+                <strong>Provincia:</strong> {{ selectedPackage.name_province }}
             </div>
             <div class="col-6 mb-2">
-                <strong>Región:</strong> {{ selectedDriver.name_region }}
+                <strong>Región:</strong> {{ selectedPackage.name_region }}
             </div>
             <div class="col-6 mb-2">
-                <strong>Estado:</strong> {{ selectedDriver.state ? 'Activo' : 'Bloqueado' }}
+                <strong>Estado:</strong> {{ selectedPackage.state ? 'Activo' : 'Bloqueado' }}
             </div>
             <div class="col-6 mb-2">
-                <strong>Creado:</strong> {{ selectedDriver.created | date:'short' }}
+                <strong>Creado:</strong> {{ selectedPackage.created | date:'short' }}
             </div>
             <div class="col-6 mb-2">
-                <strong>Actualizado:</strong> {{ selectedDriver.updated | date:'short' }}
+                <strong>Actualizado:</strong> {{ selectedPackage.updated | date:'short' }}
             </div>
             <div class="row">
                 <div class="col-6 mb-2">
                     <strong>Imagen vehículo:</strong><br />
-                    <img *ngIf="selectedDriver.path_car" [src]="selectedDriver.path_car" alt="Imagen del vehículo"
+                    <img *ngIf="selectedPackage.path_car" [src]="selectedPackage.path_car" alt="Imagen del vehículo"
                         class="img-fluid mt-2" style="max-width: 200px; border: 1px solid #ccc; padding: 5px;" />
                 </div>
                 <div class="col-6 mb-2">
                     <strong>Imagen documento:</strong><br />
-                    <img *ngIf="selectedDriver.path_document" [src]="selectedDriver.path_document"
+                    <img *ngIf="selectedPackage.path_document" [src]="selectedPackage.path_document"
                         alt="Imagen del documento" class="img-fluid mt-2"
                         style="max-width: 200px; border: 1px solid #ccc; padding: 5px;" />
                 </div>
@@ -326,6 +280,6 @@
         </div>
     </c-modal-body>
     <c-modal-footer>
-        <button cButton color="secondary" (click)="closeDriverModal()">Cerrar</button>
+        <button cButton color="secondary" (click)="closePackageModal()">Cerrar</button>
     </c-modal-footer>
 </c-modal>

@@ -4,12 +4,12 @@ import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 import { ToasterService } from '@coreui/angular';
 import { PaginationParams } from '../../data/interfaces/pagination.interface';
-import { DriverResponse } from '../../data/interfaces/driver.interface';
+import { PackageResponse } from '../../data/interfaces/package.interface';
 
 @Injectable({
   providedIn: 'root',
 })
-export class DriverService {
+export class PackageService {
   URL_BACKEND = 'http://localhost:4001';
   timeOutmessage = 3000;
   constructor(
@@ -18,7 +18,7 @@ export class DriverService {
     private router: Router
   ) {}
 
-  getClient(body: PaginationParams): Observable<DriverResponse> {
+  getClient(body: PaginationParams): Observable<PackageResponse> {
     let headers = new HttpHeaders();
     headers = headers.set('Content-type', 'application/json');
     headers = headers.set(
@@ -26,8 +26,8 @@ export class DriverService {
       'Bearer ' + localStorage.getItem('token_turistea')
     );
 
-    return this.http.get<DriverResponse>(
-      this.URL_BACKEND + '/api/admins/drivers',
+    return this.http.get<PackageResponse>(
+      this.URL_BACKEND + '/api/admins/packages',
       {
         headers: headers,
         params: {
@@ -38,19 +38,19 @@ export class DriverService {
     );
   }
 
-  createDriver(body: any): Observable<any> {
+  createPackage(body: any): Observable<any> {
     let headers = new HttpHeaders();
     headers = headers.set('Content-type', 'application/json');
     headers = headers.set(
       'Authorization',
       'Bearer ' + localStorage.getItem('token_turistea')
     );
-    return this.http.post<any>(this.URL_BACKEND + '/api/admins/drivers', body, {
+    return this.http.post<any>(this.URL_BACKEND + '/api/admins/packages', body, {
       headers: headers,
     });
   }
 
-  updateDriver(id: number, body: any): Observable<any> {
+  updatePackage(id: number, body: any): Observable<any> {
     let headers = new HttpHeaders();
     headers = headers.set('Content-type', 'application/json');
     headers = headers.set(
@@ -58,7 +58,7 @@ export class DriverService {
       'Bearer ' + localStorage.getItem('token_turistea')
     );
     return this.http.put<any>(
-      this.URL_BACKEND + '/api/admins/drivers/' + id,
+      this.URL_BACKEND + '/api/admins/packages/' + id,
       body,
       {
         headers: headers,
@@ -66,7 +66,7 @@ export class DriverService {
     );
   }
 
-  blockDriver(user: DriverResponse, state: boolean): Observable<any> {
+  blockPackage(user: PackageResponse, state: boolean): Observable<any> {
     let headers = new HttpHeaders();
     headers = headers.set('Content-type', 'application/json');
     headers = headers.set(
@@ -75,22 +75,8 @@ export class DriverService {
     );
 
     return this.http.put<any>(
-      this.URL_BACKEND + '/api/admins/drivers-inactive/' + user.id,
-      { state: state, email: user.email },
-      { headers: headers }
-    );
-  }
-
-  searchDriver(term: string): Observable<DriverResponse[]> {
-    let headers = new HttpHeaders();
-    headers = headers.set('Content-type', 'application/json');
-    headers = headers.set(
-      'Authorization',
-      'Bearer ' + localStorage.getItem('token_turistea')
-    );
-
-    return this.http.get<DriverResponse[]>(
-      this.URL_BACKEND + `/api/admins/drivers/${term}`,
+      this.URL_BACKEND + '/api/admins/packages-inactive/' + user.id,
+      { state: state },
       { headers: headers }
     );
   }

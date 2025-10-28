@@ -18,12 +18,14 @@ import {
   TableDirective,
 } from '@coreui/angular';
 import { ToastrService } from 'ngx-toastr';
-import { DriverService } from 'src/app/core/services/driver.service';
-import { DriverResponse } from 'src/app/data/interfaces/driver.interface';
+import { PackageService } from '../../../core/services/package.service';
+import { PackageResponse } from '../../../data/interfaces/package.interface';
 import {
   Pagination,
   PaginationParams,
-} from 'src/app/data/interfaces/pagination.interface';
+} from '../../../data/interfaces/pagination.interface';
+import { DriverService } from '../../../core/services/driver.service';
+import { DriverResponse } from '../../../data/interfaces/driver.interface';
 
 @Component({
   selector: 'app-offerts',
@@ -40,7 +42,7 @@ import {
     ModalBodyComponent,
     ModalFooterComponent,
   ],
-  providers: [DriverService, HttpClient],
+  providers: [PackageService, DriverService, HttpClient],
   templateUrl: './offerts.component.html',
   styleUrl: './offerts.component.scss',
   standalone: true,
@@ -49,57 +51,47 @@ export class OffertsComponent {
   page: number = 1;
   state: number = 1;
   pageTotal: number = 1;
-  dataDriver: DriverResponse[] = [];
-  driverForm: FormGroup;
-  editDriver: FormGroup;
-  visibleDriverModal = false;
-  selectedDriver: any = null;
-  visibleAddDriverModal = false;
+  dataPackage: PackageResponse[] = [];
+  packageForm: FormGroup;
+  visiblePackageModal = false;
+  selectedPackage: any = null;
+  visibleAddPackageModal = false;
   timeOutmessage = 5000;
+  dataDriver: DriverResponse[] = [];
 
   constructor(
+    private packageService: PackageService,
     private driverService: DriverService,
     private fb: FormBuilder,
     private toastr: ToastrService
   ) {
-    this.driverForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(2)]],
-      lastname: ['', [Validators.required, Validators.minLength(2)]],
-      email: ['', [Validators.required, Validators.email]],
-      cellphone: ['', [Validators.required, Validators.pattern(/^\d{9}$/)]],
-      type_document: ['', [Validators.required]],
-      number_document: ['', [Validators.required, Validators.minLength(8)]],
-      number_plate: ['', [Validators.required, Validators.minLength(6)]],
-      brand_car: ['', [Validators.required]],
-      model_car: ['', [Validators.required]],
+    this.packageForm = this.fb.group({
+      title: ['', [Validators.required, Validators.minLength(3)]],
+      description: ['', [Validators.required, Validators.minLength(10)]],
       name_district: ['', [Validators.required]],
       name_province: ['', [Validators.required]],
       name_region: ['', [Validators.required]],
-      sexo: ['', [Validators.required]],
-      image_car: ['', [Validators.required]],
-      image_document: ['', [Validators.required]],
+      id_driver: ['', [Validators.required]],
+      image_bg: ['', [Validators.required]],
     });
-
-    this.editDriver = this.fb.group({});
   }
-
   ngOnInit(): void {
-    this.loadDrivers();
+    this.loadPackages();
   }
 
-  loadDrivers(): void {
+  loadPackages(): void {
     let body: PaginationParams = {
       page: this.page,
       state: this.state,
     };
     const pageSize = 12;
 
-    this.driverService.getClient(body).subscribe({
+    this.packageService.getClient(body).subscribe({
       next: (data) => {
-        let driverData: Pagination = data as unknown as Pagination;
-        this.dataDriver = driverData.rows;
+        let packageData: Pagination = data as unknown as Pagination;
+        this.dataPackage = packageData.rows;
         this.pageTotal = Math.ceil(
-          (driverData.count || this.dataDriver.length) / pageSize
+          (packageData.count || this.dataPackage.length) / pageSize
         );
       },
       error: (error) => {},
@@ -109,36 +101,36 @@ export class OffertsComponent {
   showClientsBlock(): void {
     this.state = this.state === 1 ? 0 : 1;
     this.page = 1;
-    this.loadDrivers();
+    this.loadPackages();
   }
 
   changePage(newPage: number): void {
     if (newPage < 1 || newPage > this.pageTotal || newPage === this.page)
       return;
     this.page = newPage;
-    this.loadDrivers();
+    this.loadPackages();
   }
 
-  openDriverModal(index: number) {
-    this.selectedDriver = this.dataDriver[index];
-    this.visibleDriverModal = true;
+  openPackageModal(index: number) {
+    this.selectedPackage = this.dataPackage[index];
+    this.visiblePackageModal = true;
   }
 
-  closeDriverModal() {
-    this.visibleDriverModal = false;
-    this.selectedDriver = null;
+  closePackageModal() {
+    this.visiblePackageModal = false;
+    this.selectedPackage = null;
   }
 
-  blockUser(user: DriverResponse): void {
+  blockUser(user: PackageResponse): void {
     const state =
-      this.dataDriver.find((u) => u.id === user.id)?.state === true
+      this.dataPackage.find((u) => u.id === user.id)?.state === true
         ? false
         : true;
 
-    this.driverService.blockDriver(user, state).subscribe({
+    this.packageService.blockPackage(user, state).subscribe({
       next: (data) => {
         this.toastr.success(
-          `Conductor ${state ? 'desbloqueado' : 'bloqueado'} con éxito`,
+          `Paquetes ${state ? 'desbloqueado' : 'bloqueado'} con éxito`,
           'Éxito',
           {
             timeOut: this.timeOutmessage,
@@ -146,10 +138,10 @@ export class OffertsComponent {
             progressBar: true,
           }
         );
-        this.loadDrivers();
+        this.loadPackages();
       },
       error: (error) => {
-        this.toastr.error('Error al bloquear el conductor', 'Error', {
+        this.toastr.error('Error al bloquear el paquete', 'Error', {
           timeOut: this.timeOutmessage,
           closeButton: true,
           progressBar: true,
@@ -158,13 +150,13 @@ export class OffertsComponent {
     });
   }
 
-  saveDriver() {
-    this.visibleAddDriverModal = true;
+  savePackage() {
+    this.visibleAddPackageModal = true;
   }
 
-  closeAddDriverModal() {
-    this.visibleAddDriverModal = false;
-    this.driverForm.reset();
+  closeAddPackageModal() {
+    this.visibleAddPackageModal = false;
+    this.packageForm.reset();
   }
 
   onFileSelect(event: any, fieldName: string) {
@@ -175,51 +167,86 @@ export class OffertsComponent {
         const base64String = e.target?.result as string;
         const base64 = base64String;
 
-        this.driverForm.patchValue({
+        this.packageForm.patchValue({
           [fieldName]: base64,
         });
-        this.driverForm.get(fieldName)?.updateValueAndValidity();
+        this.packageForm.get(fieldName)?.updateValueAndValidity();
       };
       reader.readAsDataURL(file);
     }
   }
 
-  onSubmitDriver() {
-    if (this.driverForm.valid) {
+  onSubmitPackage() {
+    if (this.packageForm.valid) {
       const formData = new FormData();
-      Object.keys(this.driverForm.value).forEach((key) => {
-        formData.append(key, this.driverForm.value[key]);
+      Object.keys(this.packageForm.value).forEach((key) => {
+        formData.append(key, this.packageForm.value[key]);
       });
 
-      this.closeAddDriverModal();
+      this.closeAddPackageModal();
     } else {
-      this.driverForm.markAllAsTouched();
+      this.packageForm.markAllAsTouched();
     }
   }
 
-  createDriver() {
-    if (this.driverForm.invalid) {
-      this.driverForm.markAllAsTouched();
+  createPackage() {
+    if (this.packageForm.invalid) {
+      this.packageForm.markAllAsTouched();
       return;
     }
-    const formData = this.driverForm.value;
-    this.driverService.createDriver(formData).subscribe({
+    const formData = this.packageForm.value;
+    this.packageService.createPackage(formData).subscribe({
       next: (data) => {
-        this.toastr.success('Se creo el conductor con exito', 'Realizado', {
+        this.toastr.success('Se creo el paquete con exito', 'Realizado', {
           timeOut: this.timeOutmessage,
           closeButton: true,
           progressBar: true,
         });
-        this.loadDrivers();
-        this.closeAddDriverModal();
+        this.loadPackages();
+        this.closeAddPackageModal();
       },
       error: (error) => {
-        this.toastr.error('Error al crear el conductor', 'Error', {
+        this.toastr.error('Error al crear el paquete', 'Error', {
           timeOut: this.timeOutmessage,
           closeButton: true,
           progressBar: true,
         });
       },
     });
+  }
+
+  getDriverSearch(name: any) {
+    console.log(name.target.value);
+    this.driverService.searchDriver(name).subscribe({
+      next: (data) => {
+        this.dataDriver = data;
+      },
+      error: (error) => {
+        this.toastr.error('Error al buscar conductores', 'Error', {
+          timeOut: this.timeOutmessage,
+          closeButton: true,
+          progressBar: true,
+        });
+      },
+    });
+  }
+  selectedDriverInfo: any = null;
+  showDropdown = false;
+  filteredDrivers: any[] = [];
+
+  selectDriver(driver: any) {
+    this.selectedDriverInfo = driver;
+    this.packageForm.patchValue({
+      driverSearch: `${driver.name} ${driver.lastname} - ${driver.number_plate}`,
+      id_driver: driver.id
+    });
+    this.showDropdown = false;
+  }
+
+  hideDropdown() {
+    // Delay para permitir el click en el dropdown
+    setTimeout(() => {
+      this.showDropdown = false;
+    }, 200);
   }
 }
