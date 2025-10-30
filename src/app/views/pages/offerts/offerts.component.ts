@@ -26,6 +26,19 @@ import {
 } from '../../../data/interfaces/pagination.interface';
 import { DriverService } from '../../../core/services/driver.service';
 import { DriverResponse } from '../../../data/interfaces/driver.interface';
+import {
+  NgLabelTemplateDirective,
+  NgOptionTemplateDirective,
+  NgSelectComponent,
+} from '@ng-select/ng-select';
+import { Subject } from 'rxjs';
+import {
+  debounceTime,
+  distinctUntilChanged,
+  switchMap,
+  catchError,
+} from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-offerts',
@@ -41,6 +54,9 @@ import { DriverResponse } from '../../../data/interfaces/driver.interface';
     ButtonCloseDirective,
     ModalBodyComponent,
     ModalFooterComponent,
+    NgSelectComponent,
+    NgOptionTemplateDirective,
+    NgLabelTemplateDirective,
   ],
   providers: [PackageService, DriverService, HttpClient],
   templateUrl: './offerts.component.html',
@@ -54,11 +70,21 @@ export class OffertsComponent {
   dataPackage: PackageResponse[] = [];
   packageForm: FormGroup;
   visiblePackageModal = false;
-  selectedPackage: any = null;
+  selectedPackage: PackageResponse | null = null;
   visibleAddPackageModal = false;
   timeOutmessage = 5000;
   dataDriver: DriverResponse[] = [];
+  selectedCar!: number;
+  loadingDrivers = false;
+  driverInput$ = new Subject<string>();
+  bindLabel = 'name + " " + lastname';
 
+  cars = [
+    { id: 1, name: 'Volvo' },
+    { id: 2, name: 'Saab' },
+    { id: 3, name: 'Opel' },
+    { id: 4, name: 'Audi' },
+  ];
   constructor(
     private packageService: PackageService,
     private driverService: DriverService,
@@ -74,6 +100,33 @@ export class OffertsComponent {
       id_driver: ['', [Validators.required]],
       image_bg: ['', [Validators.required]],
     });
+
+    // Configurar la búsqueda de conductores con debounce
+    this.driverInput$
+      .pipe(
+        debounceTime(300), // Esperar 300ms después de que el usuario deje de escribir
+        distinctUntilChanged(), // Solo buscar si el término cambió
+        switchMap((term) => {
+          if (term.length < 2) {
+            return of([]); // No buscar si el término es muy corto
+          }
+          this.loadingDrivers = true;
+          return this.driverService.searchDriver(term).pipe(
+            catchError(() => {
+              this.toastr.error('Error al buscar conductores', 'Error', {
+                timeOut: this.timeOutmessage,
+                closeButton: true,
+                progressBar: true,
+              });
+              return of([]);
+            })
+          );
+        })
+      )
+      .subscribe((drivers) => {
+        this.dataDriver = drivers;
+        this.loadingDrivers = false;
+      });
   }
   ngOnInit(): void {
     this.loadPackages();
@@ -215,38 +268,8 @@ export class OffertsComponent {
     });
   }
 
-  getDriverSearch(name: any) {
-    console.log(name.target.value);
-    this.driverService.searchDriver(name).subscribe({
-      next: (data) => {
-        this.dataDriver = data;
-      },
-      error: (error) => {
-        this.toastr.error('Error al buscar conductores', 'Error', {
-          timeOut: this.timeOutmessage,
-          closeButton: true,
-          progressBar: true,
-        });
-      },
-    });
-  }
-  selectedDriverInfo: any = null;
-  showDropdown = false;
-  filteredDrivers: any[] = [];
-
-  selectDriver(driver: any) {
-    this.selectedDriverInfo = driver;
-    this.packageForm.patchValue({
-      driverSearch: `${driver.name} ${driver.lastname} - ${driver.number_plate}`,
-      id_driver: driver.id
-    });
-    this.showDropdown = false;
-  }
-
-  hideDropdown() {
-    // Delay para permitir el click en el dropdown
-    setTimeout(() => {
-      this.showDropdown = false;
-    }, 200);
+ 
+  onDriverSelected(driverId: any) {
+    console.log('Conductor seleccionado:', driverId);
   }
 }

@@ -90,7 +90,7 @@ export class DriverService {
     );
 
     return this.http.get<DriverResponse[]>(
-      this.URL_BACKEND + `/api/admins/drivers/${term}`,
+      this.URL_BACKEND + `/api/admins/driver/${term}`,
       { headers: headers }
     );
   }

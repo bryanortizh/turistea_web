@@ -21,4 +21,5 @@ export interface DriverResponse {
     updated: string; 
     created_by: number;
     updated_by: number;
+    displayName?: string; // Propiedad opcional para mostrar en ng-select
 }
