@@ -1,0 +1,333 @@
+<div class="mb-4">
+  <h2>Tracking</h2>
+  <p class="text-medium-emphasis">Configuracion del paquete {{ id }}</p>
+
+  <div class="d-flex justify-content-end mb-3">
+    <button
+      cButton
+      color="primary"
+      size="sm"
+      class="text-white"
+      (click)="showClientsBlock()"
+    >
+      Ver configuraciones desactivadas {{ state === 1 ? "desactivados" : "activos" }}
+    </button>
+    <button
+      cButton
+      color="secondary"
+      size="sm"
+      class="ms-2 text-white"
+      (click)="savePackage()"
+    >
+      Agregar
+    </button>
+  </div>
+  <div class="table-responsive">
+    <table cTable class="table align-middle">
+      <thead cTableColor="dark">
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Nombres</th>
+          <th scope="col">Fecha de creación</th>
+          <th scope="col">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of dataPackage; let i = index">
+          <th scope="row">{{ user?.id }}</th>
+          <td>{{ user?.title }}</td>
+          <td>{{ user?.created | date : "short" }}</td>
+          <td>
+            <button
+              cButton
+              color="success"
+              size="sm"
+              class="me-2 text-white"
+              (click)="openPackageModal(i)"
+            >
+              Ver datos
+            </button>
+            <button
+              cButton
+              [color]="user.state === true ? 'danger' : 'success'"
+              size="sm"
+              class="me-2 text-white"
+              (click)="blockUser(user)"
+            >
+              {{ user?.state === true ? "Desactivar" : "Activar" }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="dataPackage.length === 0" class="alert alert-info" role="alert">
+    No se encontraron configuraciones.
+  </div>
+
+  <nav class="mt-3" *ngIf="pageTotal > 1 && dataPackage.length > 0">
+    <ul class="pagination justify-content-center">
+      <li class="page-item" [class.disabled]="page === 1">
+        <button
+          class="page-link"
+          (click)="changePage(page - 1)"
+          [disabled]="page === 1"
+        >
+          Anterior
+        </button>
+      </li>
+      <li
+        class="page-item"
+        *ngFor="let p of [].constructor(pageTotal); let i = index"
+        [class.active]="page === i + 1"
+      >
+        <button class="page-link" (click)="changePage(i + 1)">
+          {{ i + 1 }}
+        </button>
+      </li>
+      <li class="page-item" [class.disabled]="page === pageTotal">
+        <button
+          class="page-link"
+          (click)="changePage(page + 1)"
+          [disabled]="page === pageTotal"
+        >
+          Siguiente
+        </button>
+      </li>
+    </ul>
+  </nav>
+</div>
+
+<!-- Modal para registrar paquete turístico -->
+<c-modal
+  [visible]="visibleAddPackageModal"
+  (visibleChange)="visibleAddPackageModal = $event"
+  size="lg"
+>
+  <c-modal-header>
+    <h5 cModalTitle>Registrar paquete turístico</h5>
+    <button cButtonClose (click)="closeAddPackageModal()"></button>
+  </c-modal-header>
+  <form [formGroup]="packageForm">
+    <c-modal-body>
+      <div class="row">
+        <!-- Título -->
+        <div class="col-md-12 mb-3">
+          <label for="title" class="form-label">Título del paquete *</label>
+          <input
+            type="text"
+            id="title"
+            class="form-control"
+            formControlName="title"
+          />
+          <div
+            *ngIf="
+              packageForm.get('title')?.invalid &&
+              packageForm.get('title')?.touched
+            "
+            class="text-danger small"
+          >
+            <div *ngIf="packageForm.get('title')?.errors?.['required']">
+              El título es requerido.
+            </div>
+            <div *ngIf="packageForm.get('title')?.errors?.['minlength']">
+              Mínimo 3 caracteres.
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-12 mb-3">
+          <label for="description" class="form-label">Descripción *</label>
+          <textarea
+            id="description"
+            class="form-control"
+            formControlName="description"
+            rows="4"
+          ></textarea>
+          <div
+            *ngIf="
+              packageForm.get('description')?.invalid &&
+              packageForm.get('description')?.touched
+            "
+            class="text-danger small"
+          >
+            <div *ngIf="packageForm.get('description')?.errors?.['required']">
+              La descripción es requerida.
+            </div>
+            <div *ngIf="packageForm.get('description')?.errors?.['minlength']">
+              Mínimo 10 caracteres.
+            </div>
+          </div>
+        </div>
+
+        <!-- Distrito -->
+        <div class="col-md-4 mb-3">
+          <label for="name_district" class="form-label">Distrito *</label>
+          <input
+            type="text"
+            id="name_district"
+            class="form-control"
+            formControlName="name_district"
+          />
+          <div
+            *ngIf="
+              packageForm.get('name_district')?.invalid &&
+              packageForm.get('name_district')?.touched
+            "
+            class="text-danger small"
+          >
+            <div *ngIf="packageForm.get('name_district')?.errors?.['required']">
+              El distrito es requerido.
+            </div>
+          </div>
+        </div>
+
+        <!-- Provincia -->
+        <div class="col-md-4 mb-3">
+          <label for="name_province" class="form-label">Provincia *</label>
+          <input
+            type="text"
+            id="name_province"
+            class="form-control"
+            formControlName="name_province"
+          />
+          <div
+            *ngIf="
+              packageForm.get('name_province')?.invalid &&
+              packageForm.get('name_province')?.touched
+            "
+            class="text-danger small"
+          >
+            <div *ngIf="packageForm.get('name_province')?.errors?.['required']">
+              La provincia es requerida.
+            </div>
+          </div>
+        </div>
+
+        <!-- Región -->
+        <div class="col-md-4 mb-3">
+          <label for="name_region" class="form-label">Región *</label>
+          <input
+            type="text"
+            id="name_region"
+            class="form-control"
+            formControlName="name_region"
+          />
+          <div
+            *ngIf="
+              packageForm.get('name_region')?.invalid &&
+              packageForm.get('name_region')?.touched
+            "
+            class="text-danger small"
+          >
+            <div *ngIf="packageForm.get('name_region')?.errors?.['required']">
+              La región es requerida.
+            </div>
+          </div>
+        </div>
+
+        <!-- Imagen de fondo -->
+        <div class="col-md-12 mb-3">
+          <label for="image_bg" class="form-label"
+            >Imagen de fondo del paquete *</label
+          >
+          <input
+            type="file"
+            id="image_bg"
+            class="form-control"
+            (change)="onFileSelect($event, 'image_bg')"
+            accept="image/*"
+          />
+          <div
+            *ngIf="
+              packageForm.get('image_bg')?.invalid &&
+              packageForm.get('image_bg')?.touched
+            "
+            class="text-danger small"
+          >
+            <div *ngIf="packageForm.get('image_bg')?.errors?.['required']">
+              La imagen de fondo es requerida.
+            </div>
+          </div>
+        </div>
+      </div>
+    </c-modal-body>
+    <c-modal-footer>
+      <button
+        type="button"
+        cButton
+        color="secondary"
+        (click)="closeAddPackageModal()"
+      >
+        Cancelar
+      </button>
+      <button
+        type="submit"
+        cButton
+        color="primary"
+        [disabled]="packageForm.invalid"
+        (click)="createPackage()"
+      >
+        Registrar paquete
+      </button>
+    </c-modal-footer>
+  </form>
+</c-modal>
+
+<c-modal
+  [visible]="visiblePackageModal"
+  (visibleChange)="visiblePackageModal = $event"
+>
+  <c-modal-header>
+    <h5 cModalTitle>Datos del paquete</h5>
+    <button cButtonClose (click)="closePackageModal()"></button>
+  </c-modal-header>
+  <c-modal-body *ngIf="selectedPackage">
+    <div class="row">
+      <div class="col-6 mb-2">
+        <strong>ID:</strong> {{ selectedPackage.id }}
+      </div>
+      <div class="col-6 mb-2">
+        <strong>Titulo:</strong> {{ selectedPackage.title }}
+      </div>
+      <div class="col-6 mb-2">
+        <strong>Distrito:</strong> {{ selectedPackage.name_district }}
+      </div>
+      <div class="col-6 mb-2">
+        <strong>Provincia:</strong> {{ selectedPackage.name_province }}
+      </div>
+      <div class="col-6 mb-2">
+        <strong>Región:</strong> {{ selectedPackage.name_region }}
+      </div>
+      <div class="col-6 mb-2">
+        <strong>Estado:</strong>
+        {{ selectedPackage.state ? "Activo" : "Bloqueado" }}
+      </div>
+      <div class="col-6 mb-2">
+        <strong>Creado:</strong> {{ selectedPackage.created | date : "short" }}
+      </div>
+      <div class="col-6 mb-2">
+        <strong>Actualizado:</strong>
+        {{ selectedPackage.updated | date : "short" }}
+      </div>
+      <div class="row">
+        <div class="col-6 mb-2">
+          <strong>Imagen Paquete:</strong><br />
+          <img
+            *ngIf="selectedPackage.path_bg"
+            [src]="selectedPackage.path_bg"
+            alt="Imagen del vehículo"
+            class="img-fluid mt-2"
+            style="max-width: 200px; border: 1px solid #ccc; padding: 5px"
+          />
+        </div>
+      </div>
+    </div>
+  </c-modal-body>
+  <c-modal-footer>
+    <button cButton color="secondary" (click)="closePackageModal()">
+      Cerrar
+    </button>
+  </c-modal-footer>
+</c-modal>

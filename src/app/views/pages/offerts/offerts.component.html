@@ -28,6 +28,7 @@
                     <td>
                         <button cButton color="success" size="sm" class="me-2 text-white" (click)="openPackageModal(i)">
                             Ver datos </button>
+                        <button cButton color="info" size="sm" class="me-2 text-white" (click)="openRouterPackage(user.id)">Configurar</button>
 
                         <button cButton [color]="user.state === true ? 'danger' : 'success'" size="sm"
                             class="me-2 text-white" (click)="blockUser(user)">
@@ -83,19 +84,11 @@
                 <!-- ID del conductor -->
                 <div class="col-md-6 mb-3">
                     <label for="id_driver" class="form-label">Conductor *</label>
-                    <ng-select [items]="dataDriver" 
-                               bindLabel="textSearch" 
-                               bindValue="id" 
-                               formControlName="id_driver"
-                               placeholder="Buscar conductor por nombre..."
-                               notFoundText="No se encontraron conductores"
-                               typeToSearchText	="Escribe para buscar..."
-                               [loading]="loadingDrivers"
-                               [clearable]="true"
-                               [searchable]="true"
-                               [typeahead]="driverInput$"
-                               [minTermLength]="2"
-                               (change)="onDriverSelected($event)">
+                    <ng-select [items]="dataDriver" bindLabel="textSearch" bindValue="id" formControlName="id_driver"
+                        placeholder="Buscar conductor por nombre..." notFoundText="No se encontraron conductores"
+                        typeToSearchText="Escribe para buscar..." [loading]="loadingDrivers" [clearable]="true"
+                        [searchable]="true" [typeahead]="driverInput$" [minTermLength]="2"
+                        (change)="onDriverSelected($event)">
                     </ng-select>
                     <div *ngIf="packageForm.get('id_driver')?.invalid && packageForm.get('id_driver')?.touched"
                         class="text-danger small">
@@ -205,7 +198,7 @@
                     <img *ngIf="selectedPackage.path_bg" [src]="selectedPackage.path_bg" alt="Imagen del vehículo"
                         class="img-fluid mt-2" style="max-width: 200px; border: 1px solid #ccc; padding: 5px;" />
                 </div>
-                
+
             </div>
         </div>
     </c-modal-body>

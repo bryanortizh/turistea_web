@@ -54,6 +54,13 @@ export const routes: Routes = [
             (m) => m.OffertsComponent
           ),
       },
+      {
+        path: "offers/package/:id",
+        loadComponent: () =>
+          import('./views/pages/offerts/router-offerts/router-offerts.component').then(
+            (m) => m.RouterOffertsComponent
+          )
+      }
     ],
   },
   {

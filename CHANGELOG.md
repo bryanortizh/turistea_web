@@ -1,4 +1,11 @@
 ### [TURISTEA-WEB]
+### [0.0.5] - 31-10-2025
+-feat: new desing login
+-fix: remove fields innecesary
+-feat: implement crud for guides
+-feat: implements package crud
+-feat: implements package select function search
+-feat: implements test router tracking
 
 ### [0.0.4] - 18-10-2025
 -feat: implements permissions navbar rol

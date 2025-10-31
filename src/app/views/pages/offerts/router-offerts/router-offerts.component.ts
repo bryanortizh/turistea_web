@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -18,14 +18,7 @@ import {
   TableDirective,
 } from '@coreui/angular';
 import { ToastrService } from 'ngx-toastr';
-import { PackageService } from '../../../core/services/package.service';
-import { PackageResponse } from '../../../data/interfaces/package.interface';
-import {
-  Pagination,
-  PaginationParams,
-} from '../../../data/interfaces/pagination.interface';
-import { DriverService } from '../../../core/services/driver.service';
-import { DriverResponse } from '../../../data/interfaces/driver.interface';
+
 import {
   NgLabelTemplateDirective,
   NgOptionTemplateDirective,
@@ -39,10 +32,18 @@ import {
   catchError,
 } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { DriverService } from '../../../../core/services/driver.service';
+import { PackageResponse } from '../../../../data/interfaces/package.interface';
+import { DriverResponse } from '../../../../data/interfaces/driver.interface';
+import {
+  Pagination,
+  PaginationParams,
+} from '../../../../data/interfaces/pagination.interface';
+import { RouterTrackingRouterService } from '../../../../core/services/package-router.service';
 
 @Component({
-  selector: 'app-offerts',
+  selector: 'app-router-offerts',
   imports: [
     CommonModule,
     TableDirective,
@@ -59,12 +60,12 @@ import { Router } from '@angular/router';
     NgOptionTemplateDirective,
     NgLabelTemplateDirective,
   ],
-  providers: [PackageService, DriverService, HttpClient],
-  templateUrl: './offerts.component.html',
-  styleUrl: './offerts.component.scss',
-  standalone: true,
+  providers: [RouterTrackingRouterService, DriverService, HttpClient],
+  templateUrl: './router-offerts.component.html',
+  styleUrl: './router-offerts.component.scss',
 })
-export class OffertsComponent {
+export class RouterOffertsComponent implements OnInit {
+  id: string | null = null;
   page: number = 1;
   state: number = 1;
   pageTotal: number = 1;
@@ -87,11 +88,12 @@ export class OffertsComponent {
     { id: 4, name: 'Audi' },
   ];
   constructor(
-    private packageService: PackageService,
+    private routerTrackingRouterService: RouterTrackingRouterService,
     private driverService: DriverService,
     private fb: FormBuilder,
     private toastr: ToastrService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     this.packageForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
@@ -102,35 +104,10 @@ export class OffertsComponent {
       id_driver: ['', [Validators.required]],
       image_bg: ['', [Validators.required]],
     });
-
-    // Configurar la búsqueda de conductores con debounce
-    this.driverInput$
-      .pipe(
-        debounceTime(300), // Esperar 300ms después de que el usuario deje de escribir
-        distinctUntilChanged(), // Solo buscar si el término cambió
-        switchMap((term) => {
-          if (term.length < 2) {
-            return of([]); // No buscar si el término es muy corto
-          }
-          this.loadingDrivers = true;
-          return this.driverService.searchDriver(term).pipe(
-            catchError(() => {
-              this.toastr.error('Error al buscar conductores', 'Error', {
-                timeOut: this.timeOutmessage,
-                closeButton: true,
-                progressBar: true,
-              });
-              return of([]);
-            })
-          );
-        })
-      )
-      .subscribe((drivers) => {
-        this.dataDriver = drivers;
-        this.loadingDrivers = false;
-      });
   }
+
   ngOnInit(): void {
+    this.id = this.route.snapshot.paramMap.get('id');
     this.loadPackages();
   }
 
@@ -141,7 +118,7 @@ export class OffertsComponent {
     };
     const pageSize = 12;
 
-    this.packageService.getClient(body).subscribe({
+    this.routerTrackingRouterService.getRouter(this.id,body).subscribe({
       next: (data) => {
         let packageData: Pagination = data as unknown as Pagination;
         this.dataPackage = packageData.rows;
@@ -182,7 +159,7 @@ export class OffertsComponent {
         ? false
         : true;
 
-    this.packageService.blockPackage(user, state).subscribe({
+    this.routerTrackingRouterService.blockRouterTracking(user, state).subscribe({
       next: (data) => {
         this.toastr.success(
           `Paquetes ${state ? 'desbloqueado' : 'bloqueado'} con éxito`,
@@ -250,7 +227,7 @@ export class OffertsComponent {
       return;
     }
     const formData = this.packageForm.value;
-    this.packageService.createPackage(formData).subscribe({
+    this.routerTrackingRouterService.createRouterTracking(formData).subscribe({
       next: (data) => {
         this.toastr.success('Se creo el paquete con exito', 'Realizado', {
           timeOut: this.timeOutmessage,
@@ -270,11 +247,4 @@ export class OffertsComponent {
     });
   }
 
-  onDriverSelected(driverId: any) {
-    console.log('Conductor seleccionado:', driverId);
-  }
-
-  openRouterPackage(id: number) {
-    this.router.navigate(['/offers/package', id]);
-  }
 }
