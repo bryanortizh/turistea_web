@@ -13,6 +13,17 @@ export class ProfileService {
     public http: HttpClient,
   ) {}
 
+  // crea un get and set service
+  
+  setProfile(profile: Profile): void {
+    localStorage.setItem('profile_turistea', JSON.stringify(profile));
+  }
+
+  getStoredProfile(): Profile | null {
+    const profileData = localStorage.getItem('profile_turistea');
+    return profileData ? JSON.parse(profileData) : null;
+  }
+
   getProfile(): Observable<Profile> {
     let headers = new HttpHeaders();
     headers = headers.set('Content-type', 'application/json');

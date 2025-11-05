@@ -56,8 +56,6 @@ import { Router } from '@angular/router';
     ModalBodyComponent,
     ModalFooterComponent,
     NgSelectComponent,
-    NgOptionTemplateDirective,
-    NgLabelTemplateDirective,
   ],
   providers: [PackageService, DriverService, HttpClient],
   templateUrl: './offerts.component.html',

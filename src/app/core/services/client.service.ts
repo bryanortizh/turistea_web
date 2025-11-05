@@ -38,6 +38,21 @@ export class ClientService {
     );
   }
 
+  searchClients(searchTerm: string): Observable<ClientResponse> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Content-type', 'application/json');
+    headers = headers.set(
+      'Authorization',
+      'Bearer ' + localStorage.getItem('token_turistea')
+    );
+    return this.http.get<ClientResponse>(
+      `${this.URL_BACKEND}/api/users-intranet/search/${searchTerm}`,
+      {
+        headers: headers,
+      }
+    );
+  }
+
   updateAdmin(id: number): Observable<ClientResponse> {
     let headers = new HttpHeaders();
     headers = headers.set('Content-type', 'application/json');

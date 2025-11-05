@@ -4,6 +4,7 @@ import { Component } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
+  FormsModule,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
@@ -33,6 +34,7 @@ import { ClientService } from '../../../core/services/client.service';
     HttpClientModule,
     ReactiveFormsModule,
     ButtonDirective,
+    FormsModule
   ],
   providers: [ClientService, HttpClient],
   templateUrl: './user-client.component.html',
@@ -49,6 +51,7 @@ export class UserClientComponent {
   selectedUserId: number | null = null;
   visible = false;
   visibleEdit = false;
+  searchTerm: string = '';
   timeOutmessage = 5000;
 
   constructor(
@@ -122,6 +125,28 @@ export class UserClientComponent {
       },
       error: (error) => {},
     });
+  }
+
+  searchUser(): void {
+    if (this.searchTerm.trim() === '') {
+      this.loadUsers();
+      return;
+    }
+
+    this.clientService.searchClients(this.searchTerm).subscribe({
+      next: (data) => {
+        this.dataAdmin = data as unknown as AdminResponse[];
+        this.pageTotal = 1;
+      },
+      error: (error) => {
+        console.error('Error fetching admin data:', error);
+      },
+    });
+  }
+
+  clearSearch(): void {
+    this.searchTerm = '';
+    this.loadUsers();
   }
 
   showClientsBlock(): void {

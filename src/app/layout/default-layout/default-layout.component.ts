@@ -64,6 +64,7 @@ export class DefaultLayoutComponent {
       next: async (userResponse: Profile) => {
         this.dataUser = userResponse;
         this.setNavItems(this.dataUser);
+        this.profileService.setProfile(this.dataUser);
       },
     });
   }

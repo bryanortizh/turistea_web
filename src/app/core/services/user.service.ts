@@ -26,12 +26,33 @@ export class AdminService {
       'Bearer ' + localStorage.getItem('token_turistea')
     );
 
-    return this.http.get<AdminResponse>(this.URL_BACKEND + '/api/admins', {
+    const params: any = {
+      page: body.page?.toString() || '1',
+      state: body.state?.toString() || '1',
+    };
+    
+    return this.http.get<AdminResponse>(this.URL_BACKEND + `/api/admins`, {
       headers: headers,
-      params: {
-        page: body.page?.toString() || '1',
-        state: body.state?.toString() || '1',
-      },
+      params: params,
+    });
+  }
+
+   searchAdmin(body: PaginationParams, searchTerm: string): Observable<AdminResponse> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Content-type', 'application/json');
+    headers = headers.set(
+      'Authorization',
+      'Bearer ' + localStorage.getItem('token_turistea')
+    );
+
+    const params: any = {
+      page: body.page?.toString() || '1',
+      state: body.state?.toString() || '1',
+    };
+    
+    return this.http.get<AdminResponse>(this.URL_BACKEND + `/api/admins/search/${searchTerm}`, {
+      headers: headers,
+      params: params,
     });
   }
 

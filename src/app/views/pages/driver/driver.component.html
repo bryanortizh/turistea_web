@@ -85,7 +85,7 @@
                 </div>
 
                 <div class="col-md-6 mb-3">
-                    <label for="lastname" class="form-label">Apellido *</label>
+                    <label for="lastname" class="form-label">Apellidos *</label>
                     <input type="text" id="lastname" class="form-control" formControlName="lastname" />
                     <div *ngIf="driverForm.get('lastname')?.invalid && driverForm.get('lastname')?.touched"
                         class="text-danger small">
@@ -145,16 +145,16 @@
                 </div>
 
                 <div class="col-md-4 mb-3">
-                    <label for="sexo" class="form-label">Sexo *</label>
+                    <label for="sexo" class="form-label">Género *</label>
                     <select id="sexo" class="form-select" formControlName="sexo">
-                        <option value="">Seleccione sexo</option>
+                        <option value="">Seleccione género</option>
                         <option value="hombre">Masculino</option>
                         <option value="mujer">Femenino</option>
                         <option value="no especificado">Otro</option>
                     </select>
                     <div *ngIf="driverForm.get('sexo')?.invalid && driverForm.get('sexo')?.touched"
                         class="text-danger small">
-                        <div *ngIf="driverForm.get('sexo')?.errors?.['required']">El sexo es requerido.</div>
+                        <div *ngIf="driverForm.get('sexo')?.errors?.['required']">El género es requerido.</div>
                     </div>
                 </div>
 
@@ -272,7 +272,7 @@
                 </div>
 
                 <div class="col-md-6 mb-3">
-                    <label for="edit_lastname" class="form-label">Apellido *</label>
+                    <label for="edit_lastname" class="form-label">Apellidos *</label>
                     <input type="text" id="edit_lastname" class="form-control" formControlName="lastname" />
                     <div *ngIf="editDriverForm.get('lastname')?.invalid && editDriverForm.get('lastname')?.touched"
                         class="text-danger small">
@@ -337,16 +337,16 @@
                 </div>
 
                 <div class="col-md-4 mb-3">
-                    <label for="edit_sexo" class="form-label">Sexo *</label>
+                    <label for="edit_sexo" class="form-label">Género *</label>
                     <select id="edit_sexo" class="form-select" formControlName="sexo">
-                        <option value="">Seleccione sexo</option>
+                        <option value="">Seleccione género</option>
                         <option value="hombre">Masculino</option>
                         <option value="mujer">Femenino</option>
                         <option value="no especificado">Otro</option>
                     </select>
                     <div *ngIf="editDriverForm.get('sexo')?.invalid && editDriverForm.get('sexo')?.touched"
                         class="text-danger small">
-                        <div *ngIf="editDriverForm.get('sexo')?.errors?.['required']">El sexo es requerido.</div>
+                        <div *ngIf="editDriverForm.get('sexo')?.errors?.['required']">El género es requerido.</div>
                     </div>
                 </div>
 
@@ -463,7 +463,7 @@
                 <strong>N° documento:</strong> {{ selectedDriver.number_document }}
             </div>
             <div class="col-6 mb-2">
-                <strong>Sexo:</strong> {{ selectedDriver.sexo }}
+                <strong>Género:</strong> {{ selectedDriver.sexo }}
             </div>
             <div class="col-6 mb-2">
                 <strong>Placa:</strong> {{ selectedDriver.number_plate }}

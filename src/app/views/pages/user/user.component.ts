@@ -20,12 +20,15 @@ import { CommonModule, NgFor, NgForOf } from '@angular/common';
 import {
   FormBuilder,
   FormGroup,
+  FormsModule,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
 import { AdminResponse } from '../../../data/interfaces/admin.interface';
 import { AdminService } from '../../../core/services/user.service';
 import { ToastrService } from 'ngx-toastr';
+import { Roles } from '../../../core/enum/roles.enum';
+import { ProfileService } from '../../../core/services/profile.service';
 
 @Component({
   selector: 'app-user',
@@ -42,8 +45,9 @@ import { ToastrService } from 'ngx-toastr';
     ButtonCloseDirective,
     ModalBodyComponent,
     ModalFooterComponent,
+    FormsModule,
   ],
-  providers: [AdminService, HttpClient],
+  providers: [AdminService, ProfileService, HttpClient],
   templateUrl: './user.component.html',
   styleUrl: './user.component.scss',
   standalone: true,
@@ -59,11 +63,12 @@ export class UserComponent {
   visible = false;
   visibleEdit = false;
   timeOutmessage = 5000;
-
+  searchTerm: string = '';
   constructor(
     private adminService: AdminService,
     private fb: FormBuilder,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    public profileService: ProfileService
   ) {
     this.adminForm = this.fb.group({
       name: [
@@ -130,8 +135,39 @@ export class UserComponent {
         );
       },
       error: (error) => {
+        console.error('Error fetching admin data:', error);
       },
     });
+  }
+
+  searchUser(): void {
+    if (this.searchTerm.trim() === '') {
+      this.loadUsers();
+      return;
+    }
+    let body: PaginationParams = {
+      page: this.page,
+      state: this.state,
+    };
+    const pageSize = 12;
+
+    this.adminService.searchAdmin(body, this.searchTerm).subscribe({
+      next: (data) => {
+        let adminData: Pagination = data as unknown as Pagination;
+        this.dataAdmin = adminData.rows;
+        this.pageTotal = Math.ceil(
+          (adminData.count || this.dataAdmin.length) / pageSize
+        );
+      },
+      error: (error) => {
+        console.error('Error fetching admin data:', error);
+      },
+    });
+  }
+
+  clearSearch(): void {
+    this.searchTerm = '';
+    this.loadUsers();
   }
 
   changePage(newPage: number): void {
@@ -175,28 +211,20 @@ export class UserComponent {
     const formData = this.adminForm.value;
     this.adminService.createAdmin(formData).subscribe({
       next: (data) => {
-          this.toastr.success(
-              'Se creo el administrador con exito',
-              'Realizado',
-              {
-                timeOut: this.timeOutmessage,
-                closeButton: true,
-                progressBar: true,
-              }
-            );
+        this.toastr.success('Se creo el administrador con exito', 'Realizado', {
+          timeOut: this.timeOutmessage,
+          closeButton: true,
+          progressBar: true,
+        });
         this.loadUsers();
         this.AddModalClose();
       },
       error: (error) => {
-        this.toastr.error(
-          'Error al crear el administrador',
-          'Error',
-          {
-            timeOut: this.timeOutmessage,
-            closeButton: true,
-            progressBar: true,
-          }
-        );
+        this.toastr.error('Error al crear el administrador', 'Error', {
+          timeOut: this.timeOutmessage,
+          closeButton: true,
+          progressBar: true,
+        });
       },
     });
   }
@@ -222,16 +250,38 @@ export class UserComponent {
         this.closeEditModal();
       },
       error: (error) => {
-        this.toastr.error(
-          'Error al actualizar el administrador',
-          'Error',
-          {
-            timeOut: this.timeOutmessage,
-            closeButton: true,
-            progressBar: true,
-          }
-        );
+        this.toastr.error('Error al actualizar el administrador', 'Error', {
+          timeOut: this.timeOutmessage,
+          closeButton: true,
+          progressBar: true,
+        });
       },
     });
+  }
+
+  getRoles() {
+    const userRole = this.profileService.getStoredProfile();
+    switch (userRole?.admin_role?.rol) {
+      case Roles.SUPER_ADMIN:
+        return [Roles.SUPER_ADMIN, Roles.ADMIN, Roles.SUPPORT];
+      case Roles.ADMIN:
+        return [Roles.SUPPORT];
+      case Roles.SUPPORT:
+        return [];
+      default:
+        return [];
+    }
+  }
+  getRoleId(role: string): number {
+    switch (role) {
+      case Roles.SUPER_ADMIN:
+        return 1;
+      case Roles.ADMIN:
+        return 2;
+      case Roles.SUPPORT:
+        return 3;
+      default:
+        return 0;
+    }
   }
 }

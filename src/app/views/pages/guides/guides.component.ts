@@ -73,7 +73,6 @@ export class GuideComponent {
       number_document: ['', [Validators.required, Validators.minLength(8)]],
       sexo: ['', [Validators.required]],
       image_photo: ['', [Validators.required]],
-      image_document: ['', [Validators.required]],
     });
 
     this.editGuideForm = this.fb.group({
@@ -85,7 +84,6 @@ export class GuideComponent {
       number_document: ['', [Validators.required, Validators.minLength(8)]],
       sexo: ['', [Validators.required]],
       image_photo: [''],
-      image_document: [''],
     });
   }
 

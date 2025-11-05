@@ -85,7 +85,7 @@
                 </div>
 
                 <div class="col-md-6 mb-3">
-                    <label for="lastname" class="form-label">Apellido *</label>
+                    <label for="lastname" class="form-label">Apellidos *</label>
                     <input type="text" id="lastname" class="form-control" formControlName="lastname" />
                     <div *ngIf="guideForm.get('lastname')?.invalid && guideForm.get('lastname')?.touched"
                         class="text-danger small">
@@ -145,39 +145,27 @@
                 </div>
 
                 <div class="col-md-4 mb-3">
-                    <label for="sexo" class="form-label">Sexo *</label>
+                    <label for="sexo" class="form-label">Género *</label>
                     <select id="sexo" class="form-select" formControlName="sexo">
-                        <option value="">Seleccione sexo</option>
+                        <option value="">Seleccione género</option>
                         <option value="hombre">Masculino</option>
                         <option value="mujer">Femenino</option>
                         <option value="no especificado">Otro</option>
                     </select>
                     <div *ngIf="guideForm.get('sexo')?.invalid && guideForm.get('sexo')?.touched"
                         class="text-danger small">
-                        <div *ngIf="guideForm.get('sexo')?.errors?.['required']">El sexo es requerido.</div>
+                        <div *ngIf="guideForm.get('sexo')?.errors?.['required']">El género es requerido.</div>
                     </div>
                 </div>
 
 
                 <div class="col-md-6 mb-3">
-                    <label for="image_photo" class="form-label">Imagen del vehículo *</label>
-                    <input type="file" id="image_photo" class="form-control" (change)="onFileSelect($event, 'image_photo')"
-                        accept="image/*" />
+                    <label for="image_photo" class="form-label">Imagen del documento</label>
+                    <input type="file" id="image_photo" class="form-control"
+                        (change)="onFileSelect($event, 'image_photo')" accept="image/*" />
                     <div *ngIf="guideForm.get('image_photo')?.invalid && guideForm.get('image_photo')?.touched"
                         class="text-danger small">
-                        <div *ngIf="guideForm.get('image_photo')?.errors?.['required']">La imagen del vehículo es
-                            requerida.</div>
-                    </div>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label for="image_document" class="form-label">Imagen del documento *</label>
-                    <input type="file" id="image_document" class="form-control"
-                        (change)="onFileSelect($event, 'image_document')" accept="image/*" />
-                    <div *ngIf="guideForm.get('image_document')?.invalid && guideForm.get('image_document')?.touched"
-                        class="text-danger small">
-                        <div *ngIf="guideForm.get('image_document')?.errors?.['required']">La imagen del documento
-                            es
+                        <div *ngIf="guideForm.get('image_photo')?.errors?.['required']">La imagen del documento es
                             requerida.</div>
                     </div>
                 </div>
@@ -210,7 +198,7 @@
                 </div>
 
                 <div class="col-md-6 mb-3">
-                    <label for="edit_lastname" class="form-label">Apellido *</label>
+                    <label for="edit_lastname" class="form-label">Apellidos *</label>
                     <input type="text" id="edit_lastname" class="form-control" formControlName="lastname" />
                     <div *ngIf="editGuideForm.get('lastname')?.invalid && editGuideForm.get('lastname')?.touched"
                         class="text-danger small">
@@ -275,33 +263,27 @@
                 </div>
 
                 <div class="col-md-4 mb-3">
-                    <label for="edit_sexo" class="form-label">Sexo *</label>
+                    <label for="edit_sexo" class="form-label">Género *</label>
                     <select id="edit_sexo" class="form-select" formControlName="sexo">
-                        <option value="">Seleccione sexo</option>
+                        <option value="">Seleccione género</option>
                         <option value="hombre">Masculino</option>
                         <option value="mujer">Femenino</option>
                         <option value="no especificado">Otro</option>
                     </select>
                     <div *ngIf="editGuideForm.get('sexo')?.invalid && editGuideForm.get('sexo')?.touched"
                         class="text-danger small">
-                        <div *ngIf="editGuideForm.get('sexo')?.errors?.['required']">El sexo es requerido.</div>
+                        <div *ngIf="editGuideForm.get('sexo')?.errors?.['required']">El género es requerido.</div>
                     </div>
                 </div>
 
 
                 <div class="col-md-6 mb-3">
-                    <label for="edit_image_photo" class="form-label">Nueva imagen del vehículo (opcional)</label>
+                    <label for="edit_image_photo" class="form-label">Nueva imagen del documento (opcional)</label>
                     <input type="file" id="edit_image_photo" class="form-control"
                         (change)="onFileSelectEdit($event, 'image_photo')" accept="image/*" />
                     <small class="text-muted">Deja vacío si no quieres cambiar la imagen</small>
                 </div>
 
-                <div class="col-md-6 mb-3">
-                    <label for="edit_image_document" class="form-label">Nueva imagen del documento (opcional)</label>
-                    <input type="file" id="edit_image_document" class="form-control"
-                        (change)="onFileSelectEdit($event, 'image_document')" accept="image/*" />
-                    <small class="text-muted">Deja vacío si no quieres cambiar la imagen</small>
-                </div>
             </div>
         </c-modal-body>
         <c-modal-footer>
@@ -341,7 +323,7 @@
                 <strong>N° documento:</strong> {{ selectedGuide.number_document }}
             </div>
             <div class="col-6 mb-2">
-                <strong>Sexo:</strong> {{ selectedGuide.sexo }}
+                <strong>Género:</strong> {{ selectedGuide.sexo }}
             </div>
             <div class="col-6 mb-2">
                 <strong>Estado:</strong> {{ selectedGuide.state ? 'Activo' : 'Bloqueado' }}
@@ -357,12 +339,6 @@
                     <strong>Imagen vehículo:</strong><br />
                     <img *ngIf="selectedGuide.path_photo" [src]="selectedGuide.path_photo" alt="Imagen del vehículo"
                         class="img-fluid mt-2" style="max-width: 200px; border: 1px solid #ccc; padding: 5px;" />
-                </div>
-                <div class="col-6 mb-2">
-                    <strong>Imagen documento:</strong><br />
-                    <img *ngIf="selectedGuide.path_document" [src]="selectedGuide.path_document"
-                        alt="Imagen del documento" class="img-fluid mt-2"
-                        style="max-width: 200px; border: 1px solid #ccc; padding: 5px;" />
                 </div>
             </div>
         </div>
