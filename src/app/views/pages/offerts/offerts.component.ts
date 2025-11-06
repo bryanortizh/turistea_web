@@ -68,10 +68,13 @@ export class OffertsComponent {
   pageTotal: number = 1;
   dataPackage: PackageResponse[] = [];
   packageForm: FormGroup;
+  editPackageForm: FormGroup;
   visiblePackageModal = false;
   selectedPackage: PackageResponse | null = null;
   visibleAddPackageModal = false;
+  visibleEditPackageModal = false;
   timeOutmessage = 5000;
+  selectedImagePreview: string | null = null;
   dataDriver: DriverResponse[] = [];
   selectedCar!: number;
   loadingDrivers = false;
@@ -94,21 +97,34 @@ export class OffertsComponent {
     this.packageForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', [Validators.required, Validators.minLength(10)]],
-      name_district: ['', [Validators.required]],
-      name_province: ['', [Validators.required]],
       name_region: ['', [Validators.required]],
       id_driver: ['', [Validators.required]],
       image_bg: ['', [Validators.required]],
     });
 
-    // Configurar la búsqueda de conductores con debounce
+    this.editPackageForm = this.fb.group({
+      id: [''],
+      title: ['', [Validators.required, Validators.minLength(3)]],
+      description: ['', [Validators.required, Validators.minLength(10)]],
+      name_region: ['', [Validators.required]],
+      id_driver: ['', [Validators.required]],
+      image_bg: [''], // No requerido en edición
+    });
+
+    this.loadDrivers();
+  }
+  ngOnInit(): void {
+    this.loadPackages();
+  }
+
+  loadDrivers() {
     this.driverInput$
       .pipe(
-        debounceTime(300), // Esperar 300ms después de que el usuario deje de escribir
-        distinctUntilChanged(), // Solo buscar si el término cambió
+        debounceTime(300),
+        distinctUntilChanged(),
         switchMap((term) => {
           if (term.length < 2) {
-            return of([]); // No buscar si el término es muy corto
+            return of([]);
           }
           this.loadingDrivers = true;
           return this.driverService.searchDriver(term).pipe(
@@ -128,8 +144,15 @@ export class OffertsComponent {
         this.loadingDrivers = false;
       });
   }
-  ngOnInit(): void {
-    this.loadPackages();
+
+  allDrivers() {
+    this.loadingDrivers = true;
+    this.driverService.allDrivers().subscribe({
+      next: (data) => {
+        this.dataDriver = data;
+        this.loadingDrivers = false;
+      }
+    });
   }
 
   loadPackages(): void {
@@ -212,6 +235,50 @@ export class OffertsComponent {
     this.packageForm.reset();
   }
 
+  // Métodos para modal de edición
+  openEditPackageModal(index: number) {
+    this.allDrivers();
+    this.selectedPackage = this.dataPackage[index];
+    if (this.selectedPackage) {
+      // Llenar el formulario con los datos del paquete seleccionado
+      this.editPackageForm.patchValue({
+        id: this.selectedPackage.id,
+        title: this.selectedPackage.title,
+        description: this.selectedPackage.description,
+        name_region: this.selectedPackage.name_region,
+        id_driver: this.selectedPackage.id_driver,
+        image_bg: '', // No cargar la imagen existente
+      });
+
+      console.log(this.selectedPackage.id_driver);
+      // Buscar y seleccionar el conductor actual
+      if (this.selectedPackage.id_driver) {
+        this.loadDriverForEdit(this.selectedPackage.id_driver);
+      }
+
+      this.visibleEditPackageModal = true;
+    }
+  }
+
+  closeEditPackageModal() {
+    this.visibleEditPackageModal = false;
+    this.editPackageForm.reset();
+    this.selectedPackage = null;
+    this.selectedImagePreview = null; // Limpiar preview de imagen
+  }
+
+  loadDriverForEdit(driverId: number) {
+    // Buscar el conductor en la lista actual o hacer una búsqueda específica
+    const existingDriver = this.dataDriver.find(
+      (driver) => driver.id === driverId
+    );
+    if (!existingDriver) {
+      // Si no está en la lista actual, podrías hacer una búsqueda específica
+      // Por ahora, simplemente establecemos el valor
+      this.editPackageForm.patchValue({ id_driver: driverId });
+    }
+  }
+
   onFileSelect(event: any, fieldName: string) {
     const file = event.target.files[0];
     if (file) {
@@ -224,6 +291,26 @@ export class OffertsComponent {
           [fieldName]: base64,
         });
         this.packageForm.get(fieldName)?.updateValueAndValidity();
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  onFileSelectEdit(event: any, fieldName: string) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64String = e.target?.result as string;
+        const base64 = base64String;
+
+        this.editPackageForm.patchValue({
+          [fieldName]: base64,
+        });
+        this.editPackageForm.get(fieldName)?.updateValueAndValidity();
+
+        // Guardar preview de la nueva imagen
+        this.selectedImagePreview = base64String;
       };
       reader.readAsDataURL(file);
     }
@@ -268,8 +355,46 @@ export class OffertsComponent {
     });
   }
 
+  updatePackage() {
+    if (this.editPackageForm.invalid) {
+      this.editPackageForm.markAllAsTouched();
+      return;
+    }
+
+    const formData = this.editPackageForm.value;
+    const packageId = formData.id;
+
+    // Si no se seleccionó nueva imagen, remover el campo del formData
+    if (!formData.image_bg) {
+      delete formData.image_bg;
+    }
+
+    this.packageService.updatePackage(packageId, formData).subscribe({
+      next: (data) => {
+        this.toastr.success('Paquete actualizado con éxito', 'Realizado', {
+          timeOut: this.timeOutmessage,
+          closeButton: true,
+          progressBar: true,
+        });
+        this.loadPackages();
+        this.closeEditPackageModal();
+      },
+      error: (error) => {
+        this.toastr.error('Error al actualizar el paquete', 'Error', {
+          timeOut: this.timeOutmessage,
+          closeButton: true,
+          progressBar: true,
+        });
+      },
+    });
+  }
+
   onDriverSelected(driverId: any) {
     console.log('Conductor seleccionado:', driverId);
+  }
+
+  onDriverSelectedEdit(driverId: any) {
+    this.editPackageForm.patchValue({ id_driver: driverId.id });
   }
 
   openRouterPackage(id: number) {

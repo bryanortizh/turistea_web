@@ -28,7 +28,12 @@
                     <td>
                         <button cButton color="success" size="sm" class="me-2 text-white" (click)="openPackageModal(i)">
                             Ver datos </button>
-                        <button cButton color="info" size="sm" class="me-2 text-white" (click)="openRouterPackage(user.id)">Configurar</button>
+
+                        <button cButton color="warning" size="sm" class="me-2 text-white" (click)="openEditPackageModal(i)">
+                            Editar</button>
+                        
+                        <button cButton color="info" size="sm" class="me-2 text-white"
+                            (click)="openRouterPackage(user.id)">Configurar</button>
 
                         <button cButton [color]="user.state === true ? 'danger' : 'success'" size="sm"
                             class="me-2 text-white" (click)="blockUser(user)">
@@ -80,9 +85,17 @@
                         <div *ngIf="packageForm.get('title')?.errors?.['minlength']">Mínimo 3 caracteres.</div>
                     </div>
                 </div>
-
-                <!-- ID del conductor -->
                 <div class="col-md-6 mb-3">
+                    <label for="name_region" class="form-label">Departamento *</label>
+                    <input type="text" id="name_region" class="form-control" formControlName="name_region" />
+                    <div *ngIf="packageForm.get('name_region')?.invalid && packageForm.get('name_region')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="packageForm.get('name_region')?.errors?.['required']">La departamento es requerida.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-12 mb-3">
                     <label for="id_driver" class="form-label">Conductor *</label>
                     <ng-select [items]="dataDriver" bindLabel="textSearch" bindValue="id" formControlName="id_driver"
                         placeholder="Buscar conductor por nombre..." notFoundText="No se encontraron conductores"
@@ -108,39 +121,8 @@
                     </div>
                 </div>
 
-                <!-- Distrito -->
-                <div class="col-md-4 mb-3">
-                    <label for="name_district" class="form-label">Distrito *</label>
-                    <input type="text" id="name_district" class="form-control" formControlName="name_district" />
-                    <div *ngIf="packageForm.get('name_district')?.invalid && packageForm.get('name_district')?.touched"
-                        class="text-danger small">
-                        <div *ngIf="packageForm.get('name_district')?.errors?.['required']">El distrito es requerido.
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Provincia -->
-                <div class="col-md-4 mb-3">
-                    <label for="name_province" class="form-label">Provincia *</label>
-                    <input type="text" id="name_province" class="form-control" formControlName="name_province" />
-                    <div *ngIf="packageForm.get('name_province')?.invalid && packageForm.get('name_province')?.touched"
-                        class="text-danger small">
-                        <div *ngIf="packageForm.get('name_province')?.errors?.['required']">La provincia es requerida.
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Región -->
-                <div class="col-md-4 mb-3">
-                    <label for="name_region" class="form-label">Región *</label>
-                    <input type="text" id="name_region" class="form-control" formControlName="name_region" />
-                    <div *ngIf="packageForm.get('name_region')?.invalid && packageForm.get('name_region')?.touched"
-                        class="text-danger small">
-                        <div *ngIf="packageForm.get('name_region')?.errors?.['required']">La región es requerida.</div>
-                    </div>
-                </div>
-
-                <!-- Imagen de fondo -->
                 <div class="col-md-12 mb-3">
                     <label for="image_bg" class="form-label">Imagen de fondo del paquete *</label>
                     <input type="file" id="image_bg" class="form-control" (change)="onFileSelect($event, 'image_bg')"
@@ -175,13 +157,7 @@
                 <strong>Titulo:</strong> {{ selectedPackage.title }}
             </div>
             <div class="col-6 mb-2">
-                <strong>Distrito:</strong> {{ selectedPackage.name_district }}
-            </div>
-            <div class="col-6 mb-2">
-                <strong>Provincia:</strong> {{ selectedPackage.name_province }}
-            </div>
-            <div class="col-6 mb-2">
-                <strong>Región:</strong> {{ selectedPackage.name_region }}
+                <strong>Departamento:</strong> {{ selectedPackage.name_region }}
             </div>
             <div class="col-6 mb-2">
                 <strong>Estado:</strong> {{ selectedPackage.state ? 'Activo' : 'Bloqueado' }}
@@ -205,4 +181,89 @@
     <c-modal-footer>
         <button cButton color="secondary" (click)="closePackageModal()">Cerrar</button>
     </c-modal-footer>
+</c-modal>
+
+<!-- Modal para editar paquete turístico -->
+<c-modal [visible]="visibleEditPackageModal" (visibleChange)="visibleEditPackageModal = $event" size="lg">
+    <c-modal-header>
+        <h5 cModalTitle>Editar paquete turístico</h5>
+        <button cButtonClose (click)="closeEditPackageModal()"></button>
+    </c-modal-header>
+    <form [formGroup]="editPackageForm">
+        <c-modal-body>
+            <div class="row">
+                <!-- ID (oculto) -->
+                <input type="hidden" formControlName="id" />
+                
+                <!-- Título -->
+                <div class="col-md-6 mb-3">
+                    <label for="edit_title" class="form-label">Título del paquete *</label>
+                    <input type="text" id="edit_title" class="form-control" formControlName="title" />
+                    <div *ngIf="editPackageForm.get('title')?.invalid && editPackageForm.get('title')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="editPackageForm.get('title')?.errors?.['required']">El título es requerido.</div>
+                        <div *ngIf="editPackageForm.get('title')?.errors?.['minlength']">Mínimo 3 caracteres.</div>
+                    </div>
+                </div>
+                
+                <!-- Departamento -->
+                <div class="col-md-6 mb-3">
+                    <label for="edit_name_region" class="form-label">Departamento *</label>
+                    <input type="text" id="edit_name_region" class="form-control" formControlName="name_region" />
+                    <div *ngIf="editPackageForm.get('name_region')?.invalid && editPackageForm.get('name_region')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="editPackageForm.get('name_region')?.errors?.['required']">El departamento es requerido.</div>
+                    </div>
+                </div>
+                
+                <!-- Conductor -->
+                <div class="col-md-12 mb-3">
+                    <label for="edit_id_driver" class="form-label">Conductor *</label>
+                    <ng-select [items]="dataDriver" bindLabel="textSearch" bindValue="id" formControlName="id_driver"
+                        placeholder="Buscar conductor por nombre..." notFoundText="No se encontraron conductores"
+                        typeToSearchText="Escribe para buscar..." [loading]="loadingDrivers" [clearable]="true"
+                        [searchable]="true" [typeahead]="driverInput$" [minTermLength]="2"
+                        (change)="onDriverSelectedEdit($event)">
+                    </ng-select>
+                    <div *ngIf="editPackageForm.get('id_driver')?.invalid && editPackageForm.get('id_driver')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="editPackageForm.get('id_driver')?.errors?.['required']">El conductor es requerido.</div>
+                    </div>
+                </div>
+
+                <!-- Descripción -->
+                <div class="col-md-12 mb-3">
+                    <label for="edit_description" class="form-label">Descripción *</label>
+                    <textarea id="edit_description" class="form-control" formControlName="description" rows="4"></textarea>
+                    <div *ngIf="editPackageForm.get('description')?.invalid && editPackageForm.get('description')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="editPackageForm.get('description')?.errors?.['required']">La descripción es requerida.</div>
+                        <div *ngIf="editPackageForm.get('description')?.errors?.['minlength']">Mínimo 10 caracteres.</div>
+                    </div>
+                </div>
+
+                <!-- Imagen actual -->
+                <div class="col-md-12 mb-3" *ngIf="selectedPackage?.path_bg">
+                    <label class="form-label">Imagen actual</label>
+                    <div>
+                        <img [src]="selectedPackage?.path_bg" alt="Imagen actual del paquete"
+                            class="img-fluid" style="max-width: 200px; border: 1px solid #ccc; padding: 5px;" />
+                    </div>
+                </div>
+
+                <!-- Nueva imagen -->
+                <div class="col-md-12 mb-3">
+                    <label for="edit_image_bg" class="form-label">Nueva imagen de fondo (opcional)</label>
+                    <input type="file" id="edit_image_bg" class="form-control" (change)="onFileSelectEdit($event, 'image_bg')"
+                        accept="image/*" />
+                    <small class="text-muted">Deja vacío si no deseas cambiar la imagen actual</small>
+                </div>
+            </div>
+        </c-modal-body>
+        <c-modal-footer>
+            <button type="button" cButton color="secondary" (click)="closeEditPackageModal()">Cancelar</button>
+            <button type="submit" cButton color="primary" [disabled]="editPackageForm.invalid"
+                (click)="updatePackage()">Actualizar paquete</button>
+        </c-modal-footer>
+    </form>
 </c-modal>

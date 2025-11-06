@@ -38,6 +38,18 @@ export class DriverService {
     );
   }
 
+  allDrivers(): Observable<DriverResponse[]> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Content-type', 'application/json');
+    headers = headers.set(
+      'Authorization',
+      'Bearer ' + localStorage.getItem('token_turistea')
+    );
+    return this.http.get<DriverResponse[]>(this.URL_BACKEND + '/api/admins/drivers-all', {
+      headers: headers,
+    });
+  }
+
   createDriver(body: any): Observable<any> {
     let headers = new HttpHeaders();
     headers = headers.set('Content-type', 'application/json');
@@ -78,6 +90,28 @@ export class DriverService {
       this.URL_BACKEND + '/api/admins/drivers-inactive/' + user.id,
       { state: state, email: user.email },
       { headers: headers }
+    );
+  }
+searchDriverInput(
+    body: PaginationParams,
+    term: string
+  ): Observable<DriverResponse> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Content-type', 'application/json');
+    headers = headers.set(
+      'Authorization',
+      'Bearer ' + localStorage.getItem('token_turistea')
+    );
+
+    return this.http.get<DriverResponse>(
+      this.URL_BACKEND + '/api/admins/drivers/search/' + term,
+      {
+        headers: headers,
+        params: {
+          page: body.page?.toString() || '1',
+          state: body.state?.toString() || '1',
+        },
+      }
     );
   }
 

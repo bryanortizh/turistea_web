@@ -8,11 +8,11 @@
             <button cButton color="secondary" size="sm" (click)="clearSearch()">Limpiar</button>
         </div>
 
-    </div>
-    <div class="d-flex justify-content-end mb-3">
-        <button cButton color="primary" size="sm" class="text-white" (click)="showClientsBlock()">
-            Ver clientes {{ state === 1 ? 'bloqueados' : 'activos' }}
-        </button>
+        <div class="d-flex justify-content-end mb-3 col-6">
+            <button cButton color="primary" size="sm" class="text-white" (click)="showClientsBlock()">
+                Ver clientes {{ state === 1 ? 'bloqueados' : 'activos' }}
+            </button>
+        </div>
     </div>
     <div class="table-responsive">
         <table cTable class="table align-middle">

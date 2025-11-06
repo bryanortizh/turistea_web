@@ -1,14 +1,20 @@
 <div class="mb-4">
     <h2>Conductores</h2>
     <p class="text-medium-emphasis">Lista de conductores del sistema</p>
-
-    <div class="d-flex justify-content-end mb-3">
-        <button cButton color="primary" size="sm" class="text-white" (click)="showClientsBlock()">
-            Ver conductores {{ state === 1 ? 'desactivados' : 'activos' }}
-        </button>
-        <button cButton color="secondary" size="sm" class="ms-2 text-white" (click)="saveDriver()">
-            Agregar
-        </button>
+    <div class="row">
+        <div class="d-flex justify-content-start mb-3 col-6">
+            <input type="text" class="form-control me-2" cInput placeholder="Buscar conductores..."
+                [(ngModel)]="searchTerm" (ngModelChange)="searchDriver()" />
+            <button cButton color="secondary" size="sm" (click)="clearDriver()">Limpiar</button>
+        </div>
+        <div class="d-flex justify-content-end mb-3 col-6">
+            <button cButton color="primary" size="sm" class="text-white" (click)="showClientsBlock()">
+                Ver conductores {{ state === 1 ? 'desactivados' : 'activos' }}
+            </button>
+            <button cButton color="secondary" size="sm" class="ms-2 text-white" (click)="saveDriver()">
+                Agregar
+            </button>
+        </div>
     </div>
     <div class="table-responsive">
         <table cTable class="table align-middle">
@@ -212,11 +218,11 @@
                 </div>
 
                 <div class="col-md-6 mb-3">
-                    <label for="name_region" class="form-label">Región *</label>
+                    <label for="name_region" class="form-label">Departamento *</label>
                     <input type="text" id="name_region" class="form-control" formControlName="name_region" />
                     <div *ngIf="driverForm.get('name_region')?.invalid && driverForm.get('name_region')?.touched"
                         class="text-danger small">
-                        <div *ngIf="driverForm.get('name_region')?.errors?.['required']">La región es requerida.
+                        <div *ngIf="driverForm.get('name_region')?.errors?.['required']">La departamento es requerida.
                         </div>
                     </div>
                 </div>
@@ -402,11 +408,11 @@
                 </div>
 
                 <div class="col-md-6 mb-3">
-                    <label for="edit_name_region" class="form-label">Región *</label>
+                    <label for="edit_name_region" class="form-label">Departamento *</label>
                     <input type="text" id="edit_name_region" class="form-control" formControlName="name_region" />
                     <div *ngIf="editDriverForm.get('name_region')?.invalid && editDriverForm.get('name_region')?.touched"
                         class="text-danger small">
-                        <div *ngIf="editDriverForm.get('name_region')?.errors?.['required']">La región es requerida.
+                        <div *ngIf="editDriverForm.get('name_region')?.errors?.['required']">La departamento es requerida.
                         </div>
                     </div>
                 </div>
@@ -481,7 +487,7 @@
                 <strong>Provincia:</strong> {{ selectedDriver.name_province }}
             </div>
             <div class="col-6 mb-2">
-                <strong>Región:</strong> {{ selectedDriver.name_region }}
+                <strong>Departamento:</strong> {{ selectedDriver.name_region }}
             </div>
             <div class="col-6 mb-2">
                 <strong>Estado:</strong> {{ selectedDriver.state ? 'Activo' : 'Bloqueado' }}

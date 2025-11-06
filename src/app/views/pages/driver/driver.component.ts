@@ -3,6 +3,7 @@ import { DriverResponse } from '../../../data/interfaces/driver.interface';
 import {
   FormBuilder,
   FormGroup,
+  FormsModule,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
@@ -39,6 +40,7 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
     ButtonCloseDirective,
     ModalBodyComponent,
     ModalFooterComponent,
+    FormsModule,
   ],
   providers: [DriverService, HttpClient],
   templateUrl: './driver.component.html',
@@ -57,6 +59,7 @@ export class DriverComponent {
   visibleAddDriverModal = false;
   visibleEditDriverModal = false;
   selectedDriverId: number = 0;
+  searchTerm: string = '';
 
   timeOutmessage = 5000;
 
@@ -123,6 +126,36 @@ export class DriverComponent {
       },
       error: (error) => {},
     });
+  }
+
+  searchDriver(): void {
+    if (this.searchTerm.trim() === '') {
+      this.loadDrivers();
+      return;
+    }
+    let body: PaginationParams = {
+      page: this.page,
+      state: this.state,
+    };
+    const pageSize = 12;
+
+    this.driverService.searchDriverInput(body, this.searchTerm).subscribe({
+      next: (data) => {
+        let adminData: Pagination = data as unknown as Pagination;
+        this.dataDriver = adminData.rows;
+        this.pageTotal = Math.ceil(
+          (adminData.count || this.dataDriver.length) / pageSize
+        );
+      },
+      error: (error) => {
+        console.error('Error fetching admin data:', error);
+      },
+    });
+  }
+
+  clearDriver(): void {
+    this.searchTerm = '';
+    this.loadDrivers();
   }
 
   showClientsBlock(): void {
