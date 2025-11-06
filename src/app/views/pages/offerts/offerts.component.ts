@@ -364,7 +364,6 @@ export class OffertsComponent {
     const formData = this.editPackageForm.value;
     const packageId = formData.id;
 
-    // Si no se seleccionó nueva imagen, remover el campo del formData
     if (!formData.image_bg) {
       delete formData.image_bg;
     }
