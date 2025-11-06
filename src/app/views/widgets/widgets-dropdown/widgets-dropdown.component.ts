@@ -244,13 +244,10 @@ export class WidgetsDropdownComponent implements OnInit, AfterContentInit {
   }
 
   updateUserChart(): void {
-    console.log('Raw monthly_data:', this.userStats.monthly_data);
     
     // Asegurarse de que tenemos datos y ordenarlos por fecha
     const sortedData = this.userStats.monthly_data
       .sort((a, b) => new Date(a.month + '-01').getTime() - new Date(b.month + '-01').getTime());
-    
-    console.log('Sorted monthly_data:', sortedData);
     
     // Usar month_name que ya viene formateado del API, pero acortarlo
     const monthLabels = sortedData.map(item => {

@@ -6,6 +6,7 @@ import {
   FormGroup,
   ReactiveFormsModule,
   Validators,
+  FormArray,
 } from '@angular/forms';
 import {
   ButtonCloseDirective,
@@ -18,24 +19,12 @@ import {
   TableDirective,
 } from '@coreui/angular';
 import { ToastrService } from 'ngx-toastr';
-
-import {
-  NgLabelTemplateDirective,
-  NgOptionTemplateDirective,
-  NgSelectComponent,
-} from '@ng-select/ng-select';
 import { Subject } from 'rxjs';
-import {
-  debounceTime,
-  distinctUntilChanged,
-  switchMap,
-  catchError,
-} from 'rxjs/operators';
-import { of } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DriverService } from '../../../../core/services/driver.service';
 import { PackageResponse } from '../../../../data/interfaces/package.interface';
 import { DriverResponse } from '../../../../data/interfaces/driver.interface';
+import { RouterTrackingResponse, RouteItem } from '../../../../data/interfaces/router-tracking.interface';
 import {
   Pagination,
   PaginationParams,
@@ -66,10 +55,11 @@ export class RouterOffertsComponent implements OnInit {
   page: number = 1;
   state: number = 1;
   pageTotal: number = 1;
-  dataPackage: PackageResponse[] = [];
+  dataPackage: RouterTrackingResponse[] = []; // Cambiado a RouterTrackingResponse
   packageForm: FormGroup;
   visiblePackageModal = false;
-  selectedPackage: PackageResponse | null = null;
+  selectedPackage: RouterTrackingResponse | null = null; // Cambiado a RouterTrackingResponse
+  selectedPackageRoutes: RouteItem[] = []; // Cambiado a RouteItem[]
   visibleAddPackageModal = false;
   timeOutmessage = 5000;
   dataDriver: DriverResponse[] = [];
@@ -97,15 +87,57 @@ export class RouterOffertsComponent implements OnInit {
       description: ['', [Validators.required, Validators.minLength(10)]],
       name_district: ['', [Validators.required]],
       name_province: ['', [Validators.required]],
-      name_region: ['', [Validators.required]],
-      id_driver: ['', [Validators.required]],
-      image_bg: ['', [Validators.required]],
+      id_package: [this.id, [Validators.required]],
+      route_json: this.fb.array([]), // Array para las rutas
+      image_one: [''],
+      image_two: [''],
+      image_tree: ['']
     });
+
+    // Agregar una ruta por defecto al inicializar
+    this.addRoute();
   }
 
   ngOnInit(): void {
     this.id = this.route.snapshot.paramMap.get('id');
+    this.packageForm.patchValue({ id_package: this.id });
     this.loadPackages();
+  }
+
+  // Métodos para manejar el FormArray de rutas
+  get routeFormArray(): FormArray {
+    return this.packageForm.get('route_json') as FormArray;
+  }
+
+  createRouteFormGroup(): FormGroup {
+    return this.fb.group({
+      id: [this.routeFormArray.length + 1],
+      index: [this.routeFormArray.length],
+      title: ['', [Validators.required, Validators.minLength(3)]],
+      description: ['', [Validators.required, Validators.minLength(10)]],
+      bg_image: ['']
+    });
+  }
+
+  addRoute(): void {
+    this.routeFormArray.push(this.createRouteFormGroup());
+  }
+
+  removeRoute(index: number): void {
+    if (this.routeFormArray.length > 1) {
+      this.routeFormArray.removeAt(index);
+      // Actualizar los IDs e índices de las rutas restantes
+      this.updateRouteIdsAndIndexes();
+    }
+  }
+
+  updateRouteIdsAndIndexes(): void {
+    this.routeFormArray.controls.forEach((control, index) => {
+      control.patchValue({ 
+        id: index + 1,
+        index: index 
+      });
+    });
   }
 
   loadPackages(): void {
@@ -142,15 +174,31 @@ export class RouterOffertsComponent implements OnInit {
 
   openPackageModal(index: number) {
     this.selectedPackage = this.dataPackage[index];
+    
+    // Parsear el route_json si existe
+    if (this.selectedPackage?.route_json) {
+      try {
+        console.log('Parsing route_json:', this.selectedPackage.route_json);
+        console.log('Parsed route_json:', JSON.parse(this.selectedPackage.route_json));
+        this.selectedPackageRoutes = JSON.parse(this.selectedPackage.route_json) as RouteItem[];
+      } catch (error) {
+        console.error('Error parsing route_json:', error);
+        this.selectedPackageRoutes = [];
+      }
+    } else {
+      this.selectedPackageRoutes = [];
+    }
+    
     this.visiblePackageModal = true;
   }
 
   closePackageModal() {
     this.visiblePackageModal = false;
     this.selectedPackage = null;
+    this.selectedPackageRoutes = [];
   }
 
-  blockUser(user: PackageResponse): void {
+  blockUser(user: RouterTrackingResponse): void {
     const state =
       this.dataPackage.find((u) => u.id === user.id)?.state === true
         ? false
@@ -186,6 +234,17 @@ export class RouterOffertsComponent implements OnInit {
   closeAddPackageModal() {
     this.visibleAddPackageModal = false;
     this.packageForm.reset();
+    
+    // Limpiar el FormArray
+    while (this.routeFormArray.length !== 0) {
+      this.routeFormArray.removeAt(0);
+    }
+    
+    // Agregar una ruta por defecto
+    this.addRoute();
+    
+    // Restablecer el id_package
+    this.packageForm.patchValue({ id_package: this.id });
   }
 
   onFileSelect(event: any, fieldName: string) {
@@ -194,12 +253,24 @@ export class RouterOffertsComponent implements OnInit {
       const reader = new FileReader();
       reader.onload = (e) => {
         const base64String = e.target?.result as string;
-        const base64 = base64String;
 
         this.packageForm.patchValue({
-          [fieldName]: base64,
+          [fieldName]: base64String,
         });
         this.packageForm.get(fieldName)?.updateValueAndValidity();
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  onRouteImageSelect(event: any, routeIndex: number) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64String = e.target?.result as string;
+        const routeControl = this.routeFormArray.at(routeIndex);
+        routeControl.patchValue({ bg_image: base64String });
       };
       reader.readAsDataURL(file);
     }
@@ -223,10 +294,15 @@ export class RouterOffertsComponent implements OnInit {
       this.packageForm.markAllAsTouched();
       return;
     }
-    const formData = this.packageForm.value;
+    
+    const formData = { ...this.packageForm.value };
+    
+    // Convertir el array de rutas a JSON string
+    formData.route_json = JSON.stringify(formData.route_json);
+    
     this.routerTrackingRouterService.createRouterTracking(formData).subscribe({
       next: (data) => {
-        this.toastr.success('Se creo el paquete con exito', 'Realizado', {
+        this.toastr.success('Se creó la configuración con éxito', 'Realizado', {
           timeOut: this.timeOutmessage,
           closeButton: true,
           progressBar: true,
@@ -235,7 +311,7 @@ export class RouterOffertsComponent implements OnInit {
         this.closeAddPackageModal();
       },
       error: (error) => {
-        this.toastr.error('Error al crear el paquete', 'Error', {
+        this.toastr.error('Error al crear la configuración', 'Error', {
           timeOut: this.timeOutmessage,
           closeButton: true,
           progressBar: true,
