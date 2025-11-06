@@ -73,6 +73,7 @@ export class GuideComponent {
       number_document: ['', [Validators.required, Validators.minLength(8)]],
       sexo: ['', [Validators.required]],
       image_photo: ['', [Validators.required]],
+      image_document: ['', [Validators.required]],
     });
 
     this.editGuideForm = this.fb.group({
@@ -84,6 +85,7 @@ export class GuideComponent {
       number_document: ['', [Validators.required, Validators.minLength(8)]],
       sexo: ['', [Validators.required]],
       image_photo: [''],
+      image_document: [''],
     });
   }
 
@@ -247,11 +249,12 @@ export class GuideComponent {
   closeEditGuideModal() {
     this.visibleEditGuideModal = false;
     this.editGuideForm.reset();
+    this.editGuideForm.markAsUntouched();
     this.selectedGuideId = 0;
   }
 
   onFileSelectEdit(event: any, fieldName: string) {
-    const file = event.target.files[0];
+   const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {

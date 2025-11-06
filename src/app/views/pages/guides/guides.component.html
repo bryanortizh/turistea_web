@@ -169,7 +169,19 @@
                             requerida.</div>
                     </div>
                 </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="image_document" class="form-label">Imagen documento</label>
+                    <input type="file" id="image_document" class="form-control"
+                        (change)="onFileSelect($event, 'image_document')" accept="image/*" />
+                    <div *ngIf="guideForm.get('image_document')?.invalid && guideForm.get('image_document')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="guideForm.get('image_document')?.errors?.['required']">La imagen del documento es
+                            requerida.</div>
+                    </div>
+                </div>
             </div>
+
         </c-modal-body>
         <c-modal-footer>
             <button type="button" cButton color="secondary" (click)="closeAddGuideModal()">Cancelar</button>
@@ -278,12 +290,18 @@
 
 
                 <div class="col-md-6 mb-3">
-                    <label for="edit_image_photo" class="form-label">Nueva imagen del documento (opcional)</label>
+                    <label for="edit_image_photo" class="form-label">Nueva imagen de perfil (opcional)</label>
                     <input type="file" id="edit_image_photo" class="form-control"
                         (change)="onFileSelectEdit($event, 'image_photo')" accept="image/*" />
                     <small class="text-muted">Deja vacío si no quieres cambiar la imagen</small>
                 </div>
 
+                <div class="col-md-6 mb-3">
+                    <label for="edit_image_document" class="form-label">Nueva imagen del documento (opcional)</label>
+                    <input type="file" id="edit_image_document" class="form-control"
+                        (change)="onFileSelectEdit($event, 'image_document')" accept="image/*" />
+                    <small class="text-muted">Deja vacío si no quieres cambiar la imagen</small>
+                </div>
             </div>
         </c-modal-body>
         <c-modal-footer>
@@ -336,9 +354,15 @@
             </div>
             <div class="row">
                 <div class="col-6 mb-2">
-                    <strong>Imagen vehículo:</strong><br />
-                    <img *ngIf="selectedGuide.path_photo" [src]="selectedGuide.path_photo" alt="Imagen del vehículo"
+                    <strong>Imagen guía:</strong><br />
+                    <img *ngIf="selectedGuide.path_photo" [src]="selectedGuide.path_photo" alt="Imagen del guía"
                         class="img-fluid mt-2" style="max-width: 200px; border: 1px solid #ccc; padding: 5px;" />
+                </div>
+                <div class="col-6 mb-2">
+                    <strong>Imagen documento:</strong><br />
+                    <img *ngIf="selectedGuide.path_document" [src]="selectedGuide.path_document"
+                        alt="Imagen del documento" class="img-fluid mt-2"
+                        style="max-width: 200px; border: 1px solid #ccc; padding: 5px;" />
                 </div>
             </div>
         </div>

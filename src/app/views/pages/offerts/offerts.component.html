@@ -16,6 +16,7 @@
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col">Nombres</th>
+                    <th scope="col">Departamento</th>
                     <th scope="col">Fecha de creación</th>
                     <th scope="col">Acciones</th>
                 </tr>
@@ -24,6 +25,7 @@
                 <tr *ngFor="let user of dataPackage; let i = index">
                     <th scope="row">{{user?.id}}</th>
                     <td>{{user?.title}}</td>
+                    <td>{{user?.name_region}}</td>
                     <td>{{user?.created | date: 'short'}}</td>
                     <td>
                         <button cButton color="success" size="sm" class="me-2 text-white" (click)="openPackageModal(i)">
