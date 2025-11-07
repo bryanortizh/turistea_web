@@ -79,14 +79,7 @@ export class OffertsComponent {
   selectedCar!: number;
   loadingDrivers = false;
   driverInput$ = new Subject<string>();
-  bindLabel = 'name + " " + lastname';
 
-  cars = [
-    { id: 1, name: 'Volvo' },
-    { id: 2, name: 'Saab' },
-    { id: 3, name: 'Opel' },
-    { id: 4, name: 'Audi' },
-  ];
   constructor(
     private packageService: PackageService,
     private driverService: DriverService,
@@ -108,7 +101,7 @@ export class OffertsComponent {
       description: ['', [Validators.required, Validators.minLength(10)]],
       name_region: ['', [Validators.required]],
       id_driver: ['', [Validators.required]],
-      image_bg: [''], // No requerido en edición
+      image_bg: [''],
     });
 
     this.loadDrivers();
@@ -151,7 +144,7 @@ export class OffertsComponent {
       next: (data) => {
         this.dataDriver = data;
         this.loadingDrivers = false;
-      }
+      },
     });
   }
 
@@ -235,23 +228,19 @@ export class OffertsComponent {
     this.packageForm.reset();
   }
 
-  // Métodos para modal de edición
   openEditPackageModal(index: number) {
     this.allDrivers();
     this.selectedPackage = this.dataPackage[index];
     if (this.selectedPackage) {
-      // Llenar el formulario con los datos del paquete seleccionado
       this.editPackageForm.patchValue({
         id: this.selectedPackage.id,
         title: this.selectedPackage.title,
         description: this.selectedPackage.description,
         name_region: this.selectedPackage.name_region,
         id_driver: this.selectedPackage.id_driver,
-        image_bg: '', // No cargar la imagen existente
+        image_bg: '',
       });
 
-      console.log(this.selectedPackage.id_driver);
-      // Buscar y seleccionar el conductor actual
       if (this.selectedPackage.id_driver) {
         this.loadDriverForEdit(this.selectedPackage.id_driver);
       }
@@ -264,17 +253,14 @@ export class OffertsComponent {
     this.visibleEditPackageModal = false;
     this.editPackageForm.reset();
     this.selectedPackage = null;
-    this.selectedImagePreview = null; // Limpiar preview de imagen
+    this.selectedImagePreview = null;
   }
 
   loadDriverForEdit(driverId: number) {
-    // Buscar el conductor en la lista actual o hacer una búsqueda específica
     const existingDriver = this.dataDriver.find(
       (driver) => driver.id === driverId
     );
     if (!existingDriver) {
-      // Si no está en la lista actual, podrías hacer una búsqueda específica
-      // Por ahora, simplemente establecemos el valor
       this.editPackageForm.patchValue({ id_driver: driverId });
     }
   }
@@ -309,7 +295,6 @@ export class OffertsComponent {
         });
         this.editPackageForm.get(fieldName)?.updateValueAndValidity();
 
-        // Guardar preview de la nueva imagen
         this.selectedImagePreview = base64String;
       };
       reader.readAsDataURL(file);

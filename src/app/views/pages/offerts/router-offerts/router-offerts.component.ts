@@ -61,6 +61,8 @@ export class RouterOffertsComponent implements OnInit {
   selectedPackage: RouterTrackingResponse | null = null; // Cambiado a RouterTrackingResponse
   selectedPackageRoutes: RouteItem[] = []; // Cambiado a RouteItem[]
   visibleAddPackageModal = false;
+  isEditMode = false; // Nueva propiedad para el modo de edición
+  editingPackageId: number | null = null; // ID del paquete en edición
   timeOutmessage = 5000;
   dataDriver: DriverResponse[] = [];
   selectedCar!: number;
@@ -175,14 +177,10 @@ export class RouterOffertsComponent implements OnInit {
   openPackageModal(index: number) {
     this.selectedPackage = this.dataPackage[index];
     
-    // Parsear el route_json si existe
     if (this.selectedPackage?.route_json) {
       try {
-        console.log('Parsing route_json:', this.selectedPackage.route_json);
-        console.log('Parsed route_json:', JSON.parse(this.selectedPackage.route_json));
         this.selectedPackageRoutes = JSON.parse(this.selectedPackage.route_json) as RouteItem[];
       } catch (error) {
-        console.error('Error parsing route_json:', error);
         this.selectedPackageRoutes = [];
       }
     } else {
@@ -231,8 +229,55 @@ export class RouterOffertsComponent implements OnInit {
     this.visibleAddPackageModal = true;
   }
 
+  editPackage(packageData: RouterTrackingResponse) {
+    this.isEditMode = true;
+    this.editingPackageId = packageData.id;
+    this.visibleAddPackageModal = true;
+    
+    // Llenar el formulario con los datos existentes
+    this.packageForm.patchValue({
+      title: packageData.title,
+      description: packageData.description,
+      name_district: packageData.name_district,
+      name_province: packageData.name_province,
+      id_package: this.id
+    });
+
+    // Limpiar rutas existentes
+    while (this.routeFormArray.length !== 0) {
+      this.routeFormArray.removeAt(0);
+    }
+
+    // Cargar rutas existentes del route_json
+    if (packageData.route_json) {
+      try {
+        const routes = JSON.parse(packageData.route_json) as any[];
+        routes.forEach((route, index) => {
+          const routeGroup = this.createRouteFormGroup();
+          routeGroup.patchValue({
+            id: route.id || null,
+            index: index,
+            title: route.title || '',
+            description: route.description || '',
+            bg_image: route.bg_image || '',
+            bg_image_key: route.bg_image_key || '',
+            bg_image_size: route.bg_image_size || ''
+          });
+          this.routeFormArray.push(routeGroup);
+        });
+      } catch (error) {
+        console.error('Error parsing route_json:', error);
+        this.addRoute(); // Agregar ruta por defecto si hay error
+      }
+    } else {
+      this.addRoute(); // Agregar ruta por defecto si no hay rutas
+    }
+  }
+
   closeAddPackageModal() {
     this.visibleAddPackageModal = false;
+    this.isEditMode = false; // Resetear modo de edición
+    this.editingPackageId = null; // Limpiar ID de edición
     this.packageForm.reset();
     
     // Limpiar el FormArray
@@ -312,6 +357,55 @@ export class RouterOffertsComponent implements OnInit {
       },
       error: (error) => {
         this.toastr.error('Error al crear la configuración', 'Error', {
+          timeOut: this.timeOutmessage,
+          closeButton: true,
+          progressBar: true,
+        });
+      },
+    });
+  }
+
+  updatePackage() {
+    if (this.packageForm.invalid) {
+      this.packageForm.markAllAsTouched();
+      return;
+    }
+
+    const formData = { ...this.packageForm.value };
+    
+    // Procesar las rutas para manejar imágenes nuevas
+    const processedRoutes = formData.route_json.map((route: any) => {
+      const processedRoute = { ...route };
+      
+      // Si hay una nueva imagen (bg_image tiene contenido base64), 
+      // eliminamos bg_image_key y bg_image_size
+      if (processedRoute.bg_image && 
+          processedRoute.bg_image.startsWith('data:image/')) {
+        delete processedRoute.bg_image_key;
+        delete processedRoute.bg_image_size;
+      }
+      
+      return processedRoute;
+    });
+    
+    // Convertir el array de rutas procesadas a JSON string
+    formData.route_json = JSON.stringify(processedRoutes);
+    
+    // El ID se pasa como parámetro separado, no en el body
+    const updateId = this.editingPackageId!;
+    
+    this.routerTrackingRouterService.updateRouterTracking(updateId, formData).subscribe({
+      next: (data) => {
+        this.toastr.success('Se actualizó la configuración con éxito', 'Realizado', {
+          timeOut: this.timeOutmessage,
+          closeButton: true,
+          progressBar: true,
+        });
+        this.loadPackages();
+        this.closeAddPackageModal();
+      },
+      error: (error) => {
+        this.toastr.error('Error al actualizar la configuración', 'Error', {
           timeOut: this.timeOutmessage,
           closeButton: true,
           progressBar: true,
