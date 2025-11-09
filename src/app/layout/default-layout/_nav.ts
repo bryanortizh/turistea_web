@@ -39,6 +39,11 @@ export const navItems: INavData[] = [
     url: '/offers',
     iconComponent: { name: 'cil-star' },
   },
+  {
+    name: 'Terramozas',
+    url: '/terraces',
+    iconComponent: { name: 'cil-building' },
+  }
 ];
 
 export const navItemsSupport: INavData[] = [

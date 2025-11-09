@@ -48,6 +48,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'terraces',
+        loadComponent: () =>
+          import('./views/pages/terraces/terraces.component').then(
+            (m) => m.TerraceComponent
+          ),
+      },
+      {
         path: 'offers',
         loadComponent: () =>
           import('./views/pages/offerts/offerts.component').then(
