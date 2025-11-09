@@ -22,7 +22,6 @@ import { ToastrService } from 'ngx-toastr';
 import { Subject } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DriverService } from '../../../../core/services/driver.service';
-import { PackageResponse } from '../../../../data/interfaces/package.interface';
 import { DriverResponse } from '../../../../data/interfaces/driver.interface';
 import { RouterTrackingResponse, RouteItem } from '../../../../data/interfaces/router-tracking.interface';
 import {
@@ -70,12 +69,7 @@ export class RouterOffertsComponent implements OnInit {
   driverInput$ = new Subject<string>();
   bindLabel = 'name + " " + lastname';
 
-  cars = [
-    { id: 1, name: 'Volvo' },
-    { id: 2, name: 'Saab' },
-    { id: 3, name: 'Opel' },
-    { id: 4, name: 'Audi' },
-  ];
+
   constructor(
     private routerTrackingRouterService: RouterTrackingRouterService,
     private driverService: DriverService,

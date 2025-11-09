@@ -31,9 +31,10 @@
                         <button cButton color="success" size="sm" class="me-2 text-white" (click)="openPackageModal(i)">
                             Ver datos </button>
 
-                        <button cButton color="warning" size="sm" class="me-2 text-white" (click)="openEditPackageModal(i)">
+                        <button cButton color="warning" size="sm" class="me-2 text-white"
+                            (click)="openEditPackageModal(i)">
                             Editar</button>
-                        
+
                         <button cButton color="info" size="sm" class="me-2 text-white"
                             (click)="openRouterPackage(user.id)">Configurar</button>
 
@@ -96,7 +97,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="col-md-12 mb-3">
                     <label for="id_driver" class="form-label">Conductor *</label>
                     <ng-select [items]="dataDriver" bindLabel="textSearch" bindValue="id" formControlName="id_driver"
@@ -132,6 +133,18 @@
                     <div *ngIf="packageForm.get('image_bg')?.invalid && packageForm.get('image_bg')?.touched"
                         class="text-danger small">
                         <div *ngIf="packageForm.get('image_bg')?.errors?.['required']">La imagen de fondo es requerida.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12 mb-3">
+                    <label for="image_bg_two" class="form-label">Segunda imagen de fondo del paquete *</label>
+                    <input type="file" id="image_bg_two" class="form-control"
+                        (change)="onFileSelect($event, 'image_bg_two')" accept="image/*" />
+                    <div *ngIf="packageForm.get('image_bg_two')?.invalid && packageForm.get('image_bg_two')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="packageForm.get('image_bg_two')?.errors?.['required']">La segunda imagen de fondo es
+                            requerida.
                         </div>
                     </div>
                 </div>
@@ -176,7 +189,12 @@
                     <img *ngIf="selectedPackage.path_bg" [src]="selectedPackage.path_bg" alt="Imagen del vehículo"
                         class="img-fluid mt-2" style="max-width: 200px; border: 1px solid #ccc; padding: 5px;" />
                 </div>
-
+                <div class="col-6 mb-2">
+                    <strong>Segunda Imagen Paquete:</strong><br />
+                    <img *ngIf="selectedPackage.path_bg_two" [src]="selectedPackage.path_bg_two"
+                        alt="Imagen del vehículo" class="img-fluid mt-2"
+                        style="max-width: 200px; border: 1px solid #ccc; padding: 5px;" />
+                </div>
             </div>
         </div>
     </c-modal-body>
@@ -194,10 +212,8 @@
     <form [formGroup]="editPackageForm">
         <c-modal-body>
             <div class="row">
-                <!-- ID (oculto) -->
                 <input type="hidden" formControlName="id" />
-                
-                <!-- Título -->
+
                 <div class="col-md-6 mb-3">
                     <label for="edit_title" class="form-label">Título del paquete *</label>
                     <input type="text" id="edit_title" class="form-control" formControlName="title" />
@@ -207,18 +223,17 @@
                         <div *ngIf="editPackageForm.get('title')?.errors?.['minlength']">Mínimo 3 caracteres.</div>
                     </div>
                 </div>
-                
-                <!-- Departamento -->
+
                 <div class="col-md-6 mb-3">
                     <label for="edit_name_region" class="form-label">Departamento *</label>
                     <input type="text" id="edit_name_region" class="form-control" formControlName="name_region" />
                     <div *ngIf="editPackageForm.get('name_region')?.invalid && editPackageForm.get('name_region')?.touched"
                         class="text-danger small">
-                        <div *ngIf="editPackageForm.get('name_region')?.errors?.['required']">El departamento es requerido.</div>
+                        <div *ngIf="editPackageForm.get('name_region')?.errors?.['required']">El departamento es
+                            requerido.</div>
                     </div>
                 </div>
-                
-                <!-- Conductor -->
+
                 <div class="col-md-12 mb-3">
                     <label for="edit_id_driver" class="form-label">Conductor *</label>
                     <ng-select [items]="dataDriver" bindLabel="textSearch" bindValue="id" formControlName="id_driver"
@@ -229,37 +244,53 @@
                     </ng-select>
                     <div *ngIf="editPackageForm.get('id_driver')?.invalid && editPackageForm.get('id_driver')?.touched"
                         class="text-danger small">
-                        <div *ngIf="editPackageForm.get('id_driver')?.errors?.['required']">El conductor es requerido.</div>
+                        <div *ngIf="editPackageForm.get('id_driver')?.errors?.['required']">El conductor es requerido.
+                        </div>
                     </div>
                 </div>
 
-                <!-- Descripción -->
                 <div class="col-md-12 mb-3">
                     <label for="edit_description" class="form-label">Descripción *</label>
-                    <textarea id="edit_description" class="form-control" formControlName="description" rows="4"></textarea>
+                    <textarea id="edit_description" class="form-control" formControlName="description"
+                        rows="4"></textarea>
                     <div *ngIf="editPackageForm.get('description')?.invalid && editPackageForm.get('description')?.touched"
                         class="text-danger small">
-                        <div *ngIf="editPackageForm.get('description')?.errors?.['required']">La descripción es requerida.</div>
-                        <div *ngIf="editPackageForm.get('description')?.errors?.['minlength']">Mínimo 10 caracteres.</div>
+                        <div *ngIf="editPackageForm.get('description')?.errors?.['required']">La descripción es
+                            requerida.</div>
+                        <div *ngIf="editPackageForm.get('description')?.errors?.['minlength']">Mínimo 10 caracteres.
+                        </div>
                     </div>
                 </div>
 
-                <!-- Imagen actual -->
                 <div class="col-md-12 mb-3" *ngIf="selectedPackage?.path_bg">
                     <label class="form-label">Imagen actual</label>
                     <div>
-                        <img [src]="selectedPackage?.path_bg" alt="Imagen actual del paquete"
-                            class="img-fluid" style="max-width: 200px; border: 1px solid #ccc; padding: 5px;" />
+                        <img [src]="selectedPackage?.path_bg" alt="Imagen actual del paquete" class="img-fluid"
+                            style="max-width: 200px; border: 1px solid #ccc; padding: 5px;" />
                     </div>
                 </div>
 
-                <!-- Nueva imagen -->
                 <div class="col-md-12 mb-3">
                     <label for="edit_image_bg" class="form-label">Nueva imagen de fondo (opcional)</label>
-                    <input type="file" id="edit_image_bg" class="form-control" (change)="onFileSelectEdit($event, 'image_bg')"
-                        accept="image/*" />
+                    <input type="file" id="edit_image_bg" class="form-control"
+                        (change)="onFileSelectEdit($event, 'image_bg')" accept="image/*" />
                     <small class="text-muted">Deja vacío si no deseas cambiar la imagen actual</small>
                 </div>
+
+                <div class="col-md-12 mb-3" *ngIf="selectedPackage?.path_bg_two">
+                    <label class="form-label">Segunda imagen actual</label>
+                    <div>
+                        <img [src]="selectedPackage?.path_bg_two" alt="Segunda imagen actual del paquete"
+                            class="img-fluid" style="max-width: 200px; border: 1px solid #ccc; padding: 5px;" />
+                    </div>
+                </div>
+                <div class="col-md-12 mb-3">
+                    <label for="edit_image_bg_two" class="form-label">Nueva segunda imagen de fondo (opcional)</label>
+                    <input type="file" id="edit_image_bg_two" class="form-control"
+                        (change)="onFileSelectEdit($event, 'image_bg_two')" accept="image/*" />
+                    <small class="text-muted">Deja vacío si no deseas cambiar la segunda imagen actual</small>
+                </div>
+
             </div>
         </c-modal-body>
         <c-modal-footer>

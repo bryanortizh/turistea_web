@@ -93,6 +93,7 @@ export class OffertsComponent {
       name_region: ['', [Validators.required]],
       id_driver: ['', [Validators.required]],
       image_bg: ['', [Validators.required]],
+      image_bg_two: ['', [Validators.required]],
     });
 
     this.editPackageForm = this.fb.group({
@@ -102,6 +103,7 @@ export class OffertsComponent {
       name_region: ['', [Validators.required]],
       id_driver: ['', [Validators.required]],
       image_bg: [''],
+      image_bg_two: [''],
     });
 
     this.loadDrivers();
