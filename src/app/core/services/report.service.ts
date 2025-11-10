@@ -9,9 +9,7 @@ import { Profile } from '../../data/interfaces/profile.interface';
 export class ReportService {
   URL_BACKEND = 'http://localhost:4001';
   timeOutmessage = 3000;
-  constructor(
-    public http: HttpClient,
-  ) {}
+  constructor(public http: HttpClient) {}
 
   getReportUser(): Observable<any> {
     let headers = new HttpHeaders();
@@ -21,8 +19,27 @@ export class ReportService {
       'Bearer ' + localStorage.getItem('token_turistea')
     );
 
-    return this.http.get<any>(this.URL_BACKEND + '/api/report/new-users-stats', {
-      headers: headers,
-    });
+    return this.http.get<any>(
+      this.URL_BACKEND + '/api/report/new-users-stats',
+      {
+        headers: headers,
+      }
+    );
+  }
+
+  getReportReserve(filter: string): Observable<any> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Content-type', 'application/json');
+    headers = headers.set(
+      'Authorization',
+      'Bearer ' + localStorage.getItem('token_turistea')
+    );
+
+    return this.http.get<any>(
+      this.URL_BACKEND + '/api/report/reserves-report?filter=' + filter,
+      {
+        headers: headers,
+      }
+    );
   }
 }

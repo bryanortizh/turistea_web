@@ -1,30 +1,25 @@
 import {
   AfterContentInit,
-  AfterViewInit,
   ChangeDetectorRef,
   Component,
   inject,
+  Input,
   OnInit,
-  viewChild,
+  OnChanges,
+  SimpleChanges,
 } from '@angular/core';
 import { getStyle } from '@coreui/utils';
 import { ChartjsComponent } from '@coreui/angular-chartjs';
-import { RouterLink } from '@angular/router';
 import { IconDirective } from '@coreui/icons-angular';
 import {
-  ButtonDirective,
   ColComponent,
-  DropdownComponent,
-  DropdownDividerDirective,
-  DropdownItemDirective,
-  DropdownMenuDirective,
-  DropdownToggleDirective,
   RowComponent,
   TemplateIdDirective,
   WidgetStatAComponent,
 } from '@coreui/angular';
 import { ReportService } from '../../../core/services/report.service';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { ReportSummary } from '../../../data/interfaces/report.interface';
 
 @Component({
   selector: 'app-widgets-dropdown',
@@ -37,86 +32,122 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
     WidgetStatAComponent,
     TemplateIdDirective,
     IconDirective,
-    DropdownComponent,
-    ButtonDirective,
-    DropdownToggleDirective,
-    DropdownMenuDirective,
-    DropdownItemDirective,
-    RouterLink,
     ChartjsComponent,
   ],
 })
 export class WidgetsDropdownComponent implements OnInit, AfterContentInit {
   private changeDetectorRef = inject(ChangeDetectorRef);
 
+  @Input() reportSummary: ReportSummary | null = null;
+
+  // Helper para usar Math.round en el template
+  Math = Math;
+
   data: any[] = [];
   options: any[] = [];
 
-  // Propiedades para datos de usuarios
+  // Estadísticas de reservas
+  reserveStats = {
+    total_reserves: 0,
+    total_revenue: 0,
+    average_price: 0,
+    total_people: 0
+  };
+
+  statusStats = {
+    pending: 0,
+    rejected: 0,
+    pendingpay: 0,
+    reserve: 0,
+    inprocesstravel: 0,
+    done: 0,
+    approved: 0
+  };
+
   userStats = {
+    total_users_system: 0,
+    percentage_change: 0,
+    total_users: 0,
+    current_month_users: 0,
+    previous_month_users: 0,
+    monthly_data: [] as any[],
+  };
+  adminStats = {
     total_users: 0,
     percentage_change: 0,
     current_month_users: 0,
     previous_month_users: 0,
-    monthly_data: [] as any[]
+    monthly_data: [] as any[],
+  };
+  driverStats = {
+    total_drivers_system: 0,
+    total_drivers: 0,
+    percentage_change: 0,
+    current_month_users: 0,
+    previous_month_users: 0,
+    monthly_data: [] as any[],
+  };
+  guideStats = {
+    total_guides_system: 0,
+    percentage_change: 0,
+    current_month_users: 0,
+    previous_month_users: 0,
+    monthly_data: [] as any[],
+  };
+  terraceStats = {
+    total_terrace_system: 0,
+    total_terrace: 0,
+    percentage_change: 0,
+    current_month_users: 0,
+    previous_month_users: 0,
+    monthly_data: [] as any[],
   };
 
-  labels = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ];
   datasets = [
     [
       {
-        label: 'My First dataset',
+        label: 'Administradores registrados',
         backgroundColor: 'transparent',
         borderColor: 'rgba(255,255,255,.55)',
         pointBackgroundColor: getStyle('--cui-primary'),
         pointHoverBorderColor: getStyle('--cui-primary'),
-        data: [65, 59, 84, 84, 51, 55, 40],
+        data: [] as number[],
       },
-    ],
-    [
       {
-        label: 'My Second dataset',
+        label: 'Usuarios registrados',
         backgroundColor: 'transparent',
         borderColor: 'rgba(255,255,255,.55)',
-        pointBackgroundColor: getStyle('--cui-info'),
-        pointHoverBorderColor: getStyle('--cui-info'),
-        data: [1, 18, 9, 17, 34, 22, 11],
+        pointBackgroundColor: getStyle('--cui-primary'),
+        pointHoverBorderColor: getStyle('--cui-primary'),
+        data: [] as number[],
       },
-    ],
-    [
       {
-        label: 'My Third dataset',
-        backgroundColor: 'rgba(255,255,255,.2)',
+        label: 'Conductores registrados',
+        backgroundColor: 'transparent',
         borderColor: 'rgba(255,255,255,.55)',
-        pointBackgroundColor: getStyle('--cui-warning'),
-        pointHoverBorderColor: getStyle('--cui-warning'),
-        data: [78, 81, 80, 45, 34, 12, 40],
-        fill: true,
+        pointBackgroundColor: getStyle('--cui-primary'),
+        pointHoverBorderColor: getStyle('--cui-primary'),
+        data: [] as number[],
       },
-    ],
-    [
       {
-        label: 'My Fourth dataset',
-        backgroundColor: 'rgba(255,255,255,.2)',
+        label: 'Guías registradas',
+        backgroundColor: 'transparent',
         borderColor: 'rgba(255,255,255,.55)',
-        data: [78, 81, 80, 45, 34, 12, 40, 85, 65, 23, 12, 98, 34, 84, 67, 82],
-        barPercentage: 0.7,
+        pointBackgroundColor: getStyle('--cui-primary'),
+        pointHoverBorderColor: getStyle('--cui-primary'),
+        data: [] as number[],
+      },
+      {
+        label: 'Terramozas registradas',
+        backgroundColor: 'transparent',
+        borderColor: 'rgba(255,255,255,.55)',
+        pointBackgroundColor: getStyle('--cui-primary'),
+        pointHoverBorderColor: getStyle('--cui-primary'),
+        data: [] as number[],
       },
     ],
   ];
+
   optionsDefault = {
     plugins: {
       legend: {
@@ -174,67 +205,91 @@ export class WidgetsDropdownComponent implements OnInit, AfterContentInit {
   }
 
   setData() {
-    for (let idx = 0; idx < 4; idx++) {
-      this.data[idx] = {
-        labels: idx < 3 ? this.labels.slice(0, 7) : this.labels,
-        datasets: this.datasets[idx],
-      };
-    }
+    // Configurar ambos gráficos
+    this.data[0] = {
+      labels: [],
+      datasets: this.datasets[0],
+    };
+    this.data[1] = {
+      labels: [],
+      datasets: this.datasets[1],
+    };
+    this.data[2] = {
+      labels: [],
+      datasets: this.datasets[2],
+    };
+    this.data[3] = {
+      labels: [],
+      datasets: this.datasets[3],
+    };
+    this.data[4] = {
+      labels: [],
+      datasets: this.datasets[4],
+    };
     this.setOptions();
   }
 
   setOptions() {
-    for (let idx = 0; idx < 4; idx++) {
-      const options = JSON.parse(JSON.stringify(this.optionsDefault));
-      switch (idx) {
-        case 0: {
-          // Configuración específica para el gráfico de usuarios
-          options.scales.y.min = 0;
-          options.scales.y.max = undefined; // Permitir que se ajuste automáticamente
-          options.elements.line.tension = 0.4;
-          options.elements.point.radius = 3;
-          options.elements.point.hoverRadius = 6;
-          this.options.push(options);
-          break;
-        }
-        case 1: {
-          options.scales.y.min = -9;
-          options.scales.y.max = 39;
-          options.elements.line.tension = 0;
-          this.options.push(options);
-          break;
-        }
-        case 2: {
-          options.scales.x = { display: false };
-          options.scales.y = { display: false };
-          options.elements.line.borderWidth = 2;
-          options.elements.point.radius = 0;
-          this.options.push(options);
-          break;
-        }
-        case 3: {
-          options.scales.x.grid = { display: false, drawTicks: false };
-          options.scales.x.grid = {
-            display: false,
-            drawTicks: false,
-            drawBorder: false,
-          };
-          options.scales.y.min = undefined;
-          options.scales.y.max = undefined;
-          options.elements = {};
-          this.options.push(options);
-          break;
-        }
-      }
-    }
+    // Opciones para gráfico de administradores
+    const adminOptions = JSON.parse(JSON.stringify(this.optionsDefault));
+    adminOptions.scales.y.min = 0;
+    adminOptions.scales.y.max = undefined;
+    adminOptions.elements.line.tension = 0.4;
+    adminOptions.elements.point.radius = 3;
+    adminOptions.elements.point.hoverRadius = 6;
+    this.options[0] = adminOptions;
+
+    // Opciones para gráfico de usuarios
+    const userOptions = JSON.parse(JSON.stringify(this.optionsDefault));
+    userOptions.scales.y.min = 0;
+    userOptions.scales.y.max = undefined;
+    userOptions.elements.line.tension = 0.4;
+    userOptions.elements.point.radius = 3;
+    userOptions.elements.point.hoverRadius = 6;
+    this.options[1] = userOptions;
+
+    // Opciones para gráfico de conductores
+    const driverOptions = JSON.parse(JSON.stringify(this.optionsDefault));
+    driverOptions.scales.y.min = 0;
+    driverOptions.scales.y.max = undefined;
+    driverOptions.elements.line.tension = 0.4;
+    driverOptions.elements.point.radius = 3;
+    driverOptions.elements.point.hoverRadius = 6;
+    this.options[2] = driverOptions;
+
+    // Opciones para gráfico de guías
+    const guideOptions = JSON.parse(JSON.stringify(this.optionsDefault));
+    guideOptions.scales.y.min = 0;
+    guideOptions.scales.y.max = undefined;
+    guideOptions.elements.line.tension = 0.4;
+    guideOptions.elements.point.radius = 3;
+    guideOptions.elements.point.hoverRadius = 6;
+    this.options[3] = guideOptions;
+
+    // Opciones para gráfico de terramozas
+    const terraceOptions = JSON.parse(JSON.stringify(this.optionsDefault));
+    terraceOptions.scales.y.min = 0;
+    terraceOptions.scales.y.max = undefined;
+    terraceOptions.elements.line.tension = 0.4;
+    terraceOptions.elements.point.radius = 3;
+    terraceOptions.elements.point.hoverRadius = 6;
+    this.options[4] = terraceOptions;
   }
 
   getReportUser(): void {
     this.reportService.getReportUser().subscribe(
       (response) => {
         if (response && response.data) {
-          this.userStats = response.data;
+          this.adminStats = response.data;
+          this.userStats = response.data_user;
+          this.terraceStats = response.data_terrace;
+          this.driverStats = response.data_drivers;
+          this.guideStats = response.data_guides;
+          this.updateAdminChart();
           this.updateUserChart();
+          this.updateDriverChart();
+          this.updateGuideChart();
+          this.updateTerraceChart();
         }
       },
       (error) => {
@@ -243,26 +298,25 @@ export class WidgetsDropdownComponent implements OnInit, AfterContentInit {
     );
   }
 
-  updateUserChart(): void {
-    
-    // Asegurarse de que tenemos datos y ordenarlos por fecha
-    const sortedData = this.userStats.monthly_data
-      .sort((a, b) => new Date(a.month + '-01').getTime() - new Date(b.month + '-01').getTime());
-    
-    // Usar month_name que ya viene formateado del API, pero acortarlo
-    const monthLabels = sortedData.map(item => {
-      // Extraer solo el mes y año abreviado de "June 2025" -> "Jun 25"
+  updateAdminChart(): void {
+    const sortedData = this.adminStats.monthly_data.sort(
+      (a, b) =>
+        new Date(a.month + '-01').getTime() -
+        new Date(b.month + '-01').getTime()
+    );
+
+    const monthLabels = sortedData.map((item) => {
       const parts = item.month_name.split(' ');
-      const month = parts[0].substring(0, 3); // Primeras 3 letras del mes
-      const year = parts[1].substring(2); // Últimos 2 dígitos del año
+      const month = parts[0].substring(0, 3);
+      const year = parts[1].substring(2);
       return `${month} ${year}`;
     });
-    
-    const monthlyUsers = sortedData.map(item => item.total_users);
-    
+
+    const monthlyUsers = sortedData.map((item) => item.total_users);
+
     this.datasets[0] = [
       {
-        label: 'Usuarios registrados',
+        label: 'Administradores registrados',
         backgroundColor: 'transparent',
         borderColor: 'rgba(255,255,255,.55)',
         pointBackgroundColor: getStyle('--cui-primary'),
@@ -278,97 +332,172 @@ export class WidgetsDropdownComponent implements OnInit, AfterContentInit {
 
     this.changeDetectorRef.detectChanges();
   }
-}
 
-/* @Component({
-  selector: 'app-chart-sample',
-  template:
-    '<c-chart type="line" [data]="data" [options]="options" width="300" #chart />',
-  imports: [ChartjsComponent],
-})
-export class ChartSample implements AfterViewInit {
-  constructor() {}
+  updateUserChart(): void {
+    const sortedData = this.userStats.monthly_data.sort(
+      (a, b) =>
+        new Date(a.month + '-01').getTime() -
+        new Date(b.month + '-01').getTime()
+    );
 
-  readonly chartComponent = viewChild.required<ChartjsComponent>('chart');
+    const monthLabels = sortedData.map((item) => {
+      const parts = item.month_name.split(' ');
+      const month = parts[0].substring(0, 3);
+      const year = parts[1].substring(2);
+      return `${month} ${year}`;
+    });
 
-  colors = {
-    label: 'My dataset',
-    backgroundColor: 'rgba(77,189,116,.2)',
-    borderColor: '#4dbd74',
-    pointHoverBackgroundColor: '#fff',
-  };
+    const monthlyUsers = sortedData.map((item) => item.total_users);
 
-  labels = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
-
-  data = {
-    labels: this.labels,
-    datasets: [
+    const userDataset = [
       {
-        data: [65, 59, 84, 84, 51, 55, 40],
-        ...this.colors,
-        fill: { value: 65 },
+        label: 'Usuarios del sistema',
+        backgroundColor: 'transparent',
+        borderColor: 'rgba(255,255,255,.55)',
+        pointBackgroundColor: getStyle('--cui-info'),
+        pointHoverBorderColor: getStyle('--cui-info'),
+        data: monthlyUsers,
       },
-    ],
-  };
+    ];
 
-  options = {
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        display: false,
-      },
-    },
-    elements: {
-      line: {
-        tension: 0.4,
-      },
-    },
-  };
+    this.data[1] = {
+      labels: monthLabels,
+      datasets: userDataset,
+    };
 
-  ngAfterViewInit(): void {
-    setTimeout(() => {
-      const data = () => {
-        return {
-          ...this.data,
-          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-          datasets: [
-            {
-              ...this.data.datasets[0],
-              data: [42, 88, 42, 66, 77],
-              fill: { value: 55 },
-            },
-            {
-              ...this.data.datasets[0],
-              borderColor: '#ffbd47',
-              data: [88, 42, 66, 77, 42],
-            },
-          ],
-        };
-      };
-      const newLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May'];
-      const newData = [42, 88, 42, 66, 77];
-      let { datasets, labels } = { ...this.data };
-      // @ts-ignore
-      const before = this.chartComponent()?.chart?.data.datasets.length;
-      // @ts-ignore
-      // this.data = data()
-      this.data = {
-        ...this.data,
-        datasets: [
-          { ...this.data.datasets[0], data: newData },
-          {
-            ...this.data.datasets[0],
-            borderColor: '#ffbd47',
-            data: [88, 42, 66, 77, 42],
-          },
-        ],
-        labels: newLabels,
-      };
-      // @ts-ignore
-      setTimeout(() => {
-        const after = this.chartComponent()?.chart?.data.datasets.length;
-      });
-    }, 5000);
+    this.changeDetectorRef.detectChanges();
   }
+
+  updateTerraceChart(): void {
+    const sortedData = this.terraceStats.monthly_data.sort(
+      (a, b) =>
+        new Date(a.month + '-01').getTime() -
+        new Date(b.month + '-01').getTime()
+    );
+
+    const monthLabels = sortedData.map((item) => {
+      const parts = item.month_name.split(' ');
+      const month = parts[0].substring(0, 3);
+      const year = parts[1].substring(2);
+      return `${month} ${year}`;
+    });
+
+    const monthlyTerraces = sortedData.map((item) => item.total_terrace);
+
+    const terraceDataset = [
+      {
+        label: 'Terramozas del sistema',
+        backgroundColor: 'transparent',
+        borderColor: 'rgba(255,255,255,.55)',
+        pointBackgroundColor: getStyle('--cui-success'),
+        pointHoverBorderColor: getStyle('--cui-success'),
+        data: monthlyTerraces,
+      },
+    ];
+
+    this.data[4] = {
+      labels: monthLabels,
+      datasets: terraceDataset,
+    };
+
+    this.changeDetectorRef.detectChanges();
+  }
+
+  updateDriverChart(): void {
+    const sortedData = this.driverStats.monthly_data.sort(
+      (a, b) =>
+        new Date(a.month + '-01').getTime() -
+        new Date(b.month + '-01').getTime()
+    );
+
+    const monthLabels = sortedData.map((item) => {
+      const parts = item.month_name.split(' ');
+      const month = parts[0].substring(0, 3);
+      const year = parts[1].substring(2);
+      return `${month} ${year}`;
+    });
+
+    const monthlyDrivers = sortedData.map((item) => item.total_drivers);
+
+    const driverDataset = [
+      {
+        label: 'Conductores del sistema',
+        backgroundColor: 'transparent',
+        borderColor: 'rgba(255,255,255,.55)',
+        pointBackgroundColor: getStyle('--cui-warning'),
+        pointHoverBorderColor: getStyle('--cui-warning'),
+        data: monthlyDrivers,
+      },
+    ];
+    this.data[2] = {
+      labels: monthLabels,
+      datasets: driverDataset,
+    };
+
+    this.changeDetectorRef.detectChanges();
+  }
+
+  updateGuideChart(): void {
+    const sortedData = this.guideStats.monthly_data.sort(
+      (a, b) =>
+        new Date(a.month + '-01').getTime() -
+        new Date(b.month + '-01').getTime()
+    );
+
+    const monthLabels = sortedData.map((item) => {
+      const parts = item.month_name.split(' ');
+      const month = parts[0].substring(0, 3);
+      const year = parts[1].substring(2);
+      return `${month} ${year}`;
+    });
+
+    const monthlyGuides = sortedData.map((item) => item.total_guides);
+    const guideDataset = [
+      {
+        label: 'Guías del sistema',
+        backgroundColor: 'transparent',
+        borderColor: 'rgba(255,255,255,.55)',
+        pointBackgroundColor: getStyle('--cui-danger'),
+        pointHoverBorderColor: getStyle('--cui-danger'),
+        data: monthlyGuides,
+      },
+    ];
+    this.data[3] = {
+      labels: monthLabels,
+      datasets: guideDataset,
+    };
+
+    this.changeDetectorRef.detectChanges();
+  }
+
+/*   ngOnChanges(changes: SimpleChanges): void {
+    if (changes['reportSummary'] && this.reportSummary) {
+      this.updateStatsWithReportData();
+    }
+  }
+
+  private updateStatsWithReportData(): void {
+    if (!this.reportSummary) return;
+
+    // Actualizar las estadísticas principales de reservas
+    this.reserveStats = {
+      total_reserves: this.reportSummary.total_reserves,
+      total_revenue: this.reportSummary.total_revenue,
+      average_price: parseFloat(this.reportSummary.average_price),
+      total_people: this.reportSummary.total_people
+    };
+
+    // Actualizar las estadísticas de estados
+    this.statusStats = {
+      pending: this.reportSummary.status_breakdown.pending,
+      rejected: this.reportSummary.status_breakdown.rejected,
+      pendingpay: this.reportSummary.status_breakdown.pendingpay,
+      reserve: this.reportSummary.status_breakdown.reserve,
+      inprocesstravel: this.reportSummary.status_breakdown.inprocesstravel,
+      done: this.reportSummary.status_breakdown.done,
+      approved: this.reportSummary.status_breakdown.approved
+    };
+    
+    this.changeDetectorRef.detectChanges();
+  } */
 }
- */

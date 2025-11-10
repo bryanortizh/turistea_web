@@ -29,100 +29,26 @@ export class DashboardChartsData {
   }
 
   initMainChart(period: string = 'Month') {
-    const brandSuccess = getStyle('--cui-success') ?? '#4dbd74';
-    const brandInfo = getStyle('--cui-info') ?? '#20a8d8';
-    const brandInfoBg = `rgba(${getStyle('--cui-info-rgb')}, .1)`
-    const brandDanger = getStyle('--cui-danger') ?? '#f86c6b';
+    // Solo inicializar el gráfico básico sin datos
+    // Los datos reales se establecerán mediante updateMainChartWithData
+    this.mainChart.type = 'line';
+    this.mainChart.data = {
+      datasets: [],
+      labels: []
+    };
+    this.mainChart.options = this.getBasicOptions();
+  }
 
-    // mainChart
-    this.mainChart['elements'] = period === 'Month' ? 12 : 27;
-    this.mainChart['Data1'] = [];
-    this.mainChart['Data2'] = [];
-    this.mainChart['Data3'] = [];
-
-    // generate random values for mainChart
-    for (let i = 0; i <= this.mainChart['elements']; i++) {
-      this.mainChart['Data1'].push(this.random(50, 240));
-      this.mainChart['Data2'].push(this.random(20, 160));
-      this.mainChart['Data3'].push(65);
-    }
-
-    let labels: string[] = [];
-    if (period === 'Month') {
-      labels = [
-        'January',
-        'February',
-        'March',
-        'April',
-        'May',
-        'June',
-        'July',
-        'August',
-        'September',
-        'October',
-        'November',
-        'December'
-      ];
-    } else {
-      /* tslint:disable:max-line-length */
-      const week = [
-        'Monday',
-        'Tuesday',
-        'Wednesday',
-        'Thursday',
-        'Friday',
-        'Saturday',
-        'Sunday'
-      ];
-      labels = week.concat(week, week, week);
-    }
-
-    const colors = [
-      {
-        // brandInfo
-        backgroundColor: brandInfoBg,
-        borderColor: brandInfo,
-        pointHoverBackgroundColor: brandInfo,
-        borderWidth: 2,
-        fill: true
-      },
-      {
-        // brandSuccess
-        backgroundColor: 'transparent',
-        borderColor: brandSuccess || '#4dbd74',
-        pointHoverBackgroundColor: '#fff'
-      },
-      {
-        // brandDanger
-        backgroundColor: 'transparent',
-        borderColor: brandDanger || '#f86c6b',
-        pointHoverBackgroundColor: brandDanger,
-        borderWidth: 1,
-        borderDash: [8, 5]
-      }
-    ];
-
-    const datasets: ChartDataset[] = [
-      {
-        data: this.mainChart['Data1'],
-        label: 'Current',
-        ...colors[0]
-      },
-      {
-        data: this.mainChart['Data2'],
-        label: 'Previous',
-        ...colors[1]
-      },
-      {
-        data: this.mainChart['Data3'],
-        label: 'BEP',
-        ...colors[2]
-      }
-    ];
-
+  private getBasicOptions(): ChartOptions {
     const plugins: DeepPartial<PluginOptionsByType<any>> = {
       legend: {
-        display: false
+        display: true,
+        position: 'bottom',
+        labels: {
+          boxWidth: 12,
+          padding: 20,
+          color: getStyle('--cui-body-color')
+        }
       },
       tooltip: {
         callbacks: {
@@ -133,7 +59,7 @@ export class DashboardChartsData {
 
     const scales = this.getScales();
 
-    const options: ChartOptions = {
+    return {
       maintainAspectRatio: false,
       plugins,
       scales,
@@ -142,19 +68,12 @@ export class DashboardChartsData {
           tension: 0.4
         },
         point: {
-          radius: 0,
+          radius: 4,
           hitRadius: 10,
-          hoverRadius: 4,
+          hoverRadius: 6,
           hoverBorderWidth: 3
         }
       }
-    };
-
-    this.mainChart.type = 'line';
-    this.mainChart.options = options;
-    this.mainChart.data = {
-      datasets,
-      labels
     };
   }
 
@@ -189,5 +108,209 @@ export class DashboardChartsData {
       }
     };
     return scales;
+  }
+
+  updateMainChartWithData(labels: string[], chartData: { 
+    totalReserves: number[], 
+    pendingReserves: number[], 
+    approvedReserves: number[], 
+    inProcessReserves: number[], 
+    doneReserves: number[], 
+    rejectedReserves: number[], 
+    pendingPayReserves: number[], 
+    reserveReserves: number[] 
+  }) {
+    // Validar que los datos no estén vacíos
+    if (!labels || labels.length === 0) {
+      console.warn('No hay etiquetas para el gráfico');
+      return;
+    }
+    
+    if (!chartData || Object.keys(chartData).length === 0) {
+      console.warn('No hay datos para el gráfico');
+      return;
+    }
+    const brandPrimary = getStyle('--cui-primary') ?? '#321fdb';
+    const brandSuccess = getStyle('--cui-success') ?? '#2eb85c';
+    const brandInfo = getStyle('--cui-info') ?? '#39f';
+    const brandWarning = getStyle('--cui-warning') ?? '#f9b115';
+    const brandDanger = getStyle('--cui-danger') ?? '#e55353';
+    const brandSecondary = getStyle('--cui-secondary') ?? '#6c757d';
+    const brandDark = getStyle('--cui-dark') ?? '#212529';
+    const brandLight = getStyle('--cui-light') ?? '#f8f9fa';
+
+    const colors = [
+      {
+        // Total Reservas - Azul primario
+        backgroundColor: `rgba(${getStyle('--cui-primary-rgb')}, .1)`,
+        borderColor: brandPrimary,
+        pointHoverBackgroundColor: brandPrimary,
+        borderWidth: 3,
+        fill: true
+      },
+      {
+        // Pendientes - Amarillo/Naranja
+        backgroundColor: 'transparent',
+        borderColor: brandWarning,
+        pointHoverBackgroundColor: brandWarning,
+        borderWidth: 2
+      },
+      {
+        // Aprobadas - Verde
+        backgroundColor: 'transparent',
+        borderColor: brandSuccess,
+        pointHoverBackgroundColor: brandSuccess,
+        borderWidth: 2
+      },
+      {
+        // En proceso de viaje - Azul info
+        backgroundColor: 'transparent',
+        borderColor: brandInfo,
+        pointHoverBackgroundColor: brandInfo,
+        borderWidth: 2,
+        borderDash: [5, 3]
+      },
+      {
+        // Completadas - Verde oscuro
+        backgroundColor: 'transparent',
+        borderColor: brandDark,
+        pointHoverBackgroundColor: brandDark,
+        borderWidth: 2
+      },
+      {
+        // Rechazadas - Rojo
+        backgroundColor: 'transparent',
+        borderColor: brandDanger,
+        pointHoverBackgroundColor: brandDanger,
+        borderWidth: 2,
+        borderDash: [3, 3]
+      },
+      {
+        // Pendientes de pago - Gris
+        backgroundColor: 'transparent',
+        borderColor: brandSecondary,
+        pointHoverBackgroundColor: brandSecondary,
+        borderWidth: 2
+      },
+      {
+        // Reservadas - Celeste claro
+        backgroundColor: 'transparent',
+        borderColor: brandLight,
+        pointHoverBackgroundColor: brandLight,
+        borderWidth: 2
+        
+      }
+    ];
+
+    const datasets: ChartDataset[] = [
+      {
+        data: chartData.totalReserves,
+        label: 'Total Reservas',
+        ...colors[0]
+      },
+      {
+        data: chartData.pendingReserves,
+        label: 'Pendientes',
+        ...colors[1]
+      },
+      {
+        data: chartData.approvedReserves,
+        label: 'Aprobadas',
+        ...colors[2]
+      },
+      {
+        data: chartData.inProcessReserves,
+        label: 'En Proceso de Viaje',
+        ...colors[3]
+      },
+      {
+        data: chartData.doneReserves,
+        label: 'Completadas',
+        ...colors[4]
+      },
+      {
+        data: chartData.rejectedReserves,
+        label: 'Rechazadas',
+        ...colors[5]
+      },
+      {
+        data: chartData.pendingPayReserves,
+        label: 'Pendientes de Pago',
+        ...colors[6]
+      },
+      {
+        data: chartData.reserveReserves,
+        label: 'Reservadas',
+        ...colors[7]
+      }
+    ];
+
+    const plugins: DeepPartial<PluginOptionsByType<any>> = {
+      legend: {
+        display: true,
+        position: 'bottom',
+        labels: {
+          boxWidth: 12,
+          padding: 20,
+          color: getStyle('--cui-body-color')
+        }
+      },
+      tooltip: {
+        callbacks: {
+          labelColor: (context) => ({ backgroundColor: context.dataset.borderColor } as TooltipLabelStyle),
+          label: (context) => {
+            let label = context.dataset.label || '';
+            if (label) {
+              label += ': ';
+            }
+            label += context.formattedValue;
+            return label;
+          }
+        }
+      }
+    };
+
+    const scales = this.getScales();
+    
+    // Ajustar la escala Y para acomodar mejor los datos
+    const allValues = [
+      ...chartData.totalReserves,
+      ...chartData.pendingReserves,
+      ...chartData.approvedReserves,
+      ...chartData.inProcessReserves,
+      ...chartData.doneReserves,
+      ...chartData.rejectedReserves,
+      ...chartData.pendingPayReserves,
+      ...chartData.reserveReserves
+    ];
+    
+    const maxValue = Math.max(...allValues);
+    
+    scales.y.max = Math.ceil(maxValue * 1.2);
+    scales.y.ticks.stepSize = Math.ceil(scales.y.max / 5);
+
+    const options: ChartOptions = {
+      maintainAspectRatio: false,
+      plugins,
+      scales,
+      elements: {
+        line: {
+          tension: 0.4
+        },
+        point: {
+          radius: 4,
+          hitRadius: 10,
+          hoverRadius: 6,
+          hoverBorderWidth: 3
+        }
+      }
+    };
+
+    this.mainChart.type = 'line';
+    this.mainChart.options = options;
+    this.mainChart.data = {
+      datasets,
+      labels
+    };
   }
 }

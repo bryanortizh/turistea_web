@@ -27,8 +27,6 @@ import {
 import { DriverService } from '../../../core/services/driver.service';
 import { DriverResponse } from '../../../data/interfaces/driver.interface';
 import {
-  NgLabelTemplateDirective,
-  NgOptionTemplateDirective,
   NgSelectComponent,
 } from '@ng-select/ng-select';
 import { Subject } from 'rxjs';
@@ -222,12 +220,16 @@ export class OffertsComponent {
   }
 
   savePackage() {
+    this.allDrivers(); // Cargar conductores al abrir modal
     this.visibleAddPackageModal = true;
   }
 
   closeAddPackageModal() {
     this.visibleAddPackageModal = false;
     this.packageForm.reset();
+    // Reiniciar el Subject para asegurar que funcione en próximas aperturas
+    this.driverInput$ = new Subject<string>();
+    this.loadDrivers();
   }
 
   openEditPackageModal(index: number) {
@@ -256,6 +258,9 @@ export class OffertsComponent {
     this.editPackageForm.reset();
     this.selectedPackage = null;
     this.selectedImagePreview = null;
+    // Reiniciar el Subject para asegurar que funcione en próximas aperturas
+    this.driverInput$ = new Subject<string>();
+    this.loadDrivers();
   }
 
   loadDriverForEdit(driverId: number) {
@@ -381,6 +386,17 @@ export class OffertsComponent {
 
   onDriverSelectedEdit(driverId: any) {
     this.editPackageForm.patchValue({ id_driver: driverId.id });
+  }
+
+  onDriverCleared() {
+    this.driverInput$ = new Subject<string>();
+    this.loadDrivers();
+  }
+
+  onDriverClearedEdit() {
+    this.driverInput$ = new Subject<string>();
+    this.loadDrivers();
+    this.editPackageForm.patchValue({ id_driver: null });
   }
 
   openRouterPackage(id: number) {

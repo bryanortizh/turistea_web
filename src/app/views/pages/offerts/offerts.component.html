@@ -69,7 +69,6 @@
     </nav>
 </div>
 
-<!-- Modal para registrar paquete turístico -->
 <c-modal [visible]="visibleAddPackageModal" (visibleChange)="visibleAddPackageModal = $event" size="lg">
     <c-modal-header>
         <h5 cModalTitle>Registrar paquete turístico</h5>
@@ -78,7 +77,6 @@
     <form [formGroup]="packageForm">
         <c-modal-body>
             <div class="row">
-                <!-- Título -->
                 <div class="col-md-6 mb-3">
                     <label for="title" class="form-label">Título del paquete *</label>
                     <input type="text" id="title" class="form-control" formControlName="title" />
@@ -104,7 +102,7 @@
                         placeholder="Buscar conductor por nombre..." notFoundText="No se encontraron conductores"
                         typeToSearchText="Escribe para buscar..." [loading]="loadingDrivers" [clearable]="true"
                         [searchable]="true" [typeahead]="driverInput$" [minTermLength]="2"
-                        (change)="onDriverSelected($event)">
+                        (change)="onDriverSelected($event)" (clear)="onDriverCleared()">
                     </ng-select>
                     <div *ngIf="packageForm.get('id_driver')?.invalid && packageForm.get('id_driver')?.touched"
                         class="text-danger small">
@@ -112,7 +110,6 @@
                     </div>
                 </div>
 
-                <!-- Descripción -->
                 <div class="col-md-12 mb-3">
                     <label for="description" class="form-label">Descripción *</label>
                     <textarea id="description" class="form-control" formControlName="description" rows="4"></textarea>
@@ -240,7 +237,7 @@
                         placeholder="Buscar conductor por nombre..." notFoundText="No se encontraron conductores"
                         typeToSearchText="Escribe para buscar..." [loading]="loadingDrivers" [clearable]="true"
                         [searchable]="true" [typeahead]="driverInput$" [minTermLength]="2"
-                        (change)="onDriverSelectedEdit($event)">
+                        (change)="onDriverSelectedEdit($event)" (clear)="onDriverClearedEdit()">
                     </ng-select>
                     <div *ngIf="editPackageForm.get('id_driver')?.invalid && editPackageForm.get('id_driver')?.touched"
                         class="text-danger small">

@@ -1,136 +1,69 @@
 import { NgStyle } from '@angular/common';
-import { Component, DestroyRef, DOCUMENT, effect, inject, OnInit, Renderer2, signal, WritableSignal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  DOCUMENT,
+  effect,
+  inject,
+  OnInit,
+  Renderer2,
+  signal,
+  WritableSignal,
+} from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ChartOptions } from 'chart.js';
 import {
-  AvatarComponent,
   ButtonDirective,
   ButtonGroupComponent,
   CardBodyComponent,
   CardComponent,
   CardFooterComponent,
-  CardHeaderComponent,
   ColComponent,
   FormCheckLabelDirective,
   GutterDirective,
   ProgressComponent,
   RowComponent,
-  TableDirective
 } from '@coreui/angular';
 import { ChartjsComponent } from '@coreui/angular-chartjs';
 import { IconDirective } from '@coreui/icons-angular';
 
-import { WidgetsBrandComponent } from '../widgets/widgets-brand/widgets-brand.component';
 import { WidgetsDropdownComponent } from '../widgets/widgets-dropdown/widgets-dropdown.component';
 import { DashboardChartsData, IChartProps } from './dashboard-charts-data';
-
-interface IUser {
-  name: string;
-  state: string;
-  registered: string;
-  country: string;
-  usage: number;
-  period: string;
-  payment: string;
-  activity: string;
-  avatar: string;
-  status: string;
-  color: string;
-}
+import { ReportService } from '../../core/services/report.service';
+import { HttpClient } from '@angular/common/http';
+import {
+  ReportResponse,
+  ReportSummary,
+} from '../../data/interfaces/report.interface';
 
 @Component({
   templateUrl: 'dashboard.component.html',
   styleUrls: ['dashboard.component.scss'],
-  imports: [WidgetsDropdownComponent, CardComponent, CardBodyComponent, RowComponent, ColComponent, ButtonDirective, IconDirective, ReactiveFormsModule, ButtonGroupComponent, FormCheckLabelDirective, ChartjsComponent, NgStyle, CardFooterComponent, GutterDirective, ProgressComponent, WidgetsBrandComponent, CardHeaderComponent, TableDirective, AvatarComponent]
+  providers: [ReportService, HttpClient],
+  imports: [
+    WidgetsDropdownComponent,
+    CardComponent,
+    CardBodyComponent,
+    RowComponent,
+    ColComponent,
+    ButtonDirective,
+    IconDirective,
+    ReactiveFormsModule,
+    ButtonGroupComponent,
+    FormCheckLabelDirective,
+    ChartjsComponent,
+    NgStyle,
+    CardFooterComponent,
+    GutterDirective,
+    ProgressComponent,
+  ],
 })
 export class DashboardComponent implements OnInit {
-
   readonly #destroyRef: DestroyRef = inject(DestroyRef);
   readonly #document: Document = inject(DOCUMENT);
   readonly #renderer: Renderer2 = inject(Renderer2);
   readonly #chartsData: DashboardChartsData = inject(DashboardChartsData);
-
-  public users: IUser[] = [
-    {
-      name: 'Yiorgos Avraamu',
-      state: 'New',
-      registered: 'Jan 1, 2021',
-      country: 'Us',
-      usage: 50,
-      period: 'Jun 11, 2021 - Jul 10, 2021',
-      payment: 'Mastercard',
-      activity: '10 sec ago',
-      avatar: './assets/images/avatars/1.jpg',
-      status: 'success',
-      color: 'success'
-    },
-    {
-      name: 'Avram Tarasios',
-      state: 'Recurring ',
-      registered: 'Jan 1, 2021',
-      country: 'Br',
-      usage: 10,
-      period: 'Jun 11, 2021 - Jul 10, 2021',
-      payment: 'Visa',
-      activity: '5 minutes ago',
-      avatar: './assets/images/avatars/2.jpg',
-      status: 'danger',
-      color: 'info'
-    },
-    {
-      name: 'Quintin Ed',
-      state: 'New',
-      registered: 'Jan 1, 2021',
-      country: 'In',
-      usage: 74,
-      period: 'Jun 11, 2021 - Jul 10, 2021',
-      payment: 'Stripe',
-      activity: '1 hour ago',
-      avatar: './assets/images/avatars/3.jpg',
-      status: 'warning',
-      color: 'warning'
-    },
-    {
-      name: 'Enéas Kwadwo',
-      state: 'Sleep',
-      registered: 'Jan 1, 2021',
-      country: 'Fr',
-      usage: 98,
-      period: 'Jun 11, 2021 - Jul 10, 2021',
-      payment: 'Paypal',
-      activity: 'Last month',
-      avatar: './assets/images/avatars/4.jpg',
-      status: 'secondary',
-      color: 'danger'
-    },
-    {
-      name: 'Agapetus Tadeáš',
-      state: 'New',
-      registered: 'Jan 1, 2021',
-      country: 'Es',
-      usage: 22,
-      period: 'Jun 11, 2021 - Jul 10, 2021',
-      payment: 'ApplePay',
-      activity: 'Last week',
-      avatar: './assets/images/avatars/5.jpg',
-      status: 'success',
-      color: 'primary'
-    },
-    {
-      name: 'Friderik Dávid',
-      state: 'New',
-      registered: 'Jan 1, 2021',
-      country: 'Pl',
-      usage: 43,
-      period: 'Jun 11, 2021 - Jul 10, 2021',
-      payment: 'Amex',
-      activity: 'Yesterday',
-      avatar: './assets/images/avatars/6.jpg',
-      status: 'info',
-      color: 'dark'
-    }
-  ];
-
+  public dateText: string = 'Últimos 12 meses';
   public mainChart: IChartProps = { type: 'line' };
   public mainChartRef: WritableSignal<any> = signal(undefined);
   #mainChartRefEffect = effect(() => {
@@ -140,35 +73,185 @@ export class DashboardComponent implements OnInit {
   });
   public chart: Array<IChartProps> = [];
   public trafficRadioGroup = new FormGroup({
-    trafficRadio: new FormControl('Month')
+    trafficRadio: new FormControl('years'),
   });
+  public reportSummary: ReportSummary | null = null;
+
+  constructor(private reportService: ReportService) {}
 
   ngOnInit(): void {
-    this.initCharts();
-    this.updateChartOnColorModeChange();
+    this.getReportReserve('years');
   }
 
+  private updateDateText(filter: string, periodLimit: number): void {
+    const filterMap: { [key: string]: string } = {
+      'days': 'días',
+      'months': 'meses', 
+      'years': 'meses'
+    };
+
+    const period = filterMap[filter] || 'períodos';
+    this.dateText = `Últimos ${periodLimit} ${period}`;
+  }
+
+  getReportReserve(filter: string): void {
+    this.reportService.getReportReserve(filter).subscribe({
+      next: (data: ReportResponse) => {
+        this.updateDateText(filter, data.period_limit);
+        this.updateChartsWithReportData(data);
+      },
+      error: (error) => {
+        console.error(
+          'Error al obtener el reporte de reservas turísticas:',
+          error
+        );
+      },
+    });
+  }
+
+  private updateChartsWithReportData(reportData: ReportResponse): void {
+    // Actualizar el resumen para los widgets
+    this.reportSummary = reportData.summary;
+
+    // Procesar los datos del reporte para el gráfico principal
+    const periodData = reportData.period_stats;
+
+    // Validar que hay datos para procesar
+    if (!periodData || periodData.length === 0) {
+      console.warn('No hay datos de período para mostrar en el gráfico');
+      return;
+    }
+
+    // Mapeo manual de meses en español
+    const monthNames = [
+      'ene',
+      'feb',
+      'mar',
+      'abr',
+      'may',
+      'jun',
+      'jul',
+      'ago',
+      'sep',
+      'oct',
+      'nov',
+      'dic',
+    ];
+
+    // Extraer las etiquetas (períodos)
+    const labels = periodData.map((period) => {
+      // El formato viene como "2025-01", "2025-02", etc.
+      const [year, monthStr] = period.reservation_period.split('-');
+      const monthIndex = parseInt(monthStr) - 1; // Convertir a índice 0-11
+      const monthName = monthNames[monthIndex];
+      return `${monthName} ${year}`;
+    });
+
+    // Datos para el gráfico con validación de valores nulos/undefined
+    const totalReserves = periodData.map(
+      (period) => period.total_reserves || 0
+    );
+    const pendingReserves = periodData.map((period) =>
+      parseInt(period.pending_reserves || '0')
+    );
+    const approvedReserves = periodData.map((period) =>
+      parseInt(period.approved_reserves || '0')
+    );
+    const inProcessReserves = periodData.map((period) =>
+      parseInt(period.inprocesstravel_reserves || '0')
+    );
+    const doneReserves = periodData.map((period) =>
+      parseInt(period.done_reserves || '0')
+    );
+    const rejectedReserves = periodData.map((period) =>
+      parseInt(period.rejected_reserves || '0')
+    );
+    const pendingPayReserves = periodData.map((period) =>
+      parseInt(period.pendingpay_reserves || '0')
+    );
+    const reserveReserves = periodData.map((period) =>
+      parseInt(period.reserve_reserves || '0')
+    );
+
+    // Detener el gráfico actual si existe
+    if (this.mainChartRef()) {
+      this.mainChartRef().stop();
+    }
+
+    // Actualizar el gráfico con datos reales
+    this.#chartsData.updateMainChartWithData(labels, {
+      totalReserves,
+      pendingReserves,
+      approvedReserves,
+      inProcessReserves,
+      doneReserves,
+      rejectedReserves,
+      pendingPayReserves,
+      reserveReserves,
+    });
+
+    // Esperar un poco más para asegurar que el DOM esté listo
+    setTimeout(() => {
+      this.initCharts();
+    }, 300);
+  }
   initCharts(): void {
-    this.mainChartRef()?.stop();
-    this.mainChart = this.#chartsData.mainChart;
+    try {
+      // Detener el gráfico anterior si existe
+      if (this.mainChartRef()) {
+        this.mainChartRef().stop();
+      }
+
+      // Actualizar con los nuevos datos
+      this.mainChart = { ...this.#chartsData.mainChart };
+
+      // Validar que los datos del gráfico están listos
+      if (
+        this.mainChart.data &&
+        this.mainChart.data.datasets &&
+        this.mainChart.data.labels
+      ) {
+      } else {
+        console.warn('Los datos del gráfico no están completos');
+      }
+    } catch (error) {
+      console.error('Error al inicializar el gráfico:', error);
+    }
   }
 
   setTrafficPeriod(value: string): void {
     this.trafficRadioGroup.setValue({ trafficRadio: value });
-    this.#chartsData.initMainChart(value);
-    this.initCharts();
+
+    // Mapear los valores del formulario a los filtros del API
+    const filterMapping: { [key: string]: string } = {
+      Month: 'months',
+      Week: 'weeks',
+      Day: 'days',
+    };
+
+    const apiFilter = filterMapping[value] || 'months';
+    this.getReportReserve(apiFilter);
   }
 
   handleChartRef($chartRef: any) {
-    if ($chartRef) {
+    if ($chartRef && typeof $chartRef === 'object') {
       this.mainChartRef.set($chartRef);
+
+      // Inicializar los estilos después de establecer la referencia
+      setTimeout(() => {
+        this.setChartStyles();
+      }, 200);
     }
   }
 
   updateChartOnColorModeChange() {
-    const unListen = this.#renderer.listen(this.#document.documentElement, 'ColorSchemeChange', () => {
-      this.setChartStyles();
-    });
+    const unListen = this.#renderer.listen(
+      this.#document.documentElement,
+      'ColorSchemeChange',
+      () => {
+        this.setChartStyles();
+      }
+    );
 
     this.#destroyRef.onDestroy(() => {
       unListen();
@@ -176,13 +259,26 @@ export class DashboardComponent implements OnInit {
   }
 
   setChartStyles() {
-    if (this.mainChartRef()) {
+    if (this.mainChartRef() && this.mainChartRef().options) {
       setTimeout(() => {
-        const options: ChartOptions = { ...this.mainChart.options };
-        const scales = this.#chartsData.getScales();
-        this.mainChartRef().options.scales = { ...options.scales, ...scales };
-        this.mainChartRef().update();
-      });
+        try {
+          const options: ChartOptions = { ...this.mainChart.options };
+          const scales = this.#chartsData.getScales();
+
+          if (
+            this.mainChartRef().options &&
+            this.mainChartRef().options.scales
+          ) {
+            this.mainChartRef().options.scales = {
+              ...options.scales,
+              ...scales,
+            };
+            this.mainChartRef().update();
+          }
+        } catch (error) {
+          console.error('Error al actualizar estilos del gráfico:', error);
+        }
+      }, 100);
     }
   }
 }
