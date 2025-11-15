@@ -87,7 +87,8 @@ export class RouterOffertsComponent implements OnInit {
       route_json: this.fb.array([]),
       image_one: [''],
       image_two: [''],
-      image_tree: ['']
+      image_tree: [''],
+      price_route: ['', [Validators.required, Validators.min(1)]],
     });
 
     this.addRoute();
@@ -230,6 +231,7 @@ export class RouterOffertsComponent implements OnInit {
       description: packageData.description,
       name_district: packageData.name_district,
       name_province: packageData.name_province,
+      price_route: packageData.price_route,
       id_package: this.id
     });
 
@@ -249,7 +251,8 @@ export class RouterOffertsComponent implements OnInit {
             description: route.description || '',
             bg_image: route.bg_image || '',
             bg_image_key: route.bg_image_key || '',
-            bg_image_size: route.bg_image_size || ''
+            bg_image_size: route.bg_image_size || '',
+            price_route: route.price_route || ''
           });
           this.routeFormArray.push(routeGroup);
         });

@@ -1,0 +1,44 @@
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class ReserveService {
+  URL_BACKEND = 'http://localhost:4001';
+  timeOutmessage = 3000;
+  constructor(private http: HttpClient) {}
+
+  getReserves(page: number = 1, limit: number = 10): Observable<any> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('limit', limit.toString())
+      .set('status', 'pendingpay');
+    let headers = new HttpHeaders();
+    headers = headers.set('Content-type', 'application/json');
+    headers = headers.set(
+      'Authorization',
+      'Bearer ' + localStorage.getItem('token_turistea')
+    );
+
+    return this.http.get(`${this.URL_BACKEND}/api/admins/form_reserves`, {
+      params,
+      headers,
+    });
+  }
+
+  approveReserve(id: number): Observable<any> {
+    return this.http.patch(
+      `${this.URL_BACKEND}/api/admins/form_reserves/${id}/approve`,
+      {}
+    );
+  }
+
+  rejectReserve(id: number): Observable<any> {
+    return this.http.patch(
+      `${this.URL_BACKEND}/api/admins/form_reserves/${id}/reject`,
+      {}
+    );
+  }
+}

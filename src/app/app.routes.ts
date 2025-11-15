@@ -62,12 +62,19 @@ export const routes: Routes = [
           ),
       },
       {
-        path: "offers/package/:id",
+        path: 'offers/package/:id',
         loadComponent: () =>
-          import('./views/pages/offerts/router-offerts/router-offerts.component').then(
-            (m) => m.RouterOffertsComponent
-          )
-      }
+          import(
+            './views/pages/offerts/router-offerts/router-offerts.component'
+          ).then((m) => m.RouterOffertsComponent),
+      },
+      {
+        path: 'reserves',
+        loadComponent: () =>
+          import('./views/pages/reserve/reserve.component').then(
+            (m) => m.ReserveComponent
+          ),
+      },
     ],
   },
   {

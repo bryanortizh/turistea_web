@@ -1,7 +1,7 @@
 import { INavData } from '@coreui/angular';
 
 export const navItems: INavData[] = [
-   {
+  {
     title: true,
     name: 'Metricas',
   },
@@ -24,6 +24,12 @@ export const navItems: INavData[] = [
     url: '/user',
     iconComponent: { name: 'cil-user' },
   },
+
+  {
+    title: true,
+    name: 'Servicio Turistico',
+  },
+
   {
     name: 'Conductores',
     url: '/driver',
@@ -43,29 +49,32 @@ export const navItems: INavData[] = [
     name: 'Terramozas',
     url: '/terraces',
     iconComponent: { name: 'cil-building' },
-  }
+  },
 ];
 
 export const navItemsSupport: INavData[] = [
-  {
+ {
     title: true,
-    name: 'Modulos',
+    name: 'Servicio Turistico',
   },
   {
     name: 'Conductores',
     url: '/driver',
     iconComponent: { name: 'cil-car' },
   },
-];
+  {
+    name: 'Guias Turisticos',
+    url: '/guides',
+  },
+  {
+    name: 'Terramozas',
+    url: '/terraces',
+    iconComponent: { name: 'cil-building' },
+  },
+  {
+    name: "Reservas",
+    url: '/reserves',
+    iconComponent: { name: 'cil-bookmark' },
+  },
 
-export const navItemsDriver: INavData[] = [
-  {
-    title: true,
-    name: 'Modulos',
-  },
-  {
-    name: 'Ofertas Turisticas',
-    url: '/offers',
-    iconComponent: { name: 'cil-star' },
-  },
 ];

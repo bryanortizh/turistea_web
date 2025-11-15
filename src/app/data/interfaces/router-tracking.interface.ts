@@ -23,6 +23,7 @@ export interface RouterTrackingResponse {
   size_bgthree: string | null;
   name_district: string | null;
   name_province: string | null;
+  price_route: string | null;
   state: boolean;
   created: string;
   updated: string;

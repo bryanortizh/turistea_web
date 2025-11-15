@@ -3,22 +3,10 @@
   <p class="text-medium-emphasis">Configuracion del paquete {{ id }}</p>
 
   <div class="d-flex justify-content-end mb-3">
-    <button
-      cButton
-      color="primary"
-      size="sm"
-      class="text-white"
-      (click)="showClientsBlock()"
-    >
+    <button cButton color="primary" size="sm" class="text-white" (click)="showClientsBlock()">
       Ver configuraciones desactivadas {{ state === 1 ? "desactivados" : "activos" }}
     </button>
-    <button
-      cButton
-      color="secondary"
-      size="sm"
-      class="ms-2 text-white"
-      (click)="savePackage()"
-    >
+    <button cButton color="secondary" size="sm" class="ms-2 text-white" (click)="savePackage()">
       Agregar
     </button>
   </div>
@@ -42,31 +30,14 @@
           <td>{{ user?.name_district }}</td>
           <td>{{ user?.created | date : "short" }}</td>
           <td>
-            <button
-              cButton
-              color="success"
-              size="sm"
-              class="me-2 text-white"
-              (click)="openPackageModal(i)"
-            >
+            <button cButton color="success" size="sm" class="me-2 text-white" (click)="openPackageModal(i)">
               Ver datos
             </button>
-            <button
-              cButton
-              color="warning"
-              size="sm"
-              class="me-2 text-white"
-              (click)="editPackage(user)"
-            >
+            <button cButton color="warning" size="sm" class="me-2 text-white" (click)="editPackage(user)">
               Editar
             </button>
-            <button
-              cButton
-              [color]="user.state === true ? 'danger' : 'success'"
-              size="sm"
-              class="me-2 text-white"
-              (click)="blockUser(user)"
-            >
+            <button cButton [color]="user.state === true ? 'danger' : 'success'" size="sm" class="me-2 text-white"
+              (click)="blockUser(user)">
               {{ user?.state === true ? "Desactivar" : "Activar" }}
             </button>
           </td>
@@ -82,29 +53,17 @@
   <nav class="mt-3" *ngIf="pageTotal > 1 && dataPackage.length > 0">
     <ul class="pagination justify-content-center">
       <li class="page-item" [class.disabled]="page === 1">
-        <button
-          class="page-link"
-          (click)="changePage(page - 1)"
-          [disabled]="page === 1"
-        >
+        <button class="page-link" (click)="changePage(page - 1)" [disabled]="page === 1">
           Anterior
         </button>
       </li>
-      <li
-        class="page-item"
-        *ngFor="let p of [].constructor(pageTotal); let i = index"
-        [class.active]="page === i + 1"
-      >
+      <li class="page-item" *ngFor="let p of [].constructor(pageTotal); let i = index" [class.active]="page === i + 1">
         <button class="page-link" (click)="changePage(i + 1)">
           {{ i + 1 }}
         </button>
       </li>
       <li class="page-item" [class.disabled]="page === pageTotal">
-        <button
-          class="page-link"
-          (click)="changePage(page + 1)"
-          [disabled]="page === pageTotal"
-        >
+        <button class="page-link" (click)="changePage(page + 1)" [disabled]="page === pageTotal">
           Siguiente
         </button>
       </li>
@@ -112,12 +71,7 @@
   </nav>
 </div>
 
-<!-- Modal para registrar configuración de paquete turístico -->
-<c-modal
-  [visible]="visibleAddPackageModal"
-  (visibleChange)="visibleAddPackageModal = $event"
-  size="xl"
->
+<c-modal [visible]="visibleAddPackageModal" (visibleChange)="visibleAddPackageModal = $event" size="xl">
   <c-modal-header>
     <h5 cModalTitle>{{ isEditMode ? 'Editar' : 'Registrar' }} configuración de paquete turístico</h5>
     <button cButtonClose (click)="closeAddPackageModal()"></button>
@@ -125,27 +79,19 @@
   <form [formGroup]="packageForm">
     <c-modal-body style="max-height: 70vh; overflow-y: auto;">
       <div class="row">
-        
+
         <div class="col-12 mb-4">
           <h6 class="text-primary border-bottom pb-2">📋 Información General</h6>
         </div>
 
         <div class="col-md-6 mb-3">
           <label for="title" class="form-label">Título del paquete *</label>
-          <input
-            type="text"
-            id="title"
-            class="form-control"
-            formControlName="title"
-            placeholder="Ej: Cuzco Paquete de viaje"
-          />
-          <div
-            *ngIf="
+          <input type="text" id="title" class="form-control" formControlName="title"
+            placeholder="Ej: Cuzco Paquete de viaje" />
+          <div *ngIf="
               packageForm.get('title')?.invalid &&
               packageForm.get('title')?.touched
-            "
-            class="text-danger small"
-          >
+            " class="text-danger small">
             <div *ngIf="packageForm.get('title')?.errors?.['required']">
               El título es requerido.
             </div>
@@ -159,20 +105,12 @@
 
         <div class="col-md-6 mb-3">
           <label for="description" class="form-label">Descripción *</label>
-          <textarea
-            id="description"
-            class="form-control"
-            formControlName="description"
-            rows="3"
-            placeholder="Descripción detallada del paquete..."
-          ></textarea>
-          <div
-            *ngIf="
+          <textarea id="description" class="form-control" formControlName="description" rows="3"
+            placeholder="Descripción detallada del paquete..."></textarea>
+          <div *ngIf="
               packageForm.get('description')?.invalid &&
               packageForm.get('description')?.touched
-            "
-            class="text-danger small"
-          >
+            " class="text-danger small">
             <div *ngIf="packageForm.get('description')?.errors?.['required']">
               La descripción es requerida.
             </div>
@@ -188,20 +126,12 @@
 
         <div class="col-md-4 mb-3">
           <label for="name_district" class="form-label">Distrito *</label>
-          <input
-            type="text"
-            id="name_district"
-            class="form-control"
-            formControlName="name_district"
-            placeholder="Ej: Cañete"
-          />
-          <div
-            *ngIf="
+          <input type="text" id="name_district" class="form-control" formControlName="name_district"
+            placeholder="Ej: Cañete" />
+          <div *ngIf="
               packageForm.get('name_district')?.invalid &&
               packageForm.get('name_district')?.touched
-            "
-            class="text-danger small"
-          >
+            " class="text-danger small">
             <div *ngIf="packageForm.get('name_district')?.errors?.['required']">
               El distrito es requerido.
             </div>
@@ -210,22 +140,27 @@
 
         <div class="col-md-4 mb-3">
           <label for="name_province" class="form-label">Provincia *</label>
-          <input
-            type="text"
-            id="name_province"
-            class="form-control"
-            formControlName="name_province"
-            placeholder="Ej: Cañete"
-          />
-          <div
-            *ngIf="
+          <input type="text" id="name_province" class="form-control" formControlName="name_province"
+            placeholder="Ej: Cañete" />
+          <div *ngIf="
               packageForm.get('name_province')?.invalid &&
               packageForm.get('name_province')?.touched
-            "
-            class="text-danger small"
-          >
+            " class="text-danger small">
             <div *ngIf="packageForm.get('name_province')?.errors?.['required']">
               La provincia es requerida.
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label for="price_route" class="form-label">Precio de la ruta *</label>
+          <input type="number" id="price_route" class="form-control" formControlName="price_route"
+            placeholder="Ej: 150.00" />
+          <div *ngIf="
+              packageForm.get('price_route')?.invalid &&
+              packageForm.get('price_route')?.touched
+            " class="text-danger small">
+            <div *ngIf="packageForm.get('price_route')?.errors?.['required']">
+              El precio de la ruta es requerido.
             </div>
           </div>
         </div>
@@ -236,102 +171,62 @@
 
         <div class="col-md-4 mb-3">
           <label for="image_one" class="form-label">Imagen Principal</label>
-          <input
-            type="file"
-            id="image_one"
-            class="form-control"
-            (change)="onFileSelect($event, 'image_one')"
-            accept="image/*"
-          />
+          <input type="file" id="image_one" class="form-control" (change)="onFileSelect($event, 'image_one')"
+            accept="image/*" />
           <small class="text-muted">Imagen principal del paquete</small>
         </div>
 
         <div class="col-md-4 mb-3">
           <label for="image_two" class="form-label">Imagen Secundaria</label>
-          <input
-            type="file"
-            id="image_two"
-            class="form-control"
-            (change)="onFileSelect($event, 'image_two')"
-            accept="image/*"
-          />
+          <input type="file" id="image_two" class="form-control" (change)="onFileSelect($event, 'image_two')"
+            accept="image/*" />
           <small class="text-muted">Imagen secundaria del paquete</small>
         </div>
 
         <div class="col-md-4 mb-3">
           <label for="image_tree" class="form-label">Imagen Adicional</label>
-          <input
-            type="file"
-            id="image_tree"
-            class="form-control"
-            (change)="onFileSelect($event, 'image_tree')"
-            accept="image/*"
-          />
+          <input type="file" id="image_tree" class="form-control" (change)="onFileSelect($event, 'image_tree')"
+            accept="image/*" />
           <small class="text-muted">Imagen adicional del paquete</small>
         </div>
 
         <div class="col-12 mb-3">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h6 class="text-primary border-bottom pb-2 mb-0">🗺️ Rutas del Itinerario</h6>
-            <button
-              type="button"
-              cButton
-              color="success"
-              size="sm"
-              (click)="addRoute()"
-              class="text-white"
-            >
+            <button type="button" cButton color="success" size="sm" (click)="addRoute()" class="text-white">
               ➕ Agregar Ruta
             </button>
           </div>
         </div>
 
         <div formArrayName="route_json">
-          <div
-            *ngFor="let routeControl of routeFormArray.controls; let i = index"
-            [formGroupName]="i"
-            class="col-12 mb-4"
-          >
+          <div *ngFor="let routeControl of routeFormArray.controls; let i = index" [formGroupName]="i"
+            class="col-12 mb-4">
             <div class="card border-2 border-info">
               <div class="card-header bg-light d-flex justify-content-between align-items-center">
                 <h6 class="mb-0 text-info">
                   🚩 Ruta {{ i + 1 }}
                 </h6>
-                <button
-                  type="button"
-                  cButton
-                  color="danger"
-                  size="sm"
-                  (click)="removeRoute(i)"
-                  [disabled]="routeFormArray.length <= 1"
-                  class="text-white"
-                >
+                <button type="button" cButton color="danger" size="sm" (click)="removeRoute(i)"
+                  [disabled]="routeFormArray.length <= 1" class="text-white">
                   🗑️ Eliminar
                 </button>
               </div>
               <div class="card-body">
                 <div class="row">
-                  
+
                   <input type="hidden" formControlName="id" />
-                  
+
                   <input type="hidden" formControlName="index" />
 
                   <div class="col-md-6 mb-3">
                     <label [for]="'route_title_' + i" class="form-label">Título de la ruta *</label>
-                    <input
-                      type="text"
-                      [id]="'route_title_' + i"
-                      class="form-control"
-                      formControlName="title"
-                      placeholder="Ej: Punto de Inicio"
-                    />
-                    <div
-                      *ngIf="
+                    <input type="text" [id]="'route_title_' + i" class="form-control" formControlName="title"
+                      placeholder="Ej: Punto de Inicio" />
+                    <div *ngIf="
                         routeControl.get('title')?.invalid &&
                         routeControl.get('title')?.touched
-                      "
-                      class="text-danger small"
-                    >
+                      " class="text-danger small">
                       <div *ngIf="routeControl.get('title')?.errors?.['required']">
                         El título es requerido.
                       </div>
@@ -343,32 +238,19 @@
 
                   <div class="col-md-6 mb-3">
                     <label [for]="'route_image_' + i" class="form-label">Imagen de la ruta</label>
-                    <input
-                      type="file"
-                      [id]="'route_image_' + i"
-                      class="form-control"
-                      (change)="onRouteImageSelect($event, i)"
-                      accept="image/*"
-                    />
+                    <input type="file" [id]="'route_image_' + i" class="form-control"
+                      (change)="onRouteImageSelect($event, i)" accept="image/*" />
                     <small class="text-muted">Imagen representativa de esta parada</small>
                   </div>
 
                   <div class="col-md-12 mb-3">
                     <label [for]="'route_description_' + i" class="form-label">Descripción de la ruta *</label>
-                    <textarea
-                      [id]="'route_description_' + i"
-                      class="form-control"
-                      formControlName="description"
-                      rows="3"
-                      placeholder="Ej: Lugar de encuentro y inicio del recorrido turístico"
-                    ></textarea>
-                    <div
-                      *ngIf="
+                    <textarea [id]="'route_description_' + i" class="form-control" formControlName="description"
+                      rows="3" placeholder="Ej: Lugar de encuentro y inicio del recorrido turístico"></textarea>
+                    <div *ngIf="
                         routeControl.get('description')?.invalid &&
                         routeControl.get('description')?.touched
-                      "
-                      class="text-danger small"
-                    >
+                      " class="text-danger small">
                       <div *ngIf="routeControl.get('description')?.errors?.['required']">
                         La descripción es requerida.
                       </div>
@@ -387,54 +269,39 @@
       </div>
     </c-modal-body>
     <c-modal-footer class="bg-light">
-      <button
-        type="button"
-        cButton
-        color="secondary"
-        (click)="closeAddPackageModal()"
-      >
+      <button type="button" cButton color="secondary" (click)="closeAddPackageModal()">
         ❌ Cancelar
       </button>
-      <button
-        type="submit"
-        cButton
-        color="primary"
-        [disabled]="packageForm.invalid"
-        (click)="isEditMode ? updatePackage() : createPackage()"
-        class="text-white"
-      >
+      <button type="submit" cButton color="primary" [disabled]="packageForm.invalid"
+        (click)="isEditMode ? updatePackage() : createPackage()" class="text-white">
         {{ isEditMode ? '📝 Actualizar Configuración' : '✅ Registrar Configuración' }}
       </button>
     </c-modal-footer>
   </form>
 </c-modal>
 
-<c-modal
-  [visible]="visiblePackageModal"
-  (visibleChange)="visiblePackageModal = $event"
-  size="xl"
->
+<c-modal [visible]="visiblePackageModal" (visibleChange)="visiblePackageModal = $event" size="xl">
   <c-modal-header>
     <h5 cModalTitle>📋 Detalle completo de la configuración</h5>
     <button cButtonClose (click)="closePackageModal()"></button>
   </c-modal-header>
   <c-modal-body *ngIf="selectedPackage" style="max-height: 70vh; overflow-y: auto;">
     <div class="row">
-      
+
       <div class="col-12 mb-4">
         <h6 class="text-primary border-bottom pb-2">📋 Información General</h6>
       </div>
-      
+
       <div class="col-md-3 mb-3">
         <strong>🆔 ID:</strong>
         <div class="text-muted">{{ selectedPackage.id }}</div>
       </div>
-      
+
       <div class="col-md-9 mb-3">
         <strong>📝 Título:</strong>
         <div class="text-muted">{{ selectedPackage.title }}</div>
       </div>
-      
+
       <div class="col-md-12 mb-3">
         <strong>📄 Descripción:</strong>
         <div class="text-muted">{{ selectedPackage.description }}</div>
@@ -443,21 +310,21 @@
       <div class="col-12 mb-4">
         <h6 class="text-primary border-bottom pb-2">🌎 Ubicación</h6>
       </div>
-      
+
       <div class="col-md-4 mb-3">
         <strong>🏘️ Distrito:</strong>
         <div class="text-muted">
           {{ selectedPackage.name_district || 'No especificado' }}
         </div>
       </div>
-      
+
       <div class="col-md-4 mb-3">
         <strong>🏙️ Provincia:</strong>
         <div class="text-muted">
           {{ selectedPackage.name_province || 'No especificado' }}
         </div>
       </div>
-      
+
       <div class="col-md-4 mb-3">
         <strong>📦 ID Paquete:</strong>
         <div class="text-muted">{{ selectedPackage.id_package }}</div>
@@ -466,7 +333,7 @@
       <div class="col-12 mb-4">
         <h6 class="text-primary border-bottom pb-2">ℹ️ Estado y Fechas</h6>
       </div>
-      
+
       <div class="col-md-4 mb-3">
         <strong>🔘 Estado:</strong>
         <div>
@@ -475,12 +342,12 @@
           </span>
         </div>
       </div>
-      
+
       <div class="col-md-4 mb-3">
         <strong>📅 Creado:</strong>
         <div class="text-muted">{{ selectedPackage.created | date : "medium" }}</div>
       </div>
-      
+
       <div class="col-md-4 mb-3">
         <strong>🔄 Actualizado:</strong>
         <div class="text-muted">{{ selectedPackage.updated | date : "medium" }}</div>
@@ -489,47 +356,36 @@
       <div class="col-12 mb-4">
         <h6 class="text-primary border-bottom pb-2">🖼️ Imágenes del Paquete</h6>
       </div>
-      
+
       <div class="col-md-4 mb-3" *ngIf="selectedPackage.path_bgone">
         <strong>🖼️ Imagen Principal:</strong>
         <div class="text-muted small mb-1">{{ selectedPackage.size_bgone }}</div>
         <div class="mt-2">
-          <img
-            [src]="selectedPackage.path_bgone"
-            alt="Imagen principal"
-            class="img-fluid rounded"
-            style="max-width: 150px; border: 2px solid #007bff;"
-          />
+          <img [src]="selectedPackage.path_bgone" alt="Imagen principal" class="img-fluid rounded"
+            style="max-width: 150px; border: 2px solid #007bff;" />
         </div>
       </div>
-      
+
       <div class="col-md-4 mb-3" *ngIf="selectedPackage.path_bgtwo">
         <strong>🖼️ Imagen Secundaria:</strong>
         <div class="text-muted small mb-1">{{ selectedPackage.size_bgtwo }}</div>
         <div class="mt-2">
-          <img
-            [src]="selectedPackage.path_bgtwo"
-            alt="Imagen secundaria"
-            class="img-fluid rounded"
-            style="max-width: 150px; border: 2px solid #28a745;"
-          />
+          <img [src]="selectedPackage.path_bgtwo" alt="Imagen secundaria" class="img-fluid rounded"
+            style="max-width: 150px; border: 2px solid #28a745;" />
         </div>
       </div>
-      
+
       <div class="col-md-4 mb-3" *ngIf="selectedPackage.path_bgthree">
         <strong>🖼️ Imagen Adicional:</strong>
         <div class="text-muted small mb-1">{{ selectedPackage.size_bgthree }}</div>
         <div class="mt-2">
-          <img
-            [src]="selectedPackage.path_bgthree"
-            alt="Imagen adicional"
-            class="img-fluid rounded"
-            style="max-width: 150px; border: 2px solid #ffc107;"
-          />
+          <img [src]="selectedPackage.path_bgthree" alt="Imagen adicional" class="img-fluid rounded"
+            style="max-width: 150px; border: 2px solid #ffc107;" />
         </div>
       </div>
 
-      <div class="col-12 mb-3" *ngIf="!selectedPackage.path_bgone && !selectedPackage.path_bgtwo && !selectedPackage.path_bgthree">
+      <div class="col-12 mb-3"
+        *ngIf="!selectedPackage.path_bgone && !selectedPackage.path_bgtwo && !selectedPackage.path_bgthree">
         <div class="alert alert-info">
           <i class="fas fa-info-circle"></i>
           No se encontraron imágenes para este paquete.
@@ -542,50 +398,46 @@
           <span class="badge bg-info">{{ selectedPackageRoutes.length }} ruta(s)</span>
         </div>
       </div>
-      
+
       <div class="col-12" *ngIf="selectedPackageRoutes.length === 0">
         <div class="alert alert-info">
           <i class="fas fa-info-circle"></i>
           No se encontraron rutas configuradas para este paquete.
         </div>
       </div>
-      
+
       <div class="col-12" *ngFor="let route of selectedPackageRoutes; let i = index">
         <div class="card mb-3 border-2" [class]="'border-' + (i % 2 === 0 ? 'info' : 'success')">
           <div class="card-header" [class]="'bg-' + (i % 2 === 0 ? 'info' : 'success') + ' text-white'">
             <h6 class="mb-0">
-              🚩 Ruta {{ route.id || (i + 1) }} 
+              🚩 Ruta {{ route.id || (i + 1) }}
               <small class="ms-2">(Índice: {{ route.index !== undefined ? route.index : i }})</small>
             </h6>
           </div>
           <div class="card-body">
             <div class="row">
-              
+
               <div class="col-md-8">
                 <div class="mb-2">
                   <strong>📍 Título:</strong>
                   <div class="text-muted">{{ route.title }}</div>
                 </div>
-                
+
                 <div class="mb-2">
                   <strong>📝 Descripción:</strong>
                   <div class="text-muted">{{ route.description }}</div>
                 </div>
-                
+
               </div>
-              
+
               <div class="col-md-4" *ngIf="route.bg_image">
                 <strong>🖼️ Imagen de la ruta:</strong>
                 <div class="mt-2">
-                  <img
-                    [src]="route.bg_image"
-                    alt="Imagen de la ruta {{ route.title }}"
-                    class="img-fluid rounded"
-                    style="max-width: 150px; border: 2px solid #17a2b8;"
-                  />
+                  <img [src]="route.bg_image" alt="Imagen de la ruta {{ route.title }}" class="img-fluid rounded"
+                    style="max-width: 150px; border: 2px solid #17a2b8;" />
                 </div>
               </div>
-              
+
               <div class="col-md-4" *ngIf="!route.bg_image">
                 <div class="d-flex align-items-center justify-content-center h-100">
                   <span class="text-muted">
@@ -598,7 +450,7 @@
           </div>
         </div>
       </div>
-      
+
     </div>
   </c-modal-body>
   <c-modal-footer class="bg-light">

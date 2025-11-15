@@ -16,7 +16,7 @@ import {
 } from '@coreui/angular';
 
 import { DefaultFooterComponent, DefaultHeaderComponent } from './';
-import { navItems, navItemsDriver, navItemsSupport } from './_nav';
+import { navItems, navItemsSupport } from './_nav';
 import { ProfileService } from '../../core/services/profile.service';
 import { Profile } from '../../data/interfaces/profile.interface';
 import { HttpClient } from '@angular/common/http';
@@ -80,9 +80,6 @@ export class DefaultLayoutComponent {
         break;
       case 'Soporte':
         this.navItems = [...navItemsSupport] as unknown as [];
-        break;
-      case 'Conductores':
-        this.navItems = [...navItemsDriver] as unknown as [];
         break;
       default:
         this.navItems = [];
