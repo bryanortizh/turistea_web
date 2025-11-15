@@ -17,7 +17,6 @@ export class AuthService {
     private router: Router
   ) {}
 
-  // Http Options
   httpOptions = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',

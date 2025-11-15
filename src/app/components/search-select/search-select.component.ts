@@ -31,7 +31,7 @@ export class SearchSelectComponent implements ControlValueAccessor, Validator, O
   @Input() typeToSearchText: string = 'Escribe para buscar...';
   @Input() required: boolean = false;
   @Input() searchFunction!: (term: string) => Observable<any[]>;
-  @Input() getAllFunction?: () => Observable<any[]>; // Función para traer todos los items
+  @Input() getAllFunction?: () => Observable<any[]>;
   @Input() bindLabel: string = 'textSearch';
   @Input() bindValue: string = 'id';
   @Input() minTermLength: number = 2;
@@ -84,11 +84,9 @@ export class SearchSelectComponent implements ControlValueAccessor, Validator, O
     this.destroy$.complete();
   }
 
-  // Implementación de ControlValueAccessor
   writeValue(value: any): void {
     this.value = value;
     
-    // Si hay un valor inicial y una función para obtener todos los items
     if (value && this.getAllFunction) {
       this.loading = true;
       this.getAllFunction().pipe(
@@ -98,10 +96,8 @@ export class SearchSelectComponent implements ControlValueAccessor, Validator, O
           return of([]);
         })
       ).subscribe((items: any[]) => {
-        // Filtrar el item que coincide con el ID
         const selectedItem = items.find(item => item[this.bindValue] === value);
         if (selectedItem) {
-          // Agregar solo el item seleccionado al array de datos
           this.data = [selectedItem];
         }
         this.loading = false;
@@ -121,7 +117,6 @@ export class SearchSelectComponent implements ControlValueAccessor, Validator, O
     this.disabled = isDisabled;
   }
 
-  // Implementación de Validator
   validate(control: AbstractControl): ValidationErrors | null {
     if (this.required && !control.value) {
       return { required: true };
@@ -129,7 +124,6 @@ export class SearchSelectComponent implements ControlValueAccessor, Validator, O
     return null;
   }
 
-  // Métodos del componente
   onSearch(term: string): void {
     this.searchInput$.next(term);
   }
@@ -150,7 +144,6 @@ export class SearchSelectComponent implements ControlValueAccessor, Validator, O
     this.onTouched();
   }
 
-  // Método para verificar si debe mostrar error
   shouldShowError(): boolean {
     return this.touched && this.required && !this.value;
   }

@@ -85,9 +85,9 @@ export class DashboardComponent implements OnInit {
 
   private updateDateText(filter: string, periodLimit: number): void {
     const filterMap: { [key: string]: string } = {
-      'days': 'días',
-      'months': 'meses', 
-      'years': 'meses'
+      days: 'días',
+      months: 'meses',
+      years: 'meses',
     };
 
     const period = filterMap[filter] || 'períodos';
@@ -110,19 +110,15 @@ export class DashboardComponent implements OnInit {
   }
 
   private updateChartsWithReportData(reportData: ReportResponse): void {
-    // Actualizar el resumen para los widgets
     this.reportSummary = reportData.summary;
 
-    // Procesar los datos del reporte para el gráfico principal
     const periodData = reportData.period_stats;
 
-    // Validar que hay datos para procesar
     if (!periodData || periodData.length === 0) {
       console.warn('No hay datos de período para mostrar en el gráfico');
       return;
     }
 
-    // Mapeo manual de meses en español
     const monthNames = [
       'ene',
       'feb',
@@ -138,16 +134,13 @@ export class DashboardComponent implements OnInit {
       'dic',
     ];
 
-    // Extraer las etiquetas (períodos)
     const labels = periodData.map((period) => {
-      // El formato viene como "2025-01", "2025-02", etc.
       const [year, monthStr] = period.reservation_period.split('-');
-      const monthIndex = parseInt(monthStr) - 1; // Convertir a índice 0-11
+      const monthIndex = parseInt(monthStr) - 1;
       const monthName = monthNames[monthIndex];
       return `${monthName} ${year}`;
     });
 
-    // Datos para el gráfico con validación de valores nulos/undefined
     const totalReserves = periodData.map(
       (period) => period.total_reserves || 0
     );
@@ -173,12 +166,10 @@ export class DashboardComponent implements OnInit {
       parseInt(period.reserve_reserves || '0')
     );
 
-    // Detener el gráfico actual si existe
     if (this.mainChartRef()) {
       this.mainChartRef().stop();
     }
 
-    // Actualizar el gráfico con datos reales
     this.#chartsData.updateMainChartWithData(labels, {
       totalReserves,
       pendingReserves,
@@ -190,22 +181,18 @@ export class DashboardComponent implements OnInit {
       reserveReserves,
     });
 
-    // Esperar un poco más para asegurar que el DOM esté listo
     setTimeout(() => {
       this.initCharts();
     }, 300);
   }
   initCharts(): void {
     try {
-      // Detener el gráfico anterior si existe
       if (this.mainChartRef()) {
         this.mainChartRef().stop();
       }
 
-      // Actualizar con los nuevos datos
       this.mainChart = { ...this.#chartsData.mainChart };
 
-      // Validar que los datos del gráfico están listos
       if (
         this.mainChart.data &&
         this.mainChart.data.datasets &&
@@ -222,7 +209,6 @@ export class DashboardComponent implements OnInit {
   setTrafficPeriod(value: string): void {
     this.trafficRadioGroup.setValue({ trafficRadio: value });
 
-    // Mapear los valores del formulario a los filtros del API
     const filterMapping: { [key: string]: string } = {
       Month: 'months',
       Week: 'weeks',
@@ -237,7 +223,6 @@ export class DashboardComponent implements OnInit {
     if ($chartRef && typeof $chartRef === 'object') {
       this.mainChartRef.set($chartRef);
 
-      // Inicializar los estilos después de establecer la referencia
       setTimeout(() => {
         this.setChartStyles();
       }, 200);

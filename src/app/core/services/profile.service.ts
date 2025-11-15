@@ -13,8 +13,6 @@ export class ProfileService {
     public http: HttpClient,
   ) {}
 
-  // crea un get and set service
-  
   setProfile(profile: Profile): void {
     localStorage.setItem('profile_turistea', JSON.stringify(profile));
   }

@@ -54,14 +54,14 @@ export class RouterOffertsComponent implements OnInit {
   page: number = 1;
   state: number = 1;
   pageTotal: number = 1;
-  dataPackage: RouterTrackingResponse[] = []; // Cambiado a RouterTrackingResponse
+  dataPackage: RouterTrackingResponse[] = [];
   packageForm: FormGroup;
   visiblePackageModal = false;
-  selectedPackage: RouterTrackingResponse | null = null; // Cambiado a RouterTrackingResponse
-  selectedPackageRoutes: RouteItem[] = []; // Cambiado a RouteItem[]
+  selectedPackage: RouterTrackingResponse | null = null;
+  selectedPackageRoutes: RouteItem[] = [];
   visibleAddPackageModal = false;
-  isEditMode = false; // Nueva propiedad para el modo de edición
-  editingPackageId: number | null = null; // ID del paquete en edición
+  isEditMode = false;
+  editingPackageId: number | null = null; 
   timeOutmessage = 5000;
   dataDriver: DriverResponse[] = [];
   selectedCar!: number;
@@ -84,13 +84,12 @@ export class RouterOffertsComponent implements OnInit {
       name_district: ['', [Validators.required]],
       name_province: ['', [Validators.required]],
       id_package: [this.id, [Validators.required]],
-      route_json: this.fb.array([]), // Array para las rutas
+      route_json: this.fb.array([]),
       image_one: [''],
       image_two: [''],
       image_tree: ['']
     });
 
-    // Agregar una ruta por defecto al inicializar
     this.addRoute();
   }
 
@@ -100,7 +99,6 @@ export class RouterOffertsComponent implements OnInit {
     this.loadPackages();
   }
 
-  // Métodos para manejar el FormArray de rutas
   get routeFormArray(): FormArray {
     return this.packageForm.get('route_json') as FormArray;
   }
@@ -122,7 +120,6 @@ export class RouterOffertsComponent implements OnInit {
   removeRoute(index: number): void {
     if (this.routeFormArray.length > 1) {
       this.routeFormArray.removeAt(index);
-      // Actualizar los IDs e índices de las rutas restantes
       this.updateRouteIdsAndIndexes();
     }
   }
@@ -228,7 +225,6 @@ export class RouterOffertsComponent implements OnInit {
     this.editingPackageId = packageData.id;
     this.visibleAddPackageModal = true;
     
-    // Llenar el formulario con los datos existentes
     this.packageForm.patchValue({
       title: packageData.title,
       description: packageData.description,
@@ -237,12 +233,10 @@ export class RouterOffertsComponent implements OnInit {
       id_package: this.id
     });
 
-    // Limpiar rutas existentes
     while (this.routeFormArray.length !== 0) {
       this.routeFormArray.removeAt(0);
     }
 
-    // Cargar rutas existentes del route_json
     if (packageData.route_json) {
       try {
         const routes = JSON.parse(packageData.route_json) as any[];
@@ -261,28 +255,25 @@ export class RouterOffertsComponent implements OnInit {
         });
       } catch (error) {
         console.error('Error parsing route_json:', error);
-        this.addRoute(); // Agregar ruta por defecto si hay error
+        this.addRoute();
       }
     } else {
-      this.addRoute(); // Agregar ruta por defecto si no hay rutas
+      this.addRoute();
     }
   }
 
   closeAddPackageModal() {
     this.visibleAddPackageModal = false;
-    this.isEditMode = false; // Resetear modo de edición
-    this.editingPackageId = null; // Limpiar ID de edición
+    this.isEditMode = false;
+    this.editingPackageId = null;
     this.packageForm.reset();
     
-    // Limpiar el FormArray
     while (this.routeFormArray.length !== 0) {
       this.routeFormArray.removeAt(0);
     }
     
-    // Agregar una ruta por defecto
     this.addRoute();
     
-    // Restablecer el id_package
     this.packageForm.patchValue({ id_package: this.id });
   }
 
@@ -336,7 +327,6 @@ export class RouterOffertsComponent implements OnInit {
     
     const formData = { ...this.packageForm.value };
     
-    // Convertir el array de rutas a JSON string
     formData.route_json = JSON.stringify(formData.route_json);
     
     this.routerTrackingRouterService.createRouterTracking(formData).subscribe({
@@ -367,12 +357,9 @@ export class RouterOffertsComponent implements OnInit {
 
     const formData = { ...this.packageForm.value };
     
-    // Procesar las rutas para manejar imágenes nuevas
     const processedRoutes = formData.route_json.map((route: any) => {
       const processedRoute = { ...route };
       
-      // Si hay una nueva imagen (bg_image tiene contenido base64), 
-      // eliminamos bg_image_key y bg_image_size
       if (processedRoute.bg_image && 
           processedRoute.bg_image.startsWith('data:image/')) {
         delete processedRoute.bg_image_key;
@@ -382,10 +369,8 @@ export class RouterOffertsComponent implements OnInit {
       return processedRoute;
     });
     
-    // Convertir el array de rutas procesadas a JSON string
     formData.route_json = JSON.stringify(processedRoutes);
     
-    // El ID se pasa como parámetro separado, no en el body
     const updateId = this.editingPackageId!;
     
     this.routerTrackingRouterService.updateRouterTracking(updateId, formData).subscribe({

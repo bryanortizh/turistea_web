@@ -108,7 +108,6 @@ export class OffertsComponent {
     this.loadPackages();
   }
 
-  // Funciones de búsqueda para el SearchSelectComponent
   searchDrivers = (term: string): Observable<DriverResponse[]> => {
     return this.driverService.searchDriver(term);
   }
@@ -121,7 +120,6 @@ export class OffertsComponent {
     return this.terraceService.searchTerrace(term);
   }
 
-  // Funciones para obtener todos los items (para filtrar en edición)
   getAllDrivers = (): Observable<DriverResponse[]> => {
     return this.driverService.allDrivers();
   }

@@ -40,13 +40,11 @@ export class WidgetsDropdownComponent implements OnInit, AfterContentInit {
 
   @Input() reportSummary: ReportSummary | null = null;
 
-  // Helper para usar Math.round en el template
   Math = Math;
 
   data: any[] = [];
   options: any[] = [];
 
-  // Estadísticas de reservas
   reserveStats = {
     total_reserves: 0,
     total_revenue: 0,
@@ -205,7 +203,6 @@ export class WidgetsDropdownComponent implements OnInit, AfterContentInit {
   }
 
   setData() {
-    // Configurar ambos gráficos
     this.data[0] = {
       labels: [],
       datasets: this.datasets[0],
@@ -230,7 +227,6 @@ export class WidgetsDropdownComponent implements OnInit, AfterContentInit {
   }
 
   setOptions() {
-    // Opciones para gráfico de administradores
     const adminOptions = JSON.parse(JSON.stringify(this.optionsDefault));
     adminOptions.scales.y.min = 0;
     adminOptions.scales.y.max = undefined;
@@ -239,7 +235,6 @@ export class WidgetsDropdownComponent implements OnInit, AfterContentInit {
     adminOptions.elements.point.hoverRadius = 6;
     this.options[0] = adminOptions;
 
-    // Opciones para gráfico de usuarios
     const userOptions = JSON.parse(JSON.stringify(this.optionsDefault));
     userOptions.scales.y.min = 0;
     userOptions.scales.y.max = undefined;
@@ -248,7 +243,6 @@ export class WidgetsDropdownComponent implements OnInit, AfterContentInit {
     userOptions.elements.point.hoverRadius = 6;
     this.options[1] = userOptions;
 
-    // Opciones para gráfico de conductores
     const driverOptions = JSON.parse(JSON.stringify(this.optionsDefault));
     driverOptions.scales.y.min = 0;
     driverOptions.scales.y.max = undefined;
@@ -257,7 +251,6 @@ export class WidgetsDropdownComponent implements OnInit, AfterContentInit {
     driverOptions.elements.point.hoverRadius = 6;
     this.options[2] = driverOptions;
 
-    // Opciones para gráfico de guías
     const guideOptions = JSON.parse(JSON.stringify(this.optionsDefault));
     guideOptions.scales.y.min = 0;
     guideOptions.scales.y.max = undefined;
@@ -266,7 +259,6 @@ export class WidgetsDropdownComponent implements OnInit, AfterContentInit {
     guideOptions.elements.point.hoverRadius = 6;
     this.options[3] = guideOptions;
 
-    // Opciones para gráfico de terramozas
     const terraceOptions = JSON.parse(JSON.stringify(this.optionsDefault));
     terraceOptions.scales.y.min = 0;
     terraceOptions.scales.y.max = undefined;
@@ -469,35 +461,4 @@ export class WidgetsDropdownComponent implements OnInit, AfterContentInit {
 
     this.changeDetectorRef.detectChanges();
   }
-
-/*   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['reportSummary'] && this.reportSummary) {
-      this.updateStatsWithReportData();
-    }
-  }
-
-  private updateStatsWithReportData(): void {
-    if (!this.reportSummary) return;
-
-    // Actualizar las estadísticas principales de reservas
-    this.reserveStats = {
-      total_reserves: this.reportSummary.total_reserves,
-      total_revenue: this.reportSummary.total_revenue,
-      average_price: parseFloat(this.reportSummary.average_price),
-      total_people: this.reportSummary.total_people
-    };
-
-    // Actualizar las estadísticas de estados
-    this.statusStats = {
-      pending: this.reportSummary.status_breakdown.pending,
-      rejected: this.reportSummary.status_breakdown.rejected,
-      pendingpay: this.reportSummary.status_breakdown.pendingpay,
-      reserve: this.reportSummary.status_breakdown.reserve,
-      inprocesstravel: this.reportSummary.status_breakdown.inprocesstravel,
-      done: this.reportSummary.status_breakdown.done,
-      approved: this.reportSummary.status_breakdown.approved
-    };
-    
-    this.changeDetectorRef.detectChanges();
-  } */
 }
