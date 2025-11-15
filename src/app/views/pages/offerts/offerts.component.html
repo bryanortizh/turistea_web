@@ -121,7 +121,15 @@
                     </div>
                 </div>
 
-
+                <div class="col-md-6 mb-3">
+                    <label for="quantity_person" class="form-label">Cantidad de personas *</label>
+                    <input type="number" id="quantity_person" class="form-control" minlength="1" formControlName="quantity_person" />
+                    <div *ngIf="packageForm.get('quantity_person')?.invalid && packageForm.get('quantity_person')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="packageForm.get('quantity_person')?.errors?.['required']">La cantidad de personas es requerida.</div>
+                        <div *ngIf="packageForm.get('quantity_person')?.errors?.['min']">Debe ser al menos 1 persona.</div>
+                    </div>
+                </div>
 
                 <div class="col-md-12 mb-3">
                     <label for="image_bg" class="form-label">Imagen de fondo del paquete *</label>
@@ -170,6 +178,12 @@
             </div>
             <div class="col-6 mb-2">
                 <strong>Departamento:</strong> {{ selectedPackage.name_region }}
+            </div>
+            <div class="col-12 mb-2">
+                <strong>Descripción:</strong> {{ selectedPackage.description }}
+            </div>
+            <div class="col-6 mb-2">
+                <strong>Cantidad de personas:</strong> {{ selectedPackage.quantity_person }}
             </div>
             <div class="col-6 mb-2">
                 <strong>Estado:</strong> {{ selectedPackage.state ? 'Activo' : 'Bloqueado' }}
@@ -256,6 +270,15 @@
                             requerida.</div>
                         <div *ngIf="editPackageForm.get('description')?.errors?.['minlength']">Mínimo 10 caracteres.
                         </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="edit_quantity_person" class="form-label">Cantidad de personas *</label>
+                    <input type="number" id="edit_quantity_person" class="form-control" minlength="1" formControlName="quantity_person" />
+                    <div *ngIf="editPackageForm.get('quantity_person')?.invalid && editPackageForm.get('quantity_person')?.touched"
+                        class="text-danger small">
+                        <div *ngIf="editPackageForm.get('quantity_person')?.errors?.['required']">La cantidad de personas es requerida.</div>
+                        <div *ngIf="editPackageForm.get('quantity_person')?.errors?.['min']">Debe ser al menos 1 persona.</div>
                     </div>
                 </div>
 

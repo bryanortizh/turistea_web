@@ -92,6 +92,7 @@ export class OffertsComponent {
       id_driver: ['', [Validators.required]],
       image_bg: ['', [Validators.required]],
       image_bg_two: ['', [Validators.required]],
+      quantity_person: ['', [Validators.required, Validators.min(1)]],
     });
 
     this.editPackageForm = this.fb.group({
@@ -102,6 +103,7 @@ export class OffertsComponent {
       id_driver: ['', [Validators.required]],
       image_bg: [''],
       image_bg_two: [''],
+      quantity_person: ['', [Validators.required, Validators.min(1)]],
     });
 
     this.loadDrivers();
@@ -220,14 +222,14 @@ export class OffertsComponent {
   }
 
   savePackage() {
-    this.allDrivers(); // Cargar conductores al abrir modal
+    this.allDrivers(); 
+    this.packageForm.reset();
     this.visibleAddPackageModal = true;
   }
 
   closeAddPackageModal() {
     this.visibleAddPackageModal = false;
     this.packageForm.reset();
-    // Reiniciar el Subject para asegurar que funcione en próximas aperturas
     this.driverInput$ = new Subject<string>();
     this.loadDrivers();
   }
@@ -242,6 +244,7 @@ export class OffertsComponent {
         description: this.selectedPackage.description,
         name_region: this.selectedPackage.name_region,
         id_driver: this.selectedPackage.id_driver,
+        quantity_person: this.selectedPackage.quantity_person,
         image_bg: '',
       });
 
