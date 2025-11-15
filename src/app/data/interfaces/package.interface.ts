@@ -10,6 +10,8 @@ export interface PackageResponse {
   name_province: string;
   name_region: string;
   id_driver: number;
+  id_guide: number;
+  id_terrace: number;
   quantity_person: string;
   state: boolean;
   created: string | null;

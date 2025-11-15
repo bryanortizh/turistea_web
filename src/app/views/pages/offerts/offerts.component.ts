@@ -26,17 +26,12 @@ import {
 } from '../../../data/interfaces/pagination.interface';
 import { DriverService } from '../../../core/services/driver.service';
 import { DriverResponse } from '../../../data/interfaces/driver.interface';
-import {
-  NgSelectComponent,
-} from '@ng-select/ng-select';
-import { Subject } from 'rxjs';
-import {
-  debounceTime,
-  distinctUntilChanged,
-  switchMap,
-  catchError,
-} from 'rxjs/operators';
-import { of } from 'rxjs';
+import { GuideServices } from '../../../core/services/guide.service';
+import { GuideResponse } from '../../../data/interfaces/guide.interface';
+import { TerraceServices } from '../../../core/services/terrace.service';
+import { TerraceResponse } from '../../../data/interfaces/terrace.interface';
+import { SearchSelectComponent } from '../../../components/search-select/search-select.component';
+import { Observable, Subject } from 'rxjs';
 import { Router } from '@angular/router';
 
 @Component({
@@ -53,9 +48,9 @@ import { Router } from '@angular/router';
     ButtonCloseDirective,
     ModalBodyComponent,
     ModalFooterComponent,
-    NgSelectComponent,
+    SearchSelectComponent,
   ],
-  providers: [PackageService, DriverService, HttpClient],
+  providers: [PackageService, DriverService, GuideServices, TerraceServices, HttpClient],
   templateUrl: './offerts.component.html',
   styleUrl: './offerts.component.scss',
   standalone: true,
@@ -73,14 +68,12 @@ export class OffertsComponent {
   visibleEditPackageModal = false;
   timeOutmessage = 5000;
   selectedImagePreview: string | null = null;
-  dataDriver: DriverResponse[] = [];
-  selectedCar!: number;
-  loadingDrivers = false;
-  driverInput$ = new Subject<string>();
 
   constructor(
     private packageService: PackageService,
     private driverService: DriverService,
+    private guideService: GuideServices,
+    private terraceService: TerraceServices,
     private fb: FormBuilder,
     private toastr: ToastrService,
     private router: Router
@@ -90,6 +83,8 @@ export class OffertsComponent {
       description: ['', [Validators.required, Validators.minLength(10)]],
       name_region: ['', [Validators.required]],
       id_driver: ['', [Validators.required]],
+      id_guide: ['', [Validators.required]],
+      id_terrace: ['', [Validators.required]],
       image_bg: ['', [Validators.required]],
       image_bg_two: ['', [Validators.required]],
       quantity_person: ['', [Validators.required, Validators.min(1)]],
@@ -101,53 +96,42 @@ export class OffertsComponent {
       description: ['', [Validators.required, Validators.minLength(10)]],
       name_region: ['', [Validators.required]],
       id_driver: ['', [Validators.required]],
+      id_guide: ['', [Validators.required]],
+      id_terrace: ['', [Validators.required]],
       image_bg: [''],
       image_bg_two: [''],
       quantity_person: ['', [Validators.required, Validators.min(1)]],
     });
-
-    this.loadDrivers();
   }
+  
   ngOnInit(): void {
     this.loadPackages();
   }
 
-  loadDrivers() {
-    this.driverInput$
-      .pipe(
-        debounceTime(300),
-        distinctUntilChanged(),
-        switchMap((term) => {
-          if (term.length < 2) {
-            return of([]);
-          }
-          this.loadingDrivers = true;
-          return this.driverService.searchDriver(term).pipe(
-            catchError(() => {
-              this.toastr.error('Error al buscar conductores', 'Error', {
-                timeOut: this.timeOutmessage,
-                closeButton: true,
-                progressBar: true,
-              });
-              return of([]);
-            })
-          );
-        })
-      )
-      .subscribe((drivers) => {
-        this.dataDriver = drivers;
-        this.loadingDrivers = false;
-      });
+  // Funciones de búsqueda para el SearchSelectComponent
+  searchDrivers = (term: string): Observable<DriverResponse[]> => {
+    return this.driverService.searchDriver(term);
   }
 
-  allDrivers() {
-    this.loadingDrivers = true;
-    this.driverService.allDrivers().subscribe({
-      next: (data) => {
-        this.dataDriver = data;
-        this.loadingDrivers = false;
-      },
-    });
+  searchGuides = (term: string): Observable<GuideResponse[]> => {
+    return this.guideService.searchGuide(term);
+  }
+
+  searchTerraces = (term: string): Observable<TerraceResponse[]> => {
+    return this.terraceService.searchTerrace(term);
+  }
+
+  // Funciones para obtener todos los items (para filtrar en edición)
+  getAllDrivers = (): Observable<DriverResponse[]> => {
+    return this.driverService.allDrivers();
+  }
+
+  getAllGuides = (): Observable<GuideResponse[]> => {
+    return this.guideService.allGuides();
+  }
+
+  getAllTerraces = (): Observable<TerraceResponse[]> => {
+    return this.terraceService.allTerraces();
   }
 
   loadPackages(): void {
@@ -222,7 +206,6 @@ export class OffertsComponent {
   }
 
   savePackage() {
-    this.allDrivers(); 
     this.packageForm.reset();
     this.visibleAddPackageModal = true;
   }
@@ -230,12 +213,9 @@ export class OffertsComponent {
   closeAddPackageModal() {
     this.visibleAddPackageModal = false;
     this.packageForm.reset();
-    this.driverInput$ = new Subject<string>();
-    this.loadDrivers();
   }
 
   openEditPackageModal(index: number) {
-    this.allDrivers();
     this.selectedPackage = this.dataPackage[index];
     if (this.selectedPackage) {
       this.editPackageForm.patchValue({
@@ -244,13 +224,12 @@ export class OffertsComponent {
         description: this.selectedPackage.description,
         name_region: this.selectedPackage.name_region,
         id_driver: this.selectedPackage.id_driver,
+        id_guide: this.selectedPackage.id_guide,
+        id_terrace: this.selectedPackage.id_terrace,
         quantity_person: this.selectedPackage.quantity_person,
-        image_bg: '',
+        image_bg: this.selectedPackage.path_bg,
+        image_bg_two: this.selectedPackage.path_bg_two,
       });
-
-      if (this.selectedPackage.id_driver) {
-        this.loadDriverForEdit(this.selectedPackage.id_driver);
-      }
 
       this.visibleEditPackageModal = true;
     }
@@ -261,18 +240,6 @@ export class OffertsComponent {
     this.editPackageForm.reset();
     this.selectedPackage = null;
     this.selectedImagePreview = null;
-    // Reiniciar el Subject para asegurar que funcione en próximas aperturas
-    this.driverInput$ = new Subject<string>();
-    this.loadDrivers();
-  }
-
-  loadDriverForEdit(driverId: number) {
-    const existingDriver = this.dataDriver.find(
-      (driver) => driver.id === driverId
-    );
-    if (!existingDriver) {
-      this.editPackageForm.patchValue({ id_driver: driverId });
-    }
   }
 
   onFileSelect(event: any, fieldName: string) {
@@ -381,25 +348,6 @@ export class OffertsComponent {
         });
       },
     });
-  }
-
-  onDriverSelected(driverId: any) {
-    console.log('Conductor seleccionado:', driverId);
-  }
-
-  onDriverSelectedEdit(driverId: any) {
-    this.editPackageForm.patchValue({ id_driver: driverId.id });
-  }
-
-  onDriverCleared() {
-    this.driverInput$ = new Subject<string>();
-    this.loadDrivers();
-  }
-
-  onDriverClearedEdit() {
-    this.driverInput$ = new Subject<string>();
-    this.loadDrivers();
-    this.editPackageForm.patchValue({ id_driver: null });
   }
 
   openRouterPackage(id: number) {

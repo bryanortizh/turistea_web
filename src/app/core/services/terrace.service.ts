@@ -74,4 +74,34 @@ export class TerraceServices {
       { headers: headers }
     );
   }
+
+  searchTerrace(term: string): Observable<TerraceResponse[]> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Content-type', 'application/json');
+    headers = headers.set(
+      'Authorization',
+      'Bearer ' + localStorage.getItem('token_turistea')
+    );
+
+    return this.http.get<TerraceResponse[]>(
+      this.URL_BACKEND + '/api/admins/terraces-search/' + term,
+      {
+        headers: headers,
+      }
+    );
+  }
+
+  allTerraces(): Observable<TerraceResponse[]> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Content-type', 'application/json');
+    headers = headers.set(
+      'Authorization',
+      'Bearer ' + localStorage.getItem('token_turistea')
+    );
+
+    return this.http.get<TerraceResponse[]>(
+      this.URL_BACKEND + '/api/admins/terraces-all',
+      { headers: headers }
+    );
+  }
 }

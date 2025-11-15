@@ -39,6 +39,7 @@ export class PackageService {
   }
 
   createPackage(body: any): Observable<any> {
+    body.quantity_person = body.quantity_person.toString();
     let headers = new HttpHeaders();
     headers = headers.set('Content-type', 'application/json');
     headers = headers.set(

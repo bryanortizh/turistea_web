@@ -75,4 +75,34 @@ export class GuideServices {
       { headers: headers }
     );
   }
+
+  searchGuide(term: string): Observable<GuideResponse[]> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Content-type', 'application/json');
+    headers = headers.set(
+      'Authorization',
+      'Bearer ' + localStorage.getItem('token_turistea')
+    );
+
+    return this.http.get<GuideResponse[]>(
+      this.URL_BACKEND + '/api/admins/guides-search/' + term,
+      {
+        headers: headers,
+      }
+    );
+  }
+
+  allGuides(): Observable<GuideResponse[]> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Content-type', 'application/json');
+    headers = headers.set(
+      'Authorization',
+      'Bearer ' + localStorage.getItem('token_turistea')
+    );
+
+    return this.http.get<GuideResponse[]>(
+      this.URL_BACKEND + '/api/admins/guides-all',
+      { headers: headers }
+    );
+  }
 }

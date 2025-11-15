@@ -96,18 +96,46 @@
                     </div>
                 </div>
 
-                <div class="col-md-12 mb-3">
-                    <label for="id_driver" class="form-label">Conductor *</label>
-                    <ng-select [items]="dataDriver" bindLabel="textSearch" bindValue="id" formControlName="id_driver"
-                        placeholder="Buscar conductor por nombre..." notFoundText="No se encontraron conductores"
-                        typeToSearchText="Escribe para buscar..." [loading]="loadingDrivers" [clearable]="true"
-                        [searchable]="true" [typeahead]="driverInput$" [minTermLength]="2"
-                        (change)="onDriverSelected($event)" (clear)="onDriverCleared()">
-                    </ng-select>
-                    <div *ngIf="packageForm.get('id_driver')?.invalid && packageForm.get('id_driver')?.touched"
-                        class="text-danger small">
-                        <div *ngIf="packageForm.get('id_driver')?.errors?.['required']">El conductor es requerido.</div>
-                    </div>
+                <div class="col-md-12">
+                    <app-search-select
+                        label="Conductor"
+                        formControlName="id_driver"
+                        [searchFunction]="searchDrivers"
+                        placeholder="Buscar conductor por nombre..."
+                        notFoundText="No se encontraron conductores"
+                        bindLabel="textSearch"
+                        bindValue="id"
+                        [required]="true"
+                        errorMessage="El conductor es requerido">
+                    </app-search-select>
+                </div>
+
+                <div class="col-md-12">
+                    <app-search-select
+                        label="Guía"
+                        formControlName="id_guide"
+                        [searchFunction]="searchGuides"
+                        placeholder="Buscar guía por nombre..."
+                        notFoundText="No se encontraron guías"
+                        bindLabel="textSearch"
+                        bindValue="id"
+                        [required]="true"
+                        errorMessage="El guía es requerido">
+                    </app-search-select>
+                </div>
+
+                <div class="col-md-12">
+                    <app-search-select
+                        label="Terraza"
+                        formControlName="id_terrace"
+                        [searchFunction]="searchTerraces"
+                        placeholder="Buscar terraza por nombre..."
+                        notFoundText="No se encontraron terrazas"
+                        bindLabel="textSearch"
+                        bindValue="id"
+                        [required]="true"
+                        errorMessage="La terraza es requerida">
+                    </app-search-select>
                 </div>
 
                 <div class="col-md-12 mb-3">
@@ -245,19 +273,49 @@
                     </div>
                 </div>
 
-                <div class="col-md-12 mb-3">
-                    <label for="edit_id_driver" class="form-label">Conductor *</label>
-                    <ng-select [items]="dataDriver" bindLabel="textSearch" bindValue="id" formControlName="id_driver"
-                        placeholder="Buscar conductor por nombre..." notFoundText="No se encontraron conductores"
-                        typeToSearchText="Escribe para buscar..." [loading]="loadingDrivers" [clearable]="true"
-                        [searchable]="true" [typeahead]="driverInput$" [minTermLength]="2"
-                        (change)="onDriverSelectedEdit($event)" (clear)="onDriverClearedEdit()">
-                    </ng-select>
-                    <div *ngIf="editPackageForm.get('id_driver')?.invalid && editPackageForm.get('id_driver')?.touched"
-                        class="text-danger small">
-                        <div *ngIf="editPackageForm.get('id_driver')?.errors?.['required']">El conductor es requerido.
-                        </div>
-                    </div>
+                <div class="col-md-12">
+                    <app-search-select
+                        label="Conductor"
+                        formControlName="id_driver"
+                        [searchFunction]="searchDrivers"
+                        [getAllFunction]="getAllDrivers"
+                        placeholder="Buscar conductor por nombre..."
+                        notFoundText="No se encontraron conductores"
+                        bindLabel="textSearch"
+                        bindValue="id"
+                        [required]="true"
+                        errorMessage="El conductor es requerido">
+                    </app-search-select>
+                </div>
+
+                <div class="col-md-12">
+                    <app-search-select
+                        label="Guía"
+                        formControlName="id_guide"
+                        [searchFunction]="searchGuides"
+                        [getAllFunction]="getAllGuides"
+                        placeholder="Buscar guía por nombre..."
+                        notFoundText="No se encontraron guías"
+                        bindLabel="textSearch"
+                        bindValue="id"
+                        [required]="true"
+                        errorMessage="El guía es requerido">
+                    </app-search-select>
+                </div>
+
+                <div class="col-md-12">
+                    <app-search-select
+                        label="Terraza"
+                        formControlName="id_terrace"
+                        [searchFunction]="searchTerraces"
+                        [getAllFunction]="getAllTerraces"
+                        placeholder="Buscar terraza por nombre..."
+                        notFoundText="No se encontraron terrazas"
+                        bindLabel="textSearch"
+                        bindValue="id"
+                        [required]="true"
+                        errorMessage="La terraza es requerida">
+                    </app-search-select>
                 </div>
 
                 <div class="col-md-12 mb-3">

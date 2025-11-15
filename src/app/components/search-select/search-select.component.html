@@ -1,0 +1,26 @@
+<div class="mb-3">
+  <label [for]="label" class="form-label">
+    {{ label }}
+    <span *ngIf="required" class="text-danger">*</span>
+  </label>
+  <ng-select
+    [items]="data"
+    [bindLabel]="bindLabel"
+    [bindValue]="bindValue"
+    [placeholder]="placeholder"
+    [notFoundText]="notFoundText"
+    [typeToSearchText]="typeToSearchText"
+    [loading]="loading"
+    [clearable]="true"
+    [searchable]="true"
+    [typeahead]="searchInput$"
+    [minTermLength]="minTermLength"
+    [(ngModel)]="value"
+    (change)="onSelectChange($event)"
+    (clear)="onClear()"
+    [disabled]="disabled">
+  </ng-select>
+  <div *ngIf="shouldShowError()" class="text-danger small mt-1">
+    {{ errorMessage }}
+  </div>
+</div>
