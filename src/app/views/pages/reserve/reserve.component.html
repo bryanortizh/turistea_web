@@ -1,157 +1,183 @@
 <div class="container-fluid">
-  <div class="row">
-    <div class="col-12">
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">Gestión de Reservas</h3>
-        </div>
-        
-        <div class="card-body">
-          <div class="table-responsive">
-            <table class="table table-bordered table-striped">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Cliente</th>
-                  <th>Documento</th>
-                  <th>Paquete</th>
-                  <th>Fecha Reserva</th>
-                  <th>Personas</th>
-                  <th>Precio Total</th>
-                  <th>Guía</th>
-                  <th>Terraza</th>
-                  <th>Estado</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let reserve of reserves">
-                  <td>{{ reserve.id }}</td>
-                  <td>{{ reserve.full_name }}</td>
-                  <td>{{ reserve.type_document }}: {{ reserve.number_document }}</td>
-                  <td>{{ reserve.package?.title }}</td>
-                  <td>{{ reserve.date_reserve | date: 'dd/MM/yyyy HH:mm' }}</td>
-                  <td>{{ reserve.cant_people }}</td>
-                  <td>S/ {{ reserve.price_total }}</td>
-                  <td>
-                    <span class="badge" [ngClass]="reserve.package.guide ? 'badge-success' : 'badge-secondary'">
-                      {{ reserve.package.guide ? 'Sí' : 'No' }}
-                    </span>
-                  </td>
-                  <td>
-                    <span class="badge" [ngClass]="reserve.package.terrace ? 'badge-success' : 'badge-secondary'">
-                      {{ reserve.package.terrace ? 'Sí' : 'No' }}
-                    </span>
-                  </td>
-                  <td>
-                    <span class="badge" [ngClass]="{
-                      'badge-warning': reserve.status_form === 'pendingpay',
-                      'badge-success': reserve.status_form === 'done',
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Gestión de Reservas</h3>
+                    <div class="card-header-actions">
+                        <button 
+                            *ngIf="!audioInitialized"
+                            cButton 
+                            color="warning" 
+                            size="sm"
+                            (click)="enableNotificationSound()"
+                            title="Habilitar sonido de notificaciones"
+                            class="mr-2">
+                            <i class="fas fa-volume-mute"></i> Habilitar Sonido
+                        </button>
+                        <span 
+                            *ngIf="audioInitialized"
+                            class="badge badge-success mr-2"
+                            title="Notificaciones de audio habilitadas">
+                            <i class="fas fa-volume-up"></i> Sonido Activo
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <button cButton color="primary" class="mt-2 ml-2 mr-2"
+                        (click)="filterByStatus('pendingpayinprocess')">Pendientes</button>
+                    <button cButton color="success" class="mt-2 mr-2" (click)="filterByStatus('reserve')">Reservado</button>
+                    <button cButton color="danger" class="mt-2 mr-2" (click)="filterByStatus('rejected')">Rechazadas</button>
+                </div>
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Cliente</th>
+                                    <th>Documento</th>
+                                    <th>Paquete</th>
+                                    <th>Fecha Reserva</th>
+                                    <th>Personas</th>
+                                    <th>Precio Total</th>
+                                    <th>Guía</th>
+                                    <th>Terraza</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let reserve of reserves">
+                                    <td>{{ reserve.id }}</td>
+                                    <td>{{ reserve.full_name }}</td>
+                                    <td>{{ reserve.type_document }}: {{ reserve.number_document }}</td>
+                                    <td>{{ reserve.package?.title }}</td>
+                                    <td>{{ reserve.date_reserve | date: 'dd/MM/yyyy HH:mm' }}</td>
+                                    <td>{{ reserve.cant_people }}</td>
+                                    <td>S/ {{ reserve.price_total }}</td>
+                                    <td>
+                                        <span class="badge"
+                                            [ngClass]="reserve.package.guide ? 'badge-success' : 'badge-secondary'">
+                                            {{ reserve.package.guide ? 'Sí' : 'No' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge"
+                                            [ngClass]="reserve.package.terrace ? 'badge-success' : 'badge-secondary'">
+                                            {{ reserve.package.terrace ? 'Sí' : 'No' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge" [ngClass]="{
+                      'badge-warning': reserve.status_form === 'pendingpayinprocess',
+                      'badge-success': reserve.status_form === 'reserve',
                       'badge-danger': reserve.status_form === 'rejected'
                     }">
-                      {{ getStatusLabel(reserve.status_form) }}
-                    </span>
-                  </td>
-                  <td>
-                    <button 
-                      class="btn btn-success btn-sm mr-2" 
-                      *ngIf="reserve.status_form !== 'done' && reserve.status_form !== 'rejected'"
-                      (click)="approveReserve(reserve.id)"
-                      [disabled]="reserve.status_form === 'done' || reserve.status_form === 'rejected'"
-                      title="Aprobar">
-                      <i class="fas fa-check"></i>
-                      Aprobar
-                    </button>
-                    <button 
-                    *ngIf="reserve.status_form !== 'rejected' && reserve.status_form !== 'done'"
-                      class="btn btn-danger btn-sm mr-2" 
-                      (click)="rejectReserve(reserve.id)"
-                      [disabled]="reserve.status_form === 'done' || reserve.status_form === 'rejected'"
-                      title="Rechazar">
-                      <i class="fas fa-times"></i>
-                      Rechazar
-                    </button>
-                    <button 
-                      class="btn btn-info btn-sm" 
-                      (click)="viewDetails(reserve)"
-                      title="Ver detalles">
-                      <i class="fas fa-eye"></i>
-                        Detalles
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+                                            {{ getStatusLabel(reserve.status_form) }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-success btn-sm mr-2"
+                                            *ngIf="reserve.status_form !== 'reserve' && reserve.status_form !== 'rejected'"
+                                            (click)="approveReserve(reserve.id)"
+                                            [disabled]="reserve.status_form === 'reserve' || reserve.status_form === 'rejected'"
+                                            title="Aprobar">
+                                            <i class="fas fa-check"></i>
+                                            Aprobar
+                                        </button>
+                                        <button
+                                            *ngIf="reserve.status_form !== 'rejected' && reserve.status_form !== 'reserve'"
+                                            class="btn btn-danger btn-sm mr-2" (click)="rejectReserve(reserve.id)"
+                                            [disabled]="reserve.status_form === 'reserve' || reserve.status_form === 'rejected'"
+                                            title="Rechazar">
+                                            <i class="fas fa-times"></i>
+                                            Rechazar
+                                        </button>
+                                        <button class="btn btn-info btn-sm" (click)="viewDetails(reserve)"
+                                            title="Ver detalles">
+                                            <i class="fas fa-eye"></i>
+                                            Detalles
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
 
-          <!-- Paginación -->
-          <div class="row mt-3">
-            <div class="col-sm-12 col-md-5">
-              <div class="dataTables_info">
-                Mostrando {{ reserves.length }} de {{ totalRecords }} registros
-              </div>
+                    <!-- Paginación -->
+                    <div class="row mt-3">
+                        <div class="col-sm-12 col-md-5">
+                            <div class="dataTables_info">
+                                Mostrando {{ reserves.length }} de {{ totalRecords }} registros
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-7">
+                            <div class="dataTables_paginate paging_simple_numbers float-right">
+                                <ul class="pagination">
+                                    <li class="paginate_button page-item" [class.disabled]="currentPage === 1">
+                                        <a (click)="changePage(currentPage - 1)" class="page-link">Anterior</a>
+                                    </li>
+                                    <li class="paginate_button page-item active">
+                                        <a class="page-link">{{ currentPage }}</a>
+                                    </li>
+                                    <li class="paginate_button page-item"
+                                        [class.disabled]="currentPage * pageSize >= totalRecords">
+                                        <a (click)="changePage(currentPage + 1)" class="page-link">Siguiente</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="col-sm-12 col-md-7">
-              <div class="dataTables_paginate paging_simple_numbers float-right">
-                <ul class="pagination">
-                  <li class="paginate_button page-item" [class.disabled]="currentPage === 1">
-                    <a (click)="changePage(currentPage - 1)" class="page-link">Anterior</a>
-                  </li>
-                  <li class="paginate_button page-item active">
-                    <a class="page-link">{{ currentPage }}</a>
-                  </li>
-                  <li class="paginate_button page-item" [class.disabled]="currentPage * pageSize >= totalRecords">
-                    <a (click)="changePage(currentPage + 1)" class="page-link">Siguiente</a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
         </div>
-      </div>
     </div>
-  </div>
 </div>
 
 <c-modal id="detailsModal" [visible]="showModal" (visibleChange)="onModalClose($event)" size="lg">
-  <c-modal-header>
-    <h5 cModalTitle>Detalles de la Reserva #{{ selectedReserve?.id }}</h5>
-    <button cButtonClose (click)="closeModal()"></button>
-  </c-modal-header>
-  <c-modal-body *ngIf="selectedReserve">
-    <h6>Información del Cliente</h6>
-    <p><strong>Nombre:</strong> {{ selectedReserve.user?.name }} {{ selectedReserve.user?.lastname }}</p>
-    <p><strong>Email:</strong> {{ selectedReserve.user?.email }}</p>
-    <p><strong>Teléfono:</strong> {{ selectedReserve.user?.cellphone }}</p>
-    
-    <h6 class="mt-3">Pasajeros</h6>
-    <ul>
-      <li *ngFor="let passenger of selectedReserve.users_json?.passengers">
-        {{ passenger.name }} - {{ passenger.type }}: {{ passenger.document }} - Edad: {{ passenger.age }}
-      </li>
-    </ul>
-    
-    <h6 class="mt-3">Contacto de Emergencia</h6>
+    <c-modal-header>
+        <h5 cModalTitle>Detalles de la Reserva #{{ selectedReserve?.id }}</h5>
+        <button cButtonClose (click)="closeModal()"></button>
+    </c-modal-header>
+    <c-modal-body *ngIf="selectedReserve">
+        <h6>Información del Cliente</h6>
+        <p><strong>Nombre:</strong> {{ selectedReserve.user?.name }} {{ selectedReserve.user?.lastname }}</p>
+        <p><strong>Email:</strong> {{ selectedReserve.user?.email }}</p>
+        <p><strong>Teléfono:</strong> {{ selectedReserve.user?.cellphone }}</p>
 
-    <h6 class="mt-3">Conductor</h6>
-    <p><strong>Nombre:</strong> {{ selectedReserve.package?.driver?.name }} {{ selectedReserve.package?.driver?.lastname }} - DNI: {{ selectedReserve.package?.driver?.dni }}</p>
-    <h6 class="mt-3">Guía</h6>
-    <p><strong>Nombre:</strong> {{ selectedReserve.package?.guide?.name }}  {{ selectedReserve.package?.guide?.lastname }} - DNI: {{ selectedReserve.package?.guide?.dni }}</p>
-    <h6>Terramoza:</h6>
-    <p><strong>Nombre:</strong> {{ selectedReserve.package?.terrace?.name }} {{ selectedReserve.package?.terrace?.lastname }} - DNI: {{ selectedReserve.package?.terrace?.dni }}</p>
-    <p>
-      <strong>{{ selectedReserve.users_json?.emergency_contact?.name }}</strong> 
-      ({{ selectedReserve.users_json?.emergency_contact?.relationship }}) - 
-      {{ selectedReserve.users_json?.emergency_contact?.phone }}
-    </p>
-    
-    <h6 class="mt-3">Información del Paquete</h6>
-    <p><strong>Identificador del paquete:</strong> {{ selectedReserve.package?.id }}</p>
-    <p><strong>Título:</strong> {{ selectedReserve.package?.title }}</p>
-    <p><strong>Región:</strong> {{ selectedReserve.package?.name_region }}</p>
-    <p><strong>Descripción:</strong> {{ selectedReserve.package?.description }}</p>
-  </c-modal-body>
-  <c-modal-footer>
-    <button cButton color="secondary" (click)="closeModal()">Cerrar</button>
-  </c-modal-footer>
+        <h6 class="mt-3">Pasajeros</h6>
+        <ul>
+            <li *ngFor="let passenger of selectedReserve.users_json?.passengers">
+                {{ passenger.name }} - {{ passenger.type }}: {{ passenger.document }} - Edad: {{ passenger.age }}
+            </li>
+        </ul>
+
+        <h6 class="mt-3">Contacto de Emergencia</h6>
+
+        <h6 class="mt-3">Conductor</h6>
+        <p><strong>Nombre:</strong> {{ selectedReserve.package?.driver?.name }} {{
+            selectedReserve.package?.driver?.lastname }} - DNI: {{ selectedReserve.package?.driver?.dni }}</p>
+        <h6 class="mt-3">Guía</h6>
+        <p><strong>Nombre:</strong> {{ selectedReserve.package?.guide?.name }} {{
+            selectedReserve.package?.guide?.lastname }} - DNI: {{ selectedReserve.package?.guide?.dni }}</p>
+        <h6>Terramoza:</h6>
+        <p><strong>Nombre:</strong> {{ selectedReserve.package?.terrace?.name }} {{
+            selectedReserve.package?.terrace?.lastname }} - DNI: {{ selectedReserve.package?.terrace?.dni }}</p>
+        <p>
+            <strong>{{ selectedReserve.users_json?.emergency_contact?.name }}</strong>
+            ({{ selectedReserve.users_json?.emergency_contact?.relationship }}) -
+            {{ selectedReserve.users_json?.emergency_contact?.phone }}
+        </p>
+
+        <h6 class="mt-3">Información del Paquete</h6>
+        <p><strong>Identificador del paquete:</strong> {{ selectedReserve.package?.id }}</p>
+        <p><strong>Título:</strong> {{ selectedReserve.package?.title }}</p>
+        <p><strong>Región:</strong> {{ selectedReserve.package?.name_region }}</p>
+        <p><strong>Descripción:</strong> {{ selectedReserve.package?.description }}</p>
+    </c-modal-body>
+    <c-modal-footer>
+        <button cButton color="secondary" (click)="closeModal()">Cerrar</button>
+    </c-modal-footer>
 </c-modal>

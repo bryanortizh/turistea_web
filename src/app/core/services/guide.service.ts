@@ -4,12 +4,13 @@ import { Observable } from 'rxjs';
 import { PaginationParams } from '../../data/interfaces/pagination.interface';
 import { DriverResponse } from '../../data/interfaces/driver.interface';
 import { GuideResponse } from '../../data/interfaces/guide.interface';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class GuideServices {
-  URL_BACKEND = 'http://localhost:4001';
+  URL_BACKEND = environment.apiUrl;
   timeOutmessage = 3000;
   constructor(public http: HttpClient) {}
 

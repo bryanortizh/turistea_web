@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Profile } from '../../data/interfaces/profile.interface';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ReportService {
-  URL_BACKEND = 'http://localhost:4001';
+  URL_BACKEND = environment.apiUrl;
   timeOutmessage = 3000;
   constructor(public http: HttpClient) {}
 

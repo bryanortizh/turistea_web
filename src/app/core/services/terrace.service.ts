@@ -3,12 +3,12 @@ import {  HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { PaginationParams } from '../../data/interfaces/pagination.interface';
 import { TerraceResponse } from '../../data/interfaces/terrace.interface';
-
+import { environment } from '../../../environments/environment';
 @Injectable({
   providedIn: 'root',
 })
 export class TerraceServices {
-  URL_BACKEND = 'http://localhost:4001';
+  URL_BACKEND = environment.apiUrl;
   timeOutmessage = 3000;
   constructor(public http: HttpClient) {}
 
