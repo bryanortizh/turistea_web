@@ -12,9 +12,10 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "start:dev": "ng serve --open",
-    "start:prod": "ng serve --configuration production",
-    "build": "ng build",
+    "start:dev": "ng serve --configuration development --open",
+    "start:prod": "ng serve --configuration production --open",
+    "build": "ng build --configuration production",
+    "build:dev": "ng build --configuration development",
     "build:prod": "ng build --configuration production",
     "build:serve": "npm run build:prod && npm run serve:dist",
     "watch": "ng build --watch --configuration development",

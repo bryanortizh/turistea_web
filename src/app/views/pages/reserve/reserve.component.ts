@@ -72,6 +72,12 @@ export class ReserveComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // Verificar qué environment se está usando
+    console.log('Environment:', environment);
+    console.log('API URL:', environment.apiUrl);
+    console.log('Socket URL:', environment.socketUrl);
+    console.log('Is Production:', environment.production);
+
     this.loadReserves(this.statusFilter);
     this.setupSocketListeners();
     setTimeout(() => {
