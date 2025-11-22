@@ -20,18 +20,18 @@
             "outputPath": "dist/coreui-free-angular-admin-template",
             "index": "src/index.html",
             "browser": "src/main.ts",
-             "polyfills": [
+            "polyfills": [
               "zone.js",
               "zone.js/testing",
               "@angular/localize/init"
             ],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
+            "preserveSymlinks": true,
             "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
+              "src/favicon.ico",
+              "src/assets",
+              "src/assets/music/notification.mp3"
             ],
             "styles": [
               "src/scss/styles.scss",

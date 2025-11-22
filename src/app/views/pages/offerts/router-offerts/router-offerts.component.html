@@ -71,7 +71,7 @@
   </nav>
 </div>
 
-<c-modal [visible]="visibleAddPackageModal" (visibleChange)="visibleAddPackageModal = $event" size="xl">
+<c-modal backdrop="static" [visible]="visibleAddPackageModal" (visibleChange)="visibleAddPackageModal = $event" size="xl">
   <c-modal-header>
     <h5 cModalTitle>{{ isEditMode ? 'Editar' : 'Registrar' }} configuración de paquete turístico</h5>
     <button cButtonClose (click)="closeAddPackageModal()"></button>
@@ -151,6 +151,35 @@
             </div>
           </div>
         </div>
+
+        <div class="col-md-4 mb-3">
+          <label for="address_initial" class="form-label">Dirección Inicial *</label>
+          <input type="text" id="address_initial" class="form-control" formControlName="address_initial"
+            placeholder="Ej: Av. Principal 123, Ciudad" />
+          <div *ngIf="
+              packageForm.get('address_initial')?.invalid &&
+              packageForm.get('address_initial')?.touched
+            " class="text-danger small">
+            <div *ngIf="packageForm.get('address_initial')?.errors?.['required']">
+              La dirección inicial es requerida.
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label for="address_final" class="form-label">Dirección Final *</label>
+          <input type="text" id="address_final" class="form-control" formControlName="address_final"
+            placeholder="Ej: Av. Secundaria 456, Ciudad" />
+          <div *ngIf="
+              packageForm.get('address_final')?.invalid &&
+              packageForm.get('address_final')?.touched
+            " class="text-danger small">
+            <div *ngIf="packageForm.get('address_final')?.errors?.['required']">
+              La dirección final es requerida.
+            </div>
+          </div>
+        </div>
+
         <div class="col-md-4 mb-3">
           <label for="price_route" class="form-label">Precio de la ruta *</label>
           <input type="number" id="price_route" class="form-control" formControlName="price_route"
@@ -280,7 +309,7 @@
   </form>
 </c-modal>
 
-<c-modal [visible]="visiblePackageModal" (visibleChange)="visiblePackageModal = $event" size="xl">
+<c-modal backdrop="static" [visible]="visiblePackageModal" (visibleChange)="visiblePackageModal = $event" size="xl">
   <c-modal-header>
     <h5 cModalTitle>📋 Detalle completo de la configuración</h5>
     <button cButtonClose (click)="closePackageModal()"></button>
@@ -322,6 +351,27 @@
         <strong>🏙️ Provincia:</strong>
         <div class="text-muted">
           {{ selectedPackage.name_province || 'No especificado' }}
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <strong>🏠 Dirección Inicial:</strong>
+        <div class="text-muted">
+          {{ selectedPackage.address_initial || 'No especificado' }}
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <strong>🏠 Dirección Final:</strong>
+        <div class="text-muted">
+          {{ selectedPackage.address_final || 'No especificado' }}
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <strong>💲 Precio de la Ruta:</strong>
+        <div class="text-muted">
+          {{ selectedPackage.price_route ? ('S/. ' + selectedPackage.price_route) : 'No especificado' }}
         </div>
       </div>
 

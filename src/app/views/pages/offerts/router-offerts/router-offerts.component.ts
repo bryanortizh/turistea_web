@@ -89,6 +89,8 @@ export class RouterOffertsComponent implements OnInit {
       image_two: [''],
       image_tree: [''],
       price_route: ['', [Validators.required, Validators.min(1)]],
+      address_initial: ['', [Validators.required]],
+      address_final: ['', [Validators.required]]
     });
 
     this.addRoute();
@@ -219,6 +221,8 @@ export class RouterOffertsComponent implements OnInit {
 
   savePackage() {
     this.visibleAddPackageModal = true;
+    this.isEditMode = false;
+    this.packageForm.reset();
   }
 
   editPackage(packageData: RouterTrackingResponse) {
@@ -232,6 +236,8 @@ export class RouterOffertsComponent implements OnInit {
       name_district: packageData.name_district,
       name_province: packageData.name_province,
       price_route: packageData.price_route,
+      address_initial: packageData.address_initial,
+      address_final: packageData.address_final,
       id_package: this.id
     });
 
@@ -252,7 +258,9 @@ export class RouterOffertsComponent implements OnInit {
             bg_image: route.bg_image || '',
             bg_image_key: route.bg_image_key || '',
             bg_image_size: route.bg_image_size || '',
-            price_route: route.price_route || ''
+            price_route: route.price_route || '',
+            address_initial: route.address_initial || '',
+            address_final: route.address_final || ''
           });
           this.routeFormArray.push(routeGroup);
         });
