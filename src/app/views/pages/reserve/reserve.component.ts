@@ -46,7 +46,7 @@ export class ReserveComponent implements OnInit, OnDestroy {
   totalRecords: number = 0;
   loading: boolean = false;
   showModal: boolean = false;
-  statusFilter: string = 'pendingpayinprocess';
+  statusFilter: string = 'pending_pay_in_process';
   private socket: Socket;
   private timeOutmessage: number = 5000;
   private notificationSound: HTMLAudioElement;
@@ -82,7 +82,7 @@ export class ReserveComponent implements OnInit, OnDestroy {
     this.setupSocketListeners();
     setTimeout(() => {
       this.enableNotificationSound();
-    }, 1000);
+    }, 2000);
   }
 
   ngOnDestroy(): void {

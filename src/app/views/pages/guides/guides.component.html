@@ -66,7 +66,7 @@
     </nav>
 </div>
 
-<c-modal [visible]="visibleAddGuideModal" (visibleChange)="visibleAddGuideModal = $event" size="lg">
+<c-modal  backdrop="static" [visible]="visibleAddGuideModal" (visibleChange)="visibleAddGuideModal = $event" size="lg">
     <c-modal-header>
         <h5 cModalTitle>Registrar guía</h5>
         <button cButtonClose (click)="closeAddGuideModal()"></button>
@@ -160,7 +160,7 @@
 
 
                 <div class="col-md-6 mb-3">
-                    <label for="image_photo" class="form-label">Imagen del documento</label>
+                    <label for="image_photo" class="form-label">Imagen frontal documento</label>
                     <input type="file" id="image_photo" class="form-control"
                         (change)="onFileSelect($event, 'image_photo')" accept="image/*" />
                     <div *ngIf="guideForm.get('image_photo')?.invalid && guideForm.get('image_photo')?.touched"
@@ -171,7 +171,7 @@
                 </div>
 
                 <div class="col-md-6 mb-3">
-                    <label for="image_document" class="form-label">Imagen documento</label>
+                    <label for="image_document" class="form-label">Imagen trasera documento</label>
                     <input type="file" id="image_document" class="form-control"
                         (change)="onFileSelect($event, 'image_document')" accept="image/*" />
                     <div *ngIf="guideForm.get('image_document')?.invalid && guideForm.get('image_document')?.touched"
@@ -191,7 +191,7 @@
     </form>
 </c-modal>
 
-<c-modal [visible]="visibleEditGuideModal" (visibleChange)="visibleEditGuideModal = $event" size="lg">
+<c-modal  backdrop="static" [visible]="visibleEditGuideModal" (visibleChange)="visibleEditGuideModal = $event" size="lg">
     <c-modal-header>
         <h5 cModalTitle>Editar guía</h5>
         <button cButtonClose (click)="closeEditGuideModal()"></button>
@@ -290,14 +290,14 @@
 
 
                 <div class="col-md-6 mb-3">
-                    <label for="edit_image_photo" class="form-label">Nueva imagen de perfil (opcional)</label>
+                    <label for="edit_image_photo" class="form-label">Imagen frontal documento</label>
                     <input type="file" id="edit_image_photo" class="form-control"
                         (change)="onFileSelectEdit($event, 'image_photo')" accept="image/*" />
                     <small class="text-muted">Deja vacío si no quieres cambiar la imagen</small>
                 </div>
 
                 <div class="col-md-6 mb-3">
-                    <label for="edit_image_document" class="form-label">Nueva imagen del documento (opcional)</label>
+                    <label for="edit_image_document" class="form-label">Imagen trasera documento</label>
                     <input type="file" id="edit_image_document" class="form-control"
                         (change)="onFileSelectEdit($event, 'image_document')" accept="image/*" />
                     <small class="text-muted">Deja vacío si no quieres cambiar la imagen</small>
@@ -312,7 +312,7 @@
     </form>
 </c-modal>
 
-<c-modal [visible]="visibleGuideModal" (visibleChange)="visibleGuideModal = $event">
+<c-modal  backdrop="static" [visible]="visibleGuideModal" (visibleChange)="visibleGuideModal = $event">
     <c-modal-header>
         <h5 cModalTitle>Datos del guía</h5>
         <button cButtonClose (click)="closeGuideModal()"></button>
@@ -354,12 +354,12 @@
             </div>
             <div class="row">
                 <div class="col-6 mb-2">
-                    <strong>Imagen guía:</strong><br />
+                    <strong>Imagen frontal documento:</strong><br />
                     <img *ngIf="selectedGuide.path_photo" [src]="selectedGuide.path_photo" alt="Imagen del guía"
                         class="img-fluid mt-2" style="max-width: 200px; border: 1px solid #ccc; padding: 5px;" />
                 </div>
                 <div class="col-6 mb-2">
-                    <strong>Imagen documento:</strong><br />
+                    <strong>Imagen trasera documento:</strong><br />
                     <img *ngIf="selectedGuide.path_document" [src]="selectedGuide.path_document"
                         alt="Imagen del documento" class="img-fluid mt-2"
                         style="max-width: 200px; border: 1px solid #ccc; padding: 5px;" />

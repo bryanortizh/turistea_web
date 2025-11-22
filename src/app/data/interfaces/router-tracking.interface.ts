@@ -24,6 +24,8 @@ export interface RouterTrackingResponse {
   name_district: string | null;
   name_province: string | null;
   price_route: string | null;
+  address_initial: string | null;
+  address_final: string | null;
   state: boolean;
   created: string;
   updated: string;

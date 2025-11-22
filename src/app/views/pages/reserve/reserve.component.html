@@ -25,7 +25,7 @@
                 </div>
                 <div class="col-md-12">
                     <button cButton color="primary" class="mt-2 ml-2 mr-2"
-                        (click)="filterByStatus('pendingpayinprocess')">Pendientes</button>
+                        (click)="filterByStatus('pending_pay_in_process')">Pendientes</button>
                     <button cButton color="success" class="mt-2 mr-2" (click)="filterByStatus('reserve')">Reservado</button>
                     <button cButton color="danger" class="mt-2 mr-2" (click)="filterByStatus('rejected')">Rechazadas</button>
                 </div>
@@ -71,7 +71,7 @@
                                     </td>
                                     <td>
                                         <span class="badge" [ngClass]="{
-                      'badge-warning': reserve.status_form === 'pendingpayinprocess',
+                      'badge-warning': reserve.status_form === 'pending_pay_in_process',
                       'badge-success': reserve.status_form === 'reserve',
                       'badge-danger': reserve.status_form === 'rejected'
                     }">
@@ -136,7 +136,7 @@
     </div>
 </div>
 
-<c-modal id="detailsModal" [visible]="showModal" (visibleChange)="onModalClose($event)" size="lg">
+<c-modal  backdrop="static" id="detailsModal" [visible]="showModal" (visibleChange)="onModalClose($event)" size="lg">
     <c-modal-header>
         <h5 cModalTitle>Detalles de la Reserva #{{ selectedReserve?.id }}</h5>
         <button cButtonClose (click)="closeModal()"></button>

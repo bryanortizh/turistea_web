@@ -33,12 +33,12 @@ export const navItems: INavData[] = [
   {
     name: 'Conductores',
     url: '/driver',
-    iconComponent: { name: 'cil-car' },
+    iconComponent: { name: 'cil-user' },
   },
   {
     name: 'Guias Turisticos',
     url: '/guides',
-    iconComponent: { name: 'cil-star' },
+    iconComponent: { name: 'cil-paper-plane' },
   },
   {
     name: 'Ofertas Turisticas',
@@ -48,33 +48,33 @@ export const navItems: INavData[] = [
   {
     name: 'Terramozas',
     url: '/terraces',
-    iconComponent: { name: 'cil-building' },
+    iconComponent: { name: 'cil-user' },
   },
 ];
 
 export const navItemsSupport: INavData[] = [
- {
+  {
     title: true,
     name: 'Servicio Turistico',
   },
   {
     name: 'Conductores',
     url: '/driver',
-    iconComponent: { name: 'cil-car' },
+    iconComponent: { name: 'cil-user' },
   },
   {
     name: 'Guias Turisticos',
     url: '/guides',
+    iconComponent: { name: 'cil-paper-plane' },
   },
   {
     name: 'Terramozas',
     url: '/terraces',
-    iconComponent: { name: 'cil-building' },
+    iconComponent: { name: 'cil-user' },
   },
   {
-    name: "Reservas",
+    name: 'Reservas',
     url: '/reserves',
     iconComponent: { name: 'cil-bookmark' },
   },
-
 ];

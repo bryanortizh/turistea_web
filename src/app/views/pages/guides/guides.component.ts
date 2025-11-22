@@ -166,6 +166,7 @@ export class GuideComponent {
 
   saveGuide() {
     this.visibleAddGuideModal = true;
+    this.guideForm.reset();
   }
 
   closeAddGuideModal() {
