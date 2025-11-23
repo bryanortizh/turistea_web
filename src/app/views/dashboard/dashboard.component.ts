@@ -101,10 +101,7 @@ export class DashboardComponent implements OnInit {
         this.updateChartsWithReportData(data);
       },
       error: (error) => {
-        console.error(
-          'Error al obtener el reporte de reservas turísticas:',
-          error
-        );
+     
       },
     });
   }
@@ -115,7 +112,6 @@ export class DashboardComponent implements OnInit {
     const periodData = reportData.period_stats;
 
     if (!periodData || periodData.length === 0) {
-      console.warn('No hay datos de período para mostrar en el gráfico');
       return;
     }
 
@@ -199,7 +195,6 @@ export class DashboardComponent implements OnInit {
         this.mainChart.data.labels
       ) {
       } else {
-        console.warn('Los datos del gráfico no están completos');
       }
     } catch (error) {
       console.error('Error al inicializar el gráfico:', error);

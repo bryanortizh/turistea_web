@@ -1,5 +1,8 @@
 <div class="mb-4">
-  <h2>Admin</h2>
+  <!-- loading component -->
+  <app-loading [show]="loading" [message]="'Cargando administradores...'"></app-loading>
+
+  <h2>Administradores</h2>
   <p class="text-medium-emphasis">Lista de administradores del sistema</p>
   <div class="row">
     <div class="d-flex justify-content-end mb-3 col-6"
@@ -14,203 +17,213 @@
         Agregar administrador
       </button>
     </div>
+    <div class="d-flex justify-content-end mb-3 col-12"
+      *ngIf="profileService.getStoredProfile()?.admin_role?.rol === 'Super Admin' || profileService.getStoredProfile()?.admin_role?.rol === 'Administrador'">
+      <button cButton color="primary" size="sm" class="text-white" (click)="loadUsers(state === 0 ? 1 : 0)">
+        {{ state === 0 ? 'Ver administradores activos' : 'Ver administradores bloqueados' }}
+      </button>
+    </div>
+    <div class="table-responsive">
+      <table cTable class="table align-middle">
+        <thead cTableColor="dark">
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Nombres</th>
+            <th scope="col">Correo</th>
+            <th scope="col">Teléfono</th>
+            <th scope="col">Rol</th>
+            <th scope="col">Fecha de creación</th>
+            <th *ngIf="profileService.getStoredProfile()?.admin_role?.rol === 'Super Admin'" scope="col">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of dataAdmin">
+            <th scope="row">{{user?.id}}</th>
+            <td>{{user?.name}}</td>
+            <td>{{user?.email}}</td>
+            <td>{{user?.cellphone}}</td>
+            <td>{{user?.admin_role?.rol}}</td>
+            <td>{{user?.created | date: 'short'}}</td>
+            <td *ngIf="profileService.getStoredProfile()?.admin_role?.rol === 'Super Admin'">
+              <button cButton color="info" size="sm" class="me-2 text-white"
+                [disabled]="user?.admin_role?.rol === 'Super Admin'" (click)="openEditModal(user)">
+                Editar
+              </button>
+              <button cButton color="danger" size="sm" class="text-white"
+                [disabled]="user?.admin_role?.rol === 'Super Admin'"
+                (click)="blockAdmin(user.id, user.state)">
+                {{ user.state === true ? 'Bloquear' : 'Desbloquear' }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="dataAdmin.length === 0" class="alert alert-info" role="alert">
+      No se encontraron administradores.
+    </div>
+
+    <nav class="mt-3" *ngIf="pageTotal > 1 && dataAdmin.length > 0">
+      <ul class="pagination justify-content-center">
+        <li class="page-item" [class.disabled]="page === 1">
+          <button class="page-link" (click)="changePage(page - 1)" [disabled]="page === 1">Anterior</button>
+        </li>
+        <li class="page-item" *ngFor="let p of [].constructor(pageTotal); let i = index"
+          [class.active]="page === i + 1">
+          <button class="page-link" (click)="changePage(i + 1)">{{ i + 1 }}</button>
+        </li>
+        <li class="page-item" [class.disabled]="page === pageTotal">
+          <button class="page-link" (click)="changePage(page + 1)" [disabled]="page === pageTotal">Siguiente</button>
+        </li>
+      </ul>
+    </nav>
   </div>
-  <div class="table-responsive">
-    <table cTable class="table align-middle">
-      <thead cTableColor="dark">
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col">Nombres</th>
-          <th scope="col">Correo</th>
-          <th scope="col">Teléfono</th>
-          <th scope="col">Rol</th>
-          <th scope="col">Fecha de creación</th>
-          <th scope="col">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let user of dataAdmin">
-          <th scope="row">{{user?.id}}</th>
-          <td>{{user?.name}}</td>
-          <td>{{user?.email}}</td>
-          <td>{{user?.cellphone}}</td>
-          <td>{{user?.admin_role?.rol}}</td>
-          <td>{{user?.created | date: 'short'}}</td>
-          <td>
-            <button cButton color="info" size="sm" class="me-2 text-white"
-              [disabled]="user?.admin_role?.rol === 'Super Admin'" (click)="openEditModal(user)">
-              Editar
-            </button>
-            <button cButton color="danger" size="sm" class="text-white"
-              [disabled]="user?.admin_role?.rol === 'Super Admin'">
-              Eliminar
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div *ngIf="dataAdmin.length === 0" class="alert alert-info" role="alert">
-    No se encontraron administradores.
-  </div>
-
-  <nav class="mt-3" *ngIf="pageTotal > 1 && dataAdmin.length > 0">
-    <ul class="pagination justify-content-center">
-      <li class="page-item" [class.disabled]="page === 1">
-        <button class="page-link" (click)="changePage(page - 1)" [disabled]="page === 1">Anterior</button>
-      </li>
-      <li class="page-item" *ngFor="let p of [].constructor(pageTotal); let i = index" [class.active]="page === i + 1">
-        <button class="page-link" (click)="changePage(i + 1)">{{ i + 1 }}</button>
-      </li>
-      <li class="page-item" [class.disabled]="page === pageTotal">
-        <button class="page-link" (click)="changePage(page + 1)" [disabled]="page === pageTotal">Siguiente</button>
-      </li>
-    </ul>
-  </nav>
-</div>
 
 
-<c-modal backdrop="static" id="addAdminModal" [visible]="visible">
-  <c-modal-header>
-    <h5 cModalTitle>Agregar administrador</h5>
-    <button (click)="AddModalClose()" cButtonClose></button>
-  </c-modal-header>
-  <form [formGroup]="adminForm">
-    <c-modal-body>
-      <div class="mb-3">
-        <label for="name" class="form-label">Nombre</label>
-        <input type="text" id="name" class="form-control" formControlName="name" />
-        <div *ngIf="adminForm.get('name')?.invalid && adminForm.get('name')?.touched" class="text-danger small">
-          <div *ngIf="adminForm.get('name')?.errors?.['required']">El nombre es requerido.</div>
-          <div *ngIf="adminForm.get('name')?.errors?.['minlength']">Mínimo 3 caracteres.</div>
-          <div *ngIf="adminForm.get('name')?.errors?.['maxlength']">Máximo 100 caracteres.</div>
-        </div>
-      </div>
-      <div class="mb-3">
-        <label for="lastname" class="form-label">Apellido</label>
-        <input type="text" id="lastname" class="form-control" formControlName="lastname" />
-        <div *ngIf="adminForm.get('lastname')?.invalid && adminForm.get('lastname')?.touched" class="text-danger small">
-          <div *ngIf="adminForm.get('lastname')?.errors?.['required']">El apellido es requerido.</div>
-          <div *ngIf="adminForm.get('lastname')?.errors?.['minlength']">Mínimo 3 caracteres.</div>
-          <div *ngIf="adminForm.get('lastname')?.errors?.['maxlength']">Máximo 100 caracteres.</div>
-        </div>
-      </div>
-      <div class="mb-3">
-        <label for="email" class="form-label">Correo</label>
-        <input type="email" id="email" class="form-control" formControlName="email" />
-        <div *ngIf="adminForm.get('email')?.invalid && adminForm.get('email')?.touched" class="text-danger small">
-          <div *ngIf="adminForm.get('email')?.errors?.['required']">El correo es requerido.</div>
-          <div *ngIf="adminForm.get('email')?.errors?.['email']">Correo inválido.</div>
-        </div>
-      </div>
-      <div class="mb-3">
-        <label for="cellphone" class="form-label">Celular</label>
-        <input type="text" id="cellphone" class="form-control" formControlName="cellphone" maxlength="9" />
-        <div *ngIf="adminForm.get('cellphone')?.invalid && adminForm.get('cellphone')?.touched"
-          class="text-danger small">
-          <div *ngIf="adminForm.get('cellphone')?.errors?.['required']">El celular es requerido.</div>
-          <div *ngIf="adminForm.get('cellphone')?.errors?.['pattern']">Solo números.</div>
-          <div
-            *ngIf="adminForm.get('cellphone')?.errors?.['minlength'] || adminForm.get('cellphone')?.errors?.['maxlength']">
-            Debe tener 9 dígitos.
+  <c-modal backdrop="static" id="addAdminModal" [visible]="visible">
+    <c-modal-header>
+      <h5 cModalTitle>Agregar administrador</h5>
+      <button (click)="AddModalClose()" cButtonClose></button>
+    </c-modal-header>
+    <form [formGroup]="adminForm">
+      <c-modal-body>
+        <div class="mb-3">
+          <label for="name" class="form-label">Nombre</label>
+          <input type="text" id="name" class="form-control" formControlName="name" />
+          <div *ngIf="adminForm.get('name')?.invalid && adminForm.get('name')?.touched" class="text-danger small">
+            <div *ngIf="adminForm.get('name')?.errors?.['required']">El nombre es requerido.</div>
+            <div *ngIf="adminForm.get('name')?.errors?.['minlength']">Mínimo 3 caracteres.</div>
+            <div *ngIf="adminForm.get('name')?.errors?.['maxlength']">Máximo 100 caracteres.</div>
           </div>
         </div>
-      </div>
-      <div class="mb-3">
-        <label for="edit_admin_rol_id" class="form-label">Rol</label>
-        <select id="edit_admin_rol_id" class="form-select" formControlName="admin_rol_id">
-          <option value="" disabled="true">Seleccione un rol</option>
-          <option *ngFor="let role of getRoles()" [value]="getRoleId(role)">{{ role }}</option>
-
-        </select>
-        <div *ngIf="editForm.get('admin_rol_id')?.invalid && editForm.get('admin_rol_id')?.touched"
-          class="text-danger small">
-          <div *ngIf="editForm.get('admin_rol_id')?.errors?.['required']">El rol es requerido.</div>
-          <div *ngIf="editForm.get('admin_rol_id')?.errors?.['pattern']">Debe ser numérico.</div>
-        </div>
-      </div>
-    </c-modal-body>
-    <c-modal-footer>
-      <button type="button" (click)="AddModalClose()" cButton color="secondary">
-        Cancelar
-      </button>
-      <button type="submit" cButton color="primary" [disabled]="adminForm.invalid" (click)="createAdmin()">
-        Guardar
-      </button>
-    </c-modal-footer>
-  </form>
-</c-modal>
-
-
-
-<c-modal backdrop="static" id="editAdminModal" [visible]="visibleEdit">
-  <c-modal-header>
-    <h5 cModalTitle>Editar administrador</h5>
-    <button (click)="closeEditModal()" cButtonClose></button>
-  </c-modal-header>
-  <form [formGroup]="editForm">
-    <c-modal-body>
-      <div class="mb-3">
-        <label for="edit_name" class="form-label">Nombre</label>
-        <input type="text" id="edit_name" class="form-control" formControlName="name" />
-        <div *ngIf="editForm.get('name')?.invalid && editForm.get('name')?.touched" class="text-danger small">
-          <div *ngIf="editForm.get('name')?.errors?.['required']">El nombre es requerido.</div>
-          <div *ngIf="editForm.get('name')?.errors?.['minlength']">Mínimo 3 caracteres.</div>
-          <div *ngIf="editForm.get('name')?.errors?.['maxlength']">Máximo 100 caracteres.</div>
-        </div>
-      </div>
-      <div class="mb-3">
-        <label for="edit_lastname" class="form-label">Apellido</label>
-        <input type="text" id="edit_lastname" class="form-control" formControlName="lastname" />
-        <div *ngIf="editForm.get('lastname')?.invalid && editForm.get('lastname')?.touched" class="text-danger small">
-          <div *ngIf="editForm.get('lastname')?.errors?.['required']">El apellido es requerido.</div>
-          <div *ngIf="editForm.get('lastname')?.errors?.['minlength']">Mínimo 3 caracteres.</div>
-          <div *ngIf="editForm.get('lastname')?.errors?.['maxlength']">Máximo 100 caracteres.</div>
-        </div>
-      </div>
-      <div class="mb-3">
-        <label for="edit_email" class="form-label">Correo</label>
-        <input type="email" id="edit_email" class="form-control" formControlName="email" readonly />
-        <div *ngIf="editForm.get('email')?.invalid && editForm.get('email')?.touched" class="text-danger small">
-          <div *ngIf="editForm.get('email')?.errors?.['required']">El correo es requerido.</div>
-          <div *ngIf="editForm.get('email')?.errors?.['email']">Correo inválido.</div>
-        </div>
-      </div>
-      <div class="mb-3">
-        <label for="edit_cellphone" class="form-label">Celular</label>
-        <input type="text" id="edit_cellphone" class="form-control" formControlName="cellphone" maxlength="9" />
-        <div *ngIf="editForm.get('cellphone')?.invalid && editForm.get('cellphone')?.touched" class="text-danger small">
-          <div *ngIf="editForm.get('cellphone')?.errors?.['required']">El celular es requerido.</div>
-          <div *ngIf="editForm.get('cellphone')?.errors?.['pattern']">Solo números.</div>
-          <div
-            *ngIf="editForm.get('cellphone')?.errors?.['minlength'] || editForm.get('cellphone')?.errors?.['maxlength']">
-            Debe tener 9 dígitos.
+        <div class="mb-3">
+          <label for="lastname" class="form-label">Apellido</label>
+          <input type="text" id="lastname" class="form-control" formControlName="lastname" />
+          <div *ngIf="adminForm.get('lastname')?.invalid && adminForm.get('lastname')?.touched"
+            class="text-danger small">
+            <div *ngIf="adminForm.get('lastname')?.errors?.['required']">El apellido es requerido.</div>
+            <div *ngIf="adminForm.get('lastname')?.errors?.['minlength']">Mínimo 3 caracteres.</div>
+            <div *ngIf="adminForm.get('lastname')?.errors?.['maxlength']">Máximo 100 caracteres.</div>
           </div>
         </div>
-      </div>
-      <div class="mb-3" *ngIf="getRoles().length > 0">
-        <label for="edit_admin_rol_id" class="form-label">Rol</label>
-        <select id="edit_admin_rol_id" class="form-select" formControlName="admin_rol_id">
-          <option value="" disabled="true">Seleccione un rol</option>
-          <option *ngFor="let role of getRoles()" [value]="getRoleId(role)">{{ role }}</option>
-
-        </select>
-        <div *ngIf="editForm.get('admin_rol_id')?.invalid && editForm.get('admin_rol_id')?.touched"
-          class="text-danger small">
-          <div *ngIf="editForm.get('admin_rol_id')?.errors?.['required']">El rol es requerido.</div>
-          <div *ngIf="editForm.get('admin_rol_id')?.errors?.['pattern']">Debe ser numérico.</div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Correo</label>
+          <input type="email" id="email" class="form-control" formControlName="email" />
+          <div *ngIf="adminForm.get('email')?.invalid && adminForm.get('email')?.touched" class="text-danger small">
+            <div *ngIf="adminForm.get('email')?.errors?.['required']">El correo es requerido.</div>
+            <div *ngIf="adminForm.get('email')?.errors?.['email']">Correo inválido.</div>
+          </div>
         </div>
-      </div>
+        <div class="mb-3">
+          <label for="cellphone" class="form-label">Celular</label>
+          <input type="text" id="cellphone" class="form-control" formControlName="cellphone" maxlength="9" />
+          <div *ngIf="adminForm.get('cellphone')?.invalid && adminForm.get('cellphone')?.touched"
+            class="text-danger small">
+            <div *ngIf="adminForm.get('cellphone')?.errors?.['required']">El celular es requerido.</div>
+            <div *ngIf="adminForm.get('cellphone')?.errors?.['pattern']">Solo números.</div>
+            <div
+              *ngIf="adminForm.get('cellphone')?.errors?.['minlength'] || adminForm.get('cellphone')?.errors?.['maxlength']">
+              Debe tener 9 dígitos.
+            </div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="edit_admin_rol_id" class="form-label">Rol</label>
+          <select id="edit_admin_rol_id" class="form-select" formControlName="admin_rol_id">
+            <option value="" disabled="true">Seleccione un rol</option>
+            <option *ngFor="let role of getRoles()" [value]="getRoleId(role)">{{ role }}</option>
 
-    </c-modal-body>
-    <c-modal-footer>
-      <button type="button" (click)="closeEditModal()" cButton color="secondary">
-        Cancelar
-      </button>
-      <button type="submit" cButton color="primary" [disabled]="editForm.invalid" (click)="updateAdmin()">
-        Guardar cambios
-      </button>
-    </c-modal-footer>
-  </form>
-</c-modal>
+          </select>
+          <div *ngIf="editForm.get('admin_rol_id')?.invalid && editForm.get('admin_rol_id')?.touched"
+            class="text-danger small">
+            <div *ngIf="editForm.get('admin_rol_id')?.errors?.['required']">El rol es requerido.</div>
+            <div *ngIf="editForm.get('admin_rol_id')?.errors?.['pattern']">Debe ser numérico.</div>
+          </div>
+        </div>
+      </c-modal-body>
+      <c-modal-footer>
+        <button type="button" (click)="AddModalClose()" cButton color="secondary">
+          Cancelar
+        </button>
+        <button type="submit" cButton color="primary" [disabled]="adminForm.invalid  || loading"
+          (click)="createAdmin()">
+          Guardar
+        </button>
+      </c-modal-footer>
+    </form>
+  </c-modal>
+
+
+
+  <c-modal backdrop="static" id="editAdminModal" [visible]="visibleEdit">
+    <c-modal-header>
+      <h5 cModalTitle>Editar administrador</h5>
+      <button (click)="closeEditModal()" cButtonClose></button>
+    </c-modal-header>
+    <form [formGroup]="editForm">
+      <c-modal-body>
+        <div class="mb-3">
+          <label for="edit_name" class="form-label">Nombre</label>
+          <input type="text" id="edit_name" class="form-control" formControlName="name" />
+          <div *ngIf="editForm.get('name')?.invalid && editForm.get('name')?.touched" class="text-danger small">
+            <div *ngIf="editForm.get('name')?.errors?.['required']">El nombre es requerido.</div>
+            <div *ngIf="editForm.get('name')?.errors?.['minlength']">Mínimo 3 caracteres.</div>
+            <div *ngIf="editForm.get('name')?.errors?.['maxlength']">Máximo 100 caracteres.</div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="edit_lastname" class="form-label">Apellido</label>
+          <input type="text" id="edit_lastname" class="form-control" formControlName="lastname" />
+          <div *ngIf="editForm.get('lastname')?.invalid && editForm.get('lastname')?.touched" class="text-danger small">
+            <div *ngIf="editForm.get('lastname')?.errors?.['required']">El apellido es requerido.</div>
+            <div *ngIf="editForm.get('lastname')?.errors?.['minlength']">Mínimo 3 caracteres.</div>
+            <div *ngIf="editForm.get('lastname')?.errors?.['maxlength']">Máximo 100 caracteres.</div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="edit_email" class="form-label">Correo</label>
+          <input type="email" id="edit_email" class="form-control" formControlName="email" readonly />
+          <div *ngIf="editForm.get('email')?.invalid && editForm.get('email')?.touched" class="text-danger small">
+            <div *ngIf="editForm.get('email')?.errors?.['required']">El correo es requerido.</div>
+            <div *ngIf="editForm.get('email')?.errors?.['email']">Correo inválido.</div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="edit_cellphone" class="form-label">Celular</label>
+          <input type="text" id="edit_cellphone" class="form-control" formControlName="cellphone" maxlength="9" />
+          <div *ngIf="editForm.get('cellphone')?.invalid && editForm.get('cellphone')?.touched"
+            class="text-danger small">
+            <div *ngIf="editForm.get('cellphone')?.errors?.['required']">El celular es requerido.</div>
+            <div *ngIf="editForm.get('cellphone')?.errors?.['pattern']">Solo números.</div>
+            <div
+              *ngIf="editForm.get('cellphone')?.errors?.['minlength'] || editForm.get('cellphone')?.errors?.['maxlength']">
+              Debe tener 9 dígitos.
+            </div>
+          </div>
+        </div>
+        <div class="mb-3" *ngIf="getRoles().length > 0">
+          <label for="edit_admin_rol_id" class="form-label">Rol</label>
+          <select id="edit_admin_rol_id" class="form-select" formControlName="admin_rol_id">
+            <option value="" disabled="true">Seleccione un rol</option>
+            <option *ngFor="let role of getRoles()" [value]="getRoleId(role)">{{ role }}</option>
+
+          </select>
+          <div *ngIf="editForm.get('admin_rol_id')?.invalid && editForm.get('admin_rol_id')?.touched"
+            class="text-danger small">
+            <div *ngIf="editForm.get('admin_rol_id')?.errors?.['required']">El rol es requerido.</div>
+            <div *ngIf="editForm.get('admin_rol_id')?.errors?.['pattern']">Debe ser numérico.</div>
+          </div>
+        </div>
+
+      </c-modal-body>
+      <c-modal-footer>
+        <button type="button" (click)="closeEditModal()" cButton color="secondary">
+          Cancelar
+        </button>
+        <button type="submit" cButton color="primary" [disabled]="editForm.invalid || loading" (click)="updateAdmin()">
+          Guardar cambios
+        </button>
+      </c-modal-footer>
+    </form>
+  </c-modal>

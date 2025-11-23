@@ -139,7 +139,6 @@ export class UserClientComponent {
         this.pageTotal = 1;
       },
       error: (error) => {
-        console.error('Error fetching admin data:', error);
       },
     });
   }

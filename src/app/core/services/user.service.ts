@@ -19,7 +19,7 @@ export class AdminService {
     private router: Router
   ) {}
 
-  getAdmin(body: PaginationParams): Observable<AdminResponse> {
+  getAdmin(body: PaginationParams, state: number): Observable<AdminResponse> {
     let headers = new HttpHeaders();
     headers = headers.set('Content-type', 'application/json');
     headers = headers.set(
@@ -29,16 +29,19 @@ export class AdminService {
 
     const params: any = {
       page: body.page?.toString() || '1',
-      state: body.state?.toString() || '1',
+      state: state.toString() || '1',
     };
-    
+
     return this.http.get<AdminResponse>(this.URL_BACKEND + `/api/admins`, {
       headers: headers,
       params: params,
     });
   }
 
-   searchAdmin(body: PaginationParams, searchTerm: string): Observable<AdminResponse> {
+  searchAdmin(
+    body: PaginationParams,
+    searchTerm: string
+  ): Observable<AdminResponse> {
     let headers = new HttpHeaders();
     headers = headers.set('Content-type', 'application/json');
     headers = headers.set(
@@ -50,11 +53,14 @@ export class AdminService {
       page: body.page?.toString() || '1',
       state: body.state?.toString() || '1',
     };
-    
-    return this.http.get<AdminResponse>(this.URL_BACKEND + `/api/admins/search/${searchTerm}`, {
-      headers: headers,
-      params: params,
-    });
+
+    return this.http.get<AdminResponse>(
+      this.URL_BACKEND + `/api/admins/search/${searchTerm}`,
+      {
+        headers: headers,
+        params: params,
+      }
+    );
   }
 
   createAdmin(body: {
@@ -93,6 +99,24 @@ export class AdminService {
 
     return this.http.put<AdminResponse>(
       `${this.URL_BACKEND}/api/admins/${id}`,
+      body,
+      {
+        headers: headers,
+      }
+    );
+  }
+
+  blockAdmin(id: number, body: { state: boolean }): Observable<AdminResponse> {
+    body.state = body.state === false ? true : false;
+    let headers = new HttpHeaders();
+    headers = headers.set('Content-type', 'application/json');
+    headers = headers.set(
+      'Authorization',
+      'Bearer ' + localStorage.getItem('token_turistea')
+    );
+
+    return this.http.put<AdminResponse>(
+      `${this.URL_BACKEND}/api/admins/${id}/blocking`,
       body,
       {
         headers: headers,
