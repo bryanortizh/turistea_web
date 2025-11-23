@@ -13,8 +13,13 @@
       <button cButton color="primary" size="sm" class="text-white" (click)="AddModal()">
         Agregar administrador
       </button>
-    </div>
   </div>
+    <div class="d-flex justify-content-end mb-3 col-12"
+      *ngIf="profileService.getStoredProfile()?.admin_role?.rol === 'Super Admin' || profileService.getStoredProfile()?.admin_role?.rol === 'Administrador'">
+      <button cButton color="primary" size="sm" class="text-white" (click)="loadUsers(state === 0 ? 1 : 0)">
+        {{ state === 0 ? 'Ver administradores activos' : 'Ver administradores bloqueados' }}
+      </button>
+    </div>
   <div class="table-responsive">
     <table cTable class="table align-middle">
       <thead cTableColor="dark">
@@ -42,8 +47,8 @@
               Editar
             </button>
             <button cButton color="danger" size="sm" class="text-white"
-              [disabled]="user?.admin_role?.rol === 'Super Admin'">
-              Eliminar
+              [disabled]="user?.admin_role?.rol === 'Super Admin'" (click)="blockAdmin(user.id, user.state)">
+              {{ user.state === true ? 'Bloquear' : 'Desbloquear' }}
             </button>
           </td>
         </tr>

@@ -148,7 +148,6 @@ export class DriverComponent {
         );
       },
       error: (error) => {
-        console.error('Error fetching admin data:', error);
       },
     });
   }

@@ -133,12 +133,10 @@ export class DashboardChartsData {
     }
   ) {
     if (!labels || labels.length === 0) {
-      console.warn('No hay etiquetas para el gráfico');
       return;
     }
 
     if (!chartData || Object.keys(chartData).length === 0) {
-      console.warn('No hay datos para el gráfico');
       return;
     }
     const brandPrimary = getStyle('--cui-primary') ?? '#321fdb';

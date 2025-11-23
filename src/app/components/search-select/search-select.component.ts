@@ -59,7 +59,6 @@ export class SearchSelectComponent implements ControlValueAccessor, Validator, O
             this.loading = true;
             return this.searchFunction(term).pipe(
               catchError((error) => {
-                console.error('Error en búsqueda:', error);
                 this.loading = false;
                 return of([]);
               })
@@ -91,7 +90,6 @@ export class SearchSelectComponent implements ControlValueAccessor, Validator, O
       this.loading = true;
       this.getAllFunction().pipe(
         catchError((error) => {
-          console.error('Error al cargar todos los items:', error);
           this.loading = false;
           return of([]);
         })
@@ -129,7 +127,6 @@ export class SearchSelectComponent implements ControlValueAccessor, Validator, O
   }
 
   onSelectChange(selectedValue: any): void {
-    console.log('Valor seleccionado:', selectedValue);
     this.value = selectedValue.id;
     this.touched = true;
     this.onChange(selectedValue.id);

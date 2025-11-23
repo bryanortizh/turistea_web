@@ -73,10 +73,6 @@ export class ReserveComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // Verificar qué environment se está usando
-    console.log('Environment:', environment);
-    console.log('API URL:', environment.apiUrl);
-    console.log('Socket URL:', environment.socketUrl);
-    console.log('Is Production:', environment.production);
 
     this.loadReserves(this.statusFilter);
     this.setupSocketListeners();
@@ -95,18 +91,14 @@ export class ReserveComponent implements OnInit, OnDestroy {
   private setupSocketListeners(): void {
     // Escuchar cuando el socket se conecta
     this.socket.on('connect', () => {
-      console.log('Socket conectado:', this.socket.id);
     });
 
     // Escuchar errores de conexión
     this.socket.on('connect_error', (error) => {
-      console.error('Error de conexión socket:', error);
     });
 
     // Escuchar cambios de estado en las reservas
     this.socket.on('form_reserve_status_changed', (data: any) => {
-      console.log('Estado de reserva cambió:', data);
-
       if (data && data.formReserveId) {
         // Reproducir sonido de notificación
         this.playNotificationSound();
@@ -130,7 +122,6 @@ export class ReserveComponent implements OnInit, OnDestroy {
 
     // Escuchar nuevas reservas
     this.socket.on('new_form_reserve', (data: any) => {
-      console.log('Nueva reserva creada:', data);
 
       if (data) {
         this.playNotificationSound();
@@ -153,7 +144,6 @@ export class ReserveComponent implements OnInit, OnDestroy {
     });
 
     this.socket.on('form_reserve_deleted', (data: any) => {
-      console.log('Reserva eliminada:', data);
 
       if (data && data.id) {
         this.toastr.warning(
@@ -188,7 +178,6 @@ export class ReserveComponent implements OnInit, OnDestroy {
         );
       })
       .catch(error => {
-        console.error('Error al habilitar audio:', error);
         this.toastr.error(
           'No se pudo habilitar el audio. Verifique los permisos del navegador.',
           'Error de Audio',
@@ -203,7 +192,6 @@ export class ReserveComponent implements OnInit, OnDestroy {
 
   private playNotificationSound(): void {
     if (!this.audioInitialized) {
-      console.warn('Audio no inicializado. Se requiere interacción del usuario.');
       this.toastr.warning(
         'Haga clic en el botón "Habilitar Sonido" para recibir notificaciones de audio',
         'Audio Deshabilitado',
@@ -223,21 +211,15 @@ export class ReserveComponent implements OnInit, OnDestroy {
       if (playPromise !== undefined) {
         playPromise
           .then(() => {
-            // Audio reproducido exitosamente
-            console.log('Sonido de notificación reproducido');
-            // Resetear al final para poder reproducir de nuevo
             this.notificationSound.onended = () => {
               this.notificationSound.currentTime = 0;
             };
           })
           .catch(error => {
-            console.warn('No se pudo reproducir el sonido de notificación:', error);
-            // Intentar usar Web Audio API como alternativa
             this.playBeepSound();
           });
       }
     } catch (error) {
-      console.warn('Error al reproducir sonido:', error);
       this.playBeepSound();
     }
   }
@@ -261,7 +243,6 @@ export class ReserveComponent implements OnInit, OnDestroy {
       oscillator.start(audioContext.currentTime);
       oscillator.stop(audioContext.currentTime + 0.5);
     } catch (error) {
-      console.warn('No se pudo crear beep alternativo:', error);
     }
   }
 
@@ -278,7 +259,6 @@ export class ReserveComponent implements OnInit, OnDestroy {
           this.loading = false;
         },
         error: (error) => {
-          console.error('Error al cargar reservas:', error);
           this.loading = false;
         },
       });
@@ -294,7 +274,6 @@ export class ReserveComponent implements OnInit, OnDestroy {
           }
         },
         error: (error) => {
-          console.error('Error al aprobar reserva:', error);
           alert('Error al aprobar la reserva');
         },
       });
@@ -311,7 +290,6 @@ export class ReserveComponent implements OnInit, OnDestroy {
           }
         },
         error: (error) => {
-          console.error('Error al rechazar reserva:', error);
           alert('Error al rechazar la reserva');
         },
       });

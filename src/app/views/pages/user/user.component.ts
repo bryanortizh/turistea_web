@@ -7,7 +7,6 @@ import {
   ModalFooterComponent,
   ModalHeaderComponent,
   ModalTitleDirective,
-  ModalToggleDirective,
   TableColorDirective,
   TableDirective,
 } from '@coreui/angular';
@@ -16,7 +15,7 @@ import {
   Pagination,
   PaginationParams,
 } from '../../../data/interfaces/pagination.interface';
-import { CommonModule, NgFor, NgForOf } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
   FormGroup,
@@ -116,17 +115,18 @@ export class UserComponent {
   }
 
   ngOnInit(): void {
-    this.loadUsers();
+    this.loadUsers(this.state);
   }
 
-  loadUsers(): void {
+  loadUsers(state: number): void {
+    this.state = state;
     let body: PaginationParams = {
       page: this.page,
-      state: this.state,
+      state: state,
     };
     const pageSize = 12;
 
-    this.adminService.getAdmin(body).subscribe({
+    this.adminService.getAdmin(body, state).subscribe({
       next: (data) => {
         let adminData: Pagination = data as unknown as Pagination;
         this.dataAdmin = adminData.rows;
@@ -135,14 +135,13 @@ export class UserComponent {
         );
       },
       error: (error) => {
-        console.error('Error fetching admin data:', error);
       },
     });
   }
 
   searchUser(): void {
     if (this.searchTerm.trim() === '') {
-      this.loadUsers();
+      this.loadUsers(this.state);
       return;
     }
     let body: PaginationParams = {
@@ -160,21 +159,20 @@ export class UserComponent {
         );
       },
       error: (error) => {
-        console.error('Error fetching admin data:', error);
       },
     });
   }
 
   clearSearch(): void {
     this.searchTerm = '';
-    this.loadUsers();
+    this.loadUsers(this.state);
   }
 
   changePage(newPage: number): void {
     if (newPage < 1 || newPage > this.pageTotal || newPage === this.page)
       return;
     this.page = newPage;
-    this.loadUsers();
+    this.loadUsers(this.state);
   }
 
   AddModal() {
@@ -216,7 +214,7 @@ export class UserComponent {
           closeButton: true,
           progressBar: true,
         });
-        this.loadUsers();
+        this.loadUsers(this.state);
         this.AddModalClose();
       },
       error: (error) => {
@@ -246,11 +244,35 @@ export class UserComponent {
             progressBar: true,
           }
         );
-        this.loadUsers();
+        this.loadUsers(this.state);
         this.closeEditModal();
       },
       error: (error) => {
         this.toastr.error('Error al actualizar el administrador', 'Error', {
+          timeOut: this.timeOutmessage,
+          closeButton: true,
+          progressBar: true,
+        });
+      },
+    });
+  }
+
+  blockAdmin(userId: number, state: boolean) {
+    this.adminService.blockAdmin(userId, { state: state }).subscribe({
+      next: (data) => {
+        this.toastr.success(
+          'Se desactivo el administrador con exito',
+          'Realizado',
+          {
+            timeOut: this.timeOutmessage,
+            closeButton: true,
+            progressBar: true,
+          }
+        );
+        this.loadUsers(this.state);
+      },
+      error: (error) => {
+        this.toastr.error('Error al desactivar el administrador', 'Error', {
           timeOut: this.timeOutmessage,
           closeButton: true,
           progressBar: true,
@@ -272,6 +294,7 @@ export class UserComponent {
         return [];
     }
   }
+
   getRoleId(role: string): number {
     switch (role) {
       case Roles.SUPER_ADMIN:

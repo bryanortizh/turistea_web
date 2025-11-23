@@ -5,6 +5,7 @@ export interface AdminResponse {
   lastname: string;
   email: string;
   cellphone: number;
+  state: boolean;
   created: string | null;
   updated: string | null;
   admin_role: {

@@ -285,7 +285,6 @@ export class WidgetsDropdownComponent implements OnInit, AfterContentInit {
         }
       },
       (error) => {
-        console.error('Error fetching user report:', error);
       }
     );
   }

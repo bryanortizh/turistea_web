@@ -265,7 +265,6 @@ export class RouterOffertsComponent implements OnInit {
           this.routeFormArray.push(routeGroup);
         });
       } catch (error) {
-        console.error('Error parsing route_json:', error);
         this.addRoute();
       }
     } else {
