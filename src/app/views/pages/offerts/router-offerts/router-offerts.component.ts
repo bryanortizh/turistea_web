@@ -72,10 +72,8 @@ export class RouterOffertsComponent implements OnInit {
 
   constructor(
     private routerTrackingRouterService: RouterTrackingRouterService,
-    private driverService: DriverService,
     private fb: FormBuilder,
     private toastr: ToastrService,
-    private router: Router,
     private route: ActivatedRoute
   ) {
     this.packageForm = this.fb.group({
@@ -223,6 +221,10 @@ export class RouterOffertsComponent implements OnInit {
     this.visibleAddPackageModal = true;
     this.isEditMode = false;
     this.packageForm.reset();
+    while (this.routeFormArray.length !== 0) {
+      this.routeFormArray.removeAt(0);
+    }
+    this.addRoute();
   }
 
   editPackage(packageData: RouterTrackingResponse) {
@@ -330,6 +332,7 @@ export class RouterOffertsComponent implements OnInit {
   }
 
   createPackage() {
+    console.log(this.packageForm);
     if (this.packageForm.invalid) {
       this.packageForm.markAllAsTouched();
       return;
