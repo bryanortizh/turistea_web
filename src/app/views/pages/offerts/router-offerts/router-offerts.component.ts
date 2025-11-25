@@ -220,11 +220,6 @@ export class RouterOffertsComponent implements OnInit {
   savePackage() {
     this.visibleAddPackageModal = true;
     this.isEditMode = false;
-   /*  this.packageForm.reset();
-    while (this.routeFormArray.length !== 0) {
-      this.routeFormArray.removeAt(0);
-    }
-    this.addRoute(); */
   }
 
   editPackage(packageData: RouterTrackingResponse) {

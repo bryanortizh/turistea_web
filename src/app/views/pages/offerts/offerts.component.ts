@@ -225,8 +225,6 @@ export class OffertsComponent {
         id_guide: this.selectedPackage.id_guide,
         id_terrace: this.selectedPackage.id_terrace,
         quantity_person: this.selectedPackage.quantity_person,
-        image_bg: this.selectedPackage.path_bg,
-        image_bg_two: this.selectedPackage.path_bg_two,
       });
 
       this.visibleEditPackageModal = true;
@@ -326,6 +324,10 @@ export class OffertsComponent {
 
     if (!formData.image_bg) {
       delete formData.image_bg;
+    }
+
+    if (!formData.image_bg_two) {
+      delete formData.image_bg_two;
     }
 
     this.packageService.updatePackage(packageId, formData).subscribe({
