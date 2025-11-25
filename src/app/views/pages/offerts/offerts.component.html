@@ -97,44 +97,25 @@
                 </div>
 
                 <div class="col-md-12">
-                    <app-search-select
-                        label="Conductor"
-                        formControlName="id_driver"
-                        [searchFunction]="searchDrivers"
-                        placeholder="Buscar conductor por nombre..."
-                        notFoundText="No se encontraron conductores"
-                        bindLabel="textSearch"
-                        bindValue="id"
-                        [required]="true"
+                    <app-search-select label="Conductor" formControlName="id_driver" [searchFunction]="searchDrivers"
+                        placeholder="Buscar conductor por nombre..." notFoundText="No se encontraron conductores"
+                        bindLabel="textSearch" bindValue="id" [required]="true"
                         errorMessage="El conductor es requerido">
                     </app-search-select>
                 </div>
 
                 <div class="col-md-12">
-                    <app-search-select
-                        label="Guía"
-                        formControlName="id_guide"
-                        [searchFunction]="searchGuides"
-                        placeholder="Buscar guía por nombre..."
-                        notFoundText="No se encontraron guías"
-                        bindLabel="textSearch"
-                        bindValue="id"
-                        [required]="true"
-                        errorMessage="El guía es requerido">
+                    <app-search-select label="Guía" formControlName="id_guide" [searchFunction]="searchGuides"
+                        placeholder="Buscar guía por nombre..." notFoundText="No se encontraron guías"
+                        bindLabel="textSearch" bindValue="id" [required]="true" errorMessage="El guía es requerido">
                     </app-search-select>
                 </div>
 
                 <div class="col-md-12">
-                    <app-search-select
-                        label="Terraza"
-                        formControlName="id_terrace"
-                        [searchFunction]="searchTerraces"
-                        placeholder="Buscar terraza por nombre..."
-                        notFoundText="No se encontraron terrazas"
-                        bindLabel="textSearch"
-                        bindValue="id"
-                        [required]="true"
-                        errorMessage="La terraza es requerida">
+                    <app-search-select label="Terramoza" formControlName="id_terrace" [searchFunction]="searchTerraces"
+                        placeholder="Buscar terramoza por nombre..." notFoundText="No se encontraron terramozas"
+                        bindLabel="textSearch" bindValue="id" [required]="true"
+                        errorMessage="La terramoza es requerida">
                     </app-search-select>
                 </div>
 
@@ -151,11 +132,14 @@
 
                 <div class="col-md-6 mb-3">
                     <label for="quantity_person" class="form-label">Cantidad de personas *</label>
-                    <input type="number" id="quantity_person" class="form-control" minlength="1" formControlName="quantity_person" />
+                    <input type="number" id="quantity_person" class="form-control" minlength="1"
+                        formControlName="quantity_person" />
                     <div *ngIf="packageForm.get('quantity_person')?.invalid && packageForm.get('quantity_person')?.touched"
                         class="text-danger small">
-                        <div *ngIf="packageForm.get('quantity_person')?.errors?.['required']">La cantidad de personas es requerida.</div>
-                        <div *ngIf="packageForm.get('quantity_person')?.errors?.['min']">Debe ser al menos 1 persona.</div>
+                        <div *ngIf="packageForm.get('quantity_person')?.errors?.['required']">La cantidad de personas es
+                            requerida.</div>
+                        <div *ngIf="packageForm.get('quantity_person')?.errors?.['min']">Debe ser al menos 1 persona.
+                        </div>
                     </div>
                 </div>
 
@@ -274,47 +258,26 @@
                 </div>
 
                 <div class="col-md-12">
-                    <app-search-select
-                        label="Conductor"
-                        formControlName="id_driver"
-                        [searchFunction]="searchDrivers"
-                        [getAllFunction]="getAllDrivers"
-                        placeholder="Buscar conductor por nombre..."
-                        notFoundText="No se encontraron conductores"
-                        bindLabel="textSearch"
-                        bindValue="id"
-                        [required]="true"
-                        errorMessage="El conductor es requerido">
+                    <app-search-select label="Conductor" formControlName="id_driver" [searchFunction]="searchDrivers"
+                        [getAllFunction]="getAllDrivers" placeholder="Buscar conductor por nombre..."
+                        notFoundText="No se encontraron conductores" bindLabel="textSearch" bindValue="id"
+                        [required]="true" errorMessage="El conductor es requerido">
                     </app-search-select>
                 </div>
 
                 <div class="col-md-12">
-                    <app-search-select
-                        label="Guía"
-                        formControlName="id_guide"
-                        [searchFunction]="searchGuides"
-                        [getAllFunction]="getAllGuides"
-                        placeholder="Buscar guía por nombre..."
-                        notFoundText="No se encontraron guías"
-                        bindLabel="textSearch"
-                        bindValue="id"
-                        [required]="true"
+                    <app-search-select label="Guía" formControlName="id_guide" [searchFunction]="searchGuides"
+                        [getAllFunction]="getAllGuides" placeholder="Buscar guía por nombre..."
+                        notFoundText="No se encontraron guías" bindLabel="textSearch" bindValue="id" [required]="true"
                         errorMessage="El guía es requerido">
                     </app-search-select>
                 </div>
 
                 <div class="col-md-12">
-                    <app-search-select
-                        label="Terraza"
-                        formControlName="id_terrace"
-                        [searchFunction]="searchTerraces"
-                        [getAllFunction]="getAllTerraces"
-                        placeholder="Buscar terraza por nombre..."
-                        notFoundText="No se encontraron terrazas"
-                        bindLabel="textSearch"
-                        bindValue="id"
-                        [required]="true"
-                        errorMessage="La terraza es requerida">
+                    <app-search-select label="Terramoza" formControlName="id_terrace" [searchFunction]="searchTerraces"
+                        [getAllFunction]="getAllTerraces" placeholder="Buscar terramoza por nombre..."
+                        notFoundText="No se encontraron terramozas" bindLabel="textSearch" bindValue="id"
+                        [required]="true" errorMessage="La terramoza es requerida">
                     </app-search-select>
                 </div>
 
@@ -332,21 +295,17 @@
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="edit_quantity_person" class="form-label">Cantidad de personas *</label>
-                    <input type="number" id="edit_quantity_person" class="form-control" minlength="1" formControlName="quantity_person" />
+                    <input type="number" id="edit_quantity_person" class="form-control" minlength="1"
+                        formControlName="quantity_person" />
                     <div *ngIf="editPackageForm.get('quantity_person')?.invalid && editPackageForm.get('quantity_person')?.touched"
                         class="text-danger small">
-                        <div *ngIf="editPackageForm.get('quantity_person')?.errors?.['required']">La cantidad de personas es requerida.</div>
-                        <div *ngIf="editPackageForm.get('quantity_person')?.errors?.['min']">Debe ser al menos 1 persona.</div>
+                        <div *ngIf="editPackageForm.get('quantity_person')?.errors?.['required']">La cantidad de
+                            personas es requerida.</div>
+                        <div *ngIf="editPackageForm.get('quantity_person')?.errors?.['min']">Debe ser al menos 1
+                            persona.</div>
                     </div>
                 </div>
 
-                <div class="col-md-12 mb-3" *ngIf="selectedPackage?.path_bg">
-                    <label class="form-label">Imagen actual</label>
-                    <div>
-                        <img [src]="selectedPackage?.path_bg" alt="Imagen actual del paquete" class="img-fluid"
-                            style="max-width: 200px; border: 1px solid #ccc; padding: 5px;" />
-                    </div>
-                </div>
 
                 <div class="col-md-12 mb-3">
                     <label for="edit_image_bg" class="form-label">Nueva imagen de fondo (opcional)</label>
@@ -355,13 +314,6 @@
                     <small class="text-muted">Deja vacío si no deseas cambiar la imagen actual</small>
                 </div>
 
-                <div class="col-md-12 mb-3" *ngIf="selectedPackage?.path_bg_two">
-                    <label class="form-label">Segunda imagen actual</label>
-                    <div>
-                        <img [src]="selectedPackage?.path_bg_two" alt="Segunda imagen actual del paquete"
-                            class="img-fluid" style="max-width: 200px; border: 1px solid #ccc; padding: 5px;" />
-                    </div>
-                </div>
                 <div class="col-md-12 mb-3">
                     <label for="edit_image_bg_two" class="form-label">Nueva segunda imagen de fondo (opcional)</label>
                     <input type="file" id="edit_image_bg_two" class="form-control"
