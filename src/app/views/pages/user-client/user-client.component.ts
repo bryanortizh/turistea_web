@@ -9,12 +9,7 @@ import {
   Validators,
 } from '@angular/forms';
 import {
-  ButtonCloseDirective,
   ButtonDirective,
-  ModalBodyComponent,
-  ModalComponent,
-  ModalHeaderComponent,
-  ModalTitleDirective,
   TableColorDirective,
   TableDirective,
 } from '@coreui/angular';
@@ -25,6 +20,7 @@ import {
   PaginationParams,
 } from '../../../data/interfaces/pagination.interface';
 import { ClientService } from '../../../core/services/client.service';
+import { LoadingComponent } from '../../../shared/loading/loading.component';
 @Component({
   selector: 'app-user-client',
   imports: [
@@ -34,7 +30,8 @@ import { ClientService } from '../../../core/services/client.service';
     HttpClientModule,
     ReactiveFormsModule,
     ButtonDirective,
-    FormsModule
+    FormsModule,
+    LoadingComponent
   ],
   providers: [ClientService, HttpClient],
   templateUrl: './user-client.component.html',
@@ -53,6 +50,7 @@ export class UserClientComponent {
   visibleEdit = false;
   searchTerm: string = '';
   timeOutmessage = 5000;
+  loading: boolean = false;
 
   constructor(
     private clientService: ClientService,
@@ -114,7 +112,7 @@ export class UserClientComponent {
       state: this.state,
     };
     const pageSize = 12;
-
+    this.loading = true;
     this.clientService.getClient(body).subscribe({
       next: (data) => {
         let adminData: Pagination = data as unknown as Pagination;
@@ -122,8 +120,11 @@ export class UserClientComponent {
         this.pageTotal = Math.ceil(
           (adminData.count || this.dataAdmin.length) / pageSize
         );
+        this.loading = false;
       },
-      error: (error) => {},
+      error: (error) => {
+        this.loading = false;
+      },
     });
   }
 
@@ -132,13 +133,16 @@ export class UserClientComponent {
       this.loadUsers();
       return;
     }
+    this.loading = true;
 
     this.clientService.searchClients(this.searchTerm).subscribe({
       next: (data) => {
         this.dataAdmin = data as unknown as AdminResponse[];
         this.pageTotal = 1;
+        this.loading = false;
       },
       error: (error) => {
+        this.loading = false;
       },
     });
   }
@@ -162,8 +166,10 @@ export class UserClientComponent {
   }
 
   blockUser(id: number): void {
+    this.loading = true;
     this.clientService.updateAdmin(id).subscribe({
       next: (data) => {
+        this.loading = false;
         this.toastr.success('Usuario bloqueado con éxito', 'Éxito', {
           timeOut: this.timeOutmessage,
           closeButton: true,
@@ -172,6 +178,7 @@ export class UserClientComponent {
         this.loadUsers();
       },
       error: (error) => {
+        this.loading = false;
         this.toastr.error('Error al actualizar el usuario', 'Error', {
           timeOut: this.timeOutmessage,
           closeButton: true,

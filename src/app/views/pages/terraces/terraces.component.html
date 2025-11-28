@@ -1,4 +1,5 @@
 <div class="mb-4">
+    <app-loading [show]="loading"  [message]="'Cargando Terramozas...'"></app-loading>
     <h2>Terramozas</h2>
     <p class="text-medium-emphasis">Lista de terramozas del sistema</p>
 
@@ -185,7 +186,7 @@
         </c-modal-body>
         <c-modal-footer>
             <button type="button" cButton color="secondary" (click)="closeAddTerraceModal()">Cancelar</button>
-            <button type="submit" cButton color="primary" [disabled]="terraceForm.invalid"
+            <button type="submit" cButton color="primary" [disabled]="terraceForm.invalid || loading"
                 (click)="createTerrace()">Registrar terramozas</button>
         </c-modal-footer>
     </form>
@@ -306,7 +307,7 @@
         </c-modal-body>
         <c-modal-footer>
             <button type="button" cButton color="secondary" (click)="closeEditTerraceModal()">Cancelar</button>
-            <button type="submit" cButton color="primary" [disabled]="editTerraceForm.invalid"
+            <button type="submit" cButton color="primary" [disabled]="editTerraceForm.invalid || loading"
                 (click)="updateTerrace()">Actualizar terramozas</button>
         </c-modal-footer>
     </form>

@@ -1,4 +1,5 @@
 <div class="mb-4">
+  <app-loading [show]="loading"  [message]="'Cargando rutas...'"></app-loading>
   <h2>Tracking</h2>
   <p class="text-medium-emphasis">Configuracion del paquete {{ id }}</p>
 
@@ -301,7 +302,7 @@
       <button type="button" cButton color="secondary" (click)="closeAddPackageModal()">
         ❌ Cancelar
       </button>
-      <button type="submit" cButton color="primary" [disabled]="packageForm.invalid"
+      <button type="submit" cButton color="primary" [disabled]="packageForm.invalid || loading"
         (click)="isEditMode ? updatePackage() : createPackage()" class="text-white">
         {{ isEditMode ? '📝 Actualizar Configuración' : '✅ Registrar Configuración' }}
       </button>

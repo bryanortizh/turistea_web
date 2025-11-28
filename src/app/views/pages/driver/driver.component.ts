@@ -25,6 +25,7 @@ import {
   TableDirective,
 } from '@coreui/angular';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { LoadingComponent } from '../../../shared/loading/loading.component';
 
 @Component({
   selector: 'app-driver',
@@ -41,6 +42,7 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
     ModalBodyComponent,
     ModalFooterComponent,
     FormsModule,
+    LoadingComponent
   ],
   providers: [DriverService, HttpClient],
   templateUrl: './driver.component.html',
@@ -60,7 +62,7 @@ export class DriverComponent {
   visibleEditDriverModal = false;
   selectedDriverId: number = 0;
   searchTerm: string = '';
-
+  loading: boolean = false;
   timeOutmessage = 5000;
 
   constructor(
@@ -115,16 +117,19 @@ export class DriverComponent {
       state: this.state,
     };
     const pageSize = 12;
-
+    this.loading = true;
     this.driverService.getClient(body).subscribe({
       next: (data) => {
+        this.loading = false;
         let driverData: Pagination = data as unknown as Pagination;
         this.dataDriver = driverData.rows;
         this.pageTotal = Math.ceil(
           (driverData.count || this.dataDriver.length) / pageSize
         );
       },
-      error: (error) => {},
+      error: (error) => {
+        this.loading = false;
+      },
     });
   }
 
@@ -138,7 +143,7 @@ export class DriverComponent {
       state: this.state,
     };
     const pageSize = 12;
-
+    this.loading = true;
     this.driverService.searchDriverInput(body, this.searchTerm).subscribe({
       next: (data) => {
         let adminData: Pagination = data as unknown as Pagination;
@@ -146,8 +151,10 @@ export class DriverComponent {
         this.pageTotal = Math.ceil(
           (adminData.count || this.dataDriver.length) / pageSize
         );
+        this.loading = false;
       },
       error: (error) => {
+        this.loading = false;
       },
     });
   }
@@ -186,8 +193,10 @@ export class DriverComponent {
         ? false
         : true;
 
+    this.loading = true;
     this.driverService.blockDriver(user, state).subscribe({
       next: (data) => {
+        this.loading = false;
         this.toastr.success(
           `Conductor ${state ? 'desbloqueado' : 'bloqueado'} con éxito`,
           'Éxito',
@@ -200,6 +209,7 @@ export class DriverComponent {
         this.loadDrivers();
       },
       error: (error) => {
+        this.loading = false;
         this.toastr.error('Error al bloquear el conductor', 'Error', {
           timeOut: this.timeOutmessage,
           closeButton: true,
@@ -253,9 +263,11 @@ export class DriverComponent {
       this.driverForm.markAllAsTouched();
       return;
     }
+    this.loading = true;
     const formData = this.driverForm.value;
     this.driverService.createDriver(formData).subscribe({
       next: (data) => {
+        this.loading = false;
         this.toastr.success('Se creo el conductor con exito', 'Realizado', {
           timeOut: this.timeOutmessage,
           closeButton: true,
@@ -265,6 +277,7 @@ export class DriverComponent {
         this.closeAddDriverModal();
       },
       error: (error) => {
+        this.loading = false;
         this.toastr.error('Error al crear el conductor', 'Error', {
           timeOut: this.timeOutmessage,
           closeButton: true,
@@ -325,9 +338,11 @@ export class DriverComponent {
       this.editDriverForm.markAllAsTouched();
       return;
     }
+    this.loading = true;
     const formData = this.editDriverForm.value;
     this.driverService.updateDriver(this.selectedDriverId, formData).subscribe({
       next: (data) => {
+        this.loading = false;
         this.toastr.success('Se edito el conductor con exito', 'Realizado', {
           timeOut: this.timeOutmessage,
           closeButton: true,
@@ -337,6 +352,7 @@ export class DriverComponent {
         this.closeEditDriverModal();
       },
       error: (error) => {
+        this.loading = false;
         this.toastr.error('Error al editar el conductor', 'Error', {
           timeOut: this.timeOutmessage,
           closeButton: true,

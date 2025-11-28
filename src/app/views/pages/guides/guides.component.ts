@@ -24,6 +24,7 @@ import {
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { GuideServices } from '../../../core/services/guide.service';
 import { GuideResponse } from '../../../data/interfaces/guide.interface';
+import { LoadingComponent } from '../../../shared/loading/loading.component';
 
 @Component({
   selector: 'app-guide',
@@ -39,6 +40,7 @@ import { GuideResponse } from '../../../data/interfaces/guide.interface';
     ButtonCloseDirective,
     ModalBodyComponent,
     ModalFooterComponent,
+    LoadingComponent
   ],
   providers: [GuideServices, HttpClient],
   templateUrl: './guides.component.html',
@@ -58,7 +60,7 @@ export class GuideComponent {
   visibleEditGuideModal = false;
   selectedGuideId: number = 0;
   timeOutmessage = 5000;
-
+  loading: boolean = false;
   constructor(
     private guideService: GuideServices,
     private fb: FormBuilder,
@@ -99,16 +101,20 @@ export class GuideComponent {
       state: this.state,
     };
     const pageSize = 12;
+    this.loading = true;
 
     this.guideService.getGuide(body).subscribe({
       next: (data) => {
+        this.loading = false;
         let driverData: Pagination = data as unknown as Pagination;
         this.dataGuide = driverData.rows;
         this.pageTotal = Math.ceil(
           (driverData.count || this.dataGuide.length) / pageSize
         );
       },
-      error: (error) => {},
+      error: (error) => {
+        this.loading = false;
+      },
     });
   }
 
@@ -141,8 +147,10 @@ export class GuideComponent {
         ? false
         : true;
 
+    this.loading = true;
     this.guideService.blockGuide(user, state).subscribe({
       next: (data) => {
+        this.loading = false;
         this.toastr.success(
           `Guía ${state ? 'desbloqueada' : 'bloqueada'} con éxito`,
           'Éxito',
@@ -155,6 +163,7 @@ export class GuideComponent {
         this.loadGuides();
       },
       error: (error) => {
+        this.loading = false;
         this.toastr.error('Error al bloquear el guía', 'Error', {
           timeOut: this.timeOutmessage,
           closeButton: true,
@@ -209,9 +218,11 @@ export class GuideComponent {
       this.guideForm.markAllAsTouched();
       return;
     }
+    this.loading = true;
     const formData = this.guideForm.value;
     this.guideService.createGuide(formData).subscribe({
       next: (data) => {
+        this.loading = false;
         this.toastr.success('Se creo el guía con exito', 'Realizado', {
           timeOut: this.timeOutmessage,
           closeButton: true,
@@ -221,6 +232,7 @@ export class GuideComponent {
         this.closeAddGuideModal();
       },
       error: (error) => {
+        this.loading = false;
         this.toastr.error('Error al crear el guía', 'Error', {
           timeOut: this.timeOutmessage,
           closeButton: true,
@@ -276,9 +288,11 @@ export class GuideComponent {
       this.editGuideForm.markAllAsTouched();
       return;
     }
+    this.loading = true;
     const formData = this.editGuideForm.value;
     this.guideService.updateGuide(this.selectedGuideId, formData).subscribe({
       next: (data) => {
+        this.loading = false;
         this.toastr.success('Se edito el guía con exito', 'Realizado', {
           timeOut: this.timeOutmessage,
           closeButton: true,
@@ -288,6 +302,7 @@ export class GuideComponent {
         this.closeEditGuideModal();
       },
       error: (error) => {
+        this.loading = false;
         this.toastr.error('Error al editar el guía', 'Error', {
           timeOut: this.timeOutmessage,
           closeButton: true,

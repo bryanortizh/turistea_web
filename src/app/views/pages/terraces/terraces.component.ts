@@ -24,6 +24,7 @@ import {
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { TerraceServices } from '../../../core/services/terrace.service';
 import { TerraceResponse } from '../../../data/interfaces/terrace.interface';
+import { LoadingComponent } from '../../../shared/loading/loading.component';
 
 @Component({
   selector: 'app-terrace',
@@ -39,6 +40,7 @@ import { TerraceResponse } from '../../../data/interfaces/terrace.interface';
     ButtonCloseDirective,
     ModalBodyComponent,
     ModalFooterComponent,
+    LoadingComponent
   ],
   providers: [TerraceServices, HttpClient],
   templateUrl: './terraces.component.html',
@@ -58,7 +60,7 @@ export class TerraceComponent {
   visibleEditTerraceModal = false;
   selectedTerraceId: number = 0;
   timeOutmessage = 5000;
-
+  loading: boolean = false;
   constructor(
     private terraceService: TerraceServices,
     private fb: FormBuilder,
@@ -99,16 +101,19 @@ export class TerraceComponent {
       state: this.state,
     };
     const pageSize = 12;
-
+    this.loading = true;
     this.terraceService.getTerrace(body).subscribe({
       next: (data) => {
+        this.loading = false;
         let terraceData: Pagination = data as unknown as Pagination;
         this.dataTerrace = terraceData.rows;
         this.pageTotal = Math.ceil(
           (terraceData.count || this.dataTerrace.length) / pageSize
         );
       },
-      error: (error) => {},
+      error: (error) => {
+        this.loading = false;
+      },
     });
   }
 
@@ -140,9 +145,10 @@ export class TerraceComponent {
       this.dataTerrace.find((u) => u.id === user.id)?.state === true
         ? false
         : true;
-
+    this.loading = true;
     this.terraceService.blockTerrace(user, state).subscribe({
       next: (data) => {
+        this.loading = false;
         this.toastr.success(
           `Terramozas ${state ? 'desbloqueada' : 'bloqueada'} con éxito`,
           'Éxito',
@@ -155,6 +161,7 @@ export class TerraceComponent {
         this.loadTerraces();
       },
       error: (error) => {
+        this.loading = false;
         this.toastr.error('Error al bloquear la terramozas', 'Error', {
           timeOut: this.timeOutmessage,
           closeButton: true,
@@ -209,8 +216,10 @@ export class TerraceComponent {
       return;
     }
     const formData = this.terraceForm.value;
+    this.loading = true;
     this.terraceService.createTerrace(formData).subscribe({
       next: (data) => {
+        this.loading = false;
         this.toastr.success('Se creo la terramozas con exito', 'Realizado', {
           timeOut: this.timeOutmessage,
           closeButton: true,
@@ -220,6 +229,7 @@ export class TerraceComponent {
         this.closeAddTerraceModal();
       },
       error: (error) => {
+        this.loading = false;
         this.toastr.error('Error al crear la terramozas', 'Error', {
           timeOut: this.timeOutmessage,
           closeButton: true,
@@ -275,9 +285,11 @@ export class TerraceComponent {
       this.editTerraceForm.markAllAsTouched();
       return;
     }
+    this.loading = true;
     const formData = this.editTerraceForm.value;
     this.terraceService.updateTerrace(this.selectedTerraceId, formData).subscribe({
       next: (data) => {
+        this.loading = false;
         this.toastr.success('Se edito la terramozas con exito', 'Realizado', {
           timeOut: this.timeOutmessage,
           closeButton: true,
@@ -287,6 +299,7 @@ export class TerraceComponent {
         this.closeEditTerraceModal();
       },
       error: (error) => {
+        this.loading = false;
         this.toastr.error('Error al editar la terramozas', 'Error', {
           timeOut: this.timeOutmessage,
           closeButton: true,
