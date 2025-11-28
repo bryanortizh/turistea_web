@@ -146,31 +146,31 @@
         <p><strong>Nombre:</strong> {{ selectedReserve.user?.name }} {{ selectedReserve.user?.lastname }}</p>
         <p><strong>Email:</strong> {{ selectedReserve.user?.email }}</p>
         <p><strong>Teléfono:</strong> {{ selectedReserve.user?.cellphone }}</p>
-
+<!-- 
         <h6 class="mt-3">Pasajeros</h6>
         <ul>
             <li *ngFor="let passenger of selectedReserve.users_json?.passengers">
                 {{ passenger.name }} - {{ passenger.type }}: {{ passenger.document }} - Edad: {{ passenger.age }}
             </li>
         </ul>
-
+ -->
         <h6 class="mt-3">Contacto de Emergencia</h6>
 
         <h6 class="mt-3">Conductor</h6>
         <p><strong>Nombre:</strong> {{ selectedReserve.package?.driver?.name }} {{
-            selectedReserve.package?.driver?.lastname }} - DNI: {{ selectedReserve.package?.driver?.dni }}</p>
+            selectedReserve.package?.driver?.lastname }} - Numero de documento: {{ selectedReserve.package?.driver?.number_document }}</p>
         <h6 class="mt-3">Guía</h6>
         <p><strong>Nombre:</strong> {{ selectedReserve.package?.guide?.name }} {{
-            selectedReserve.package?.guide?.lastname }} - DNI: {{ selectedReserve.package?.guide?.dni }}</p>
+            selectedReserve.package?.guide?.lastname }} - DNI: {{ selectedReserve.package?.guide?.number_document }}</p>
         <h6>Terramoza:</h6>
         <p><strong>Nombre:</strong> {{ selectedReserve.package?.terrace?.name }} {{
-            selectedReserve.package?.terrace?.lastname }} - DNI: {{ selectedReserve.package?.terrace?.dni }}</p>
-        <p>
+            selectedReserve.package?.terrace?.lastname }} - DNI: {{ selectedReserve.package?.terrace?.number_document }}</p>
+     <!--    <p>
             <strong>{{ selectedReserve.users_json?.emergency_contact?.name }}</strong>
             ({{ selectedReserve.users_json?.emergency_contact?.relationship }}) -
             {{ selectedReserve.users_json?.emergency_contact?.phone }}
         </p>
-
+ -->
         <h6 class="mt-3">Información del Paquete</h6>
         <p><strong>Identificador del paquete:</strong> {{ selectedReserve.package?.id }}</p>
         <p><strong>Título:</strong> {{ selectedReserve.package?.title }}</p>
