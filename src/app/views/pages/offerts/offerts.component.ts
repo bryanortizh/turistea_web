@@ -33,6 +33,7 @@ import { TerraceResponse } from '../../../data/interfaces/terrace.interface';
 import { SearchSelectComponent } from '../../../components/search-select/search-select.component';
 import { Observable, Subject } from 'rxjs';
 import { Router } from '@angular/router';
+import { LoadingComponent } from 'src/app/shared/loading/loading.component';
 
 @Component({
   selector: 'app-offerts',
@@ -49,6 +50,7 @@ import { Router } from '@angular/router';
     ModalBodyComponent,
     ModalFooterComponent,
     SearchSelectComponent,
+    LoadingComponent
   ],
   providers: [PackageService, DriverService, GuideServices, TerraceServices, HttpClient],
   templateUrl: './offerts.component.html',
@@ -68,7 +70,7 @@ export class OffertsComponent {
   visibleEditPackageModal = false;
   timeOutmessage = 5000;
   selectedImagePreview: string | null = null;
-
+  loading: boolean = false;
   constructor(
     private packageService: PackageService,
     private driverService: DriverService,
@@ -133,6 +135,7 @@ export class OffertsComponent {
   }
 
   loadPackages(): void {
+    this.loading = true;
     let body: PaginationParams = {
       page: this.page,
       state: this.state,
@@ -141,13 +144,16 @@ export class OffertsComponent {
 
     this.packageService.getClient(body).subscribe({
       next: (data) => {
+        this.loading = false;
         let packageData: Pagination = data as unknown as Pagination;
         this.dataPackage = packageData.rows;
         this.pageTotal = Math.ceil(
           (packageData.count || this.dataPackage.length) / pageSize
         );
       },
-      error: (error) => {},
+      error: (error) => {
+        this.loading = false;
+      },
     });
   }
 
@@ -179,9 +185,10 @@ export class OffertsComponent {
       this.dataPackage.find((u) => u.id === user.id)?.state === true
         ? false
         : true;
-
+    this.loading = true;
     this.packageService.blockPackage(user, state).subscribe({
       next: (data) => {
+        this.loading = false;
         this.toastr.success(
           `Paquetes ${state ? 'desbloqueado' : 'bloqueado'} con éxito`,
           'Éxito',
@@ -194,6 +201,7 @@ export class OffertsComponent {
         this.loadPackages();
       },
       error: (error) => {
+        this.loading = false;
         this.toastr.error('Error al bloquear el paquete', 'Error', {
           timeOut: this.timeOutmessage,
           closeButton: true,
@@ -292,9 +300,11 @@ export class OffertsComponent {
       this.packageForm.markAllAsTouched();
       return;
     }
+    this.loading = true;
     const formData = this.packageForm.value;
     this.packageService.createPackage(formData).subscribe({
       next: (data) => {
+        this.loading = false;
         this.toastr.success('Se creo el paquete con exito', 'Realizado', {
           timeOut: this.timeOutmessage,
           closeButton: true,
@@ -304,6 +314,7 @@ export class OffertsComponent {
         this.closeAddPackageModal();
       },
       error: (error) => {
+        this.loading = false;
         this.toastr.error('Error al crear el paquete', 'Error', {
           timeOut: this.timeOutmessage,
           closeButton: true,
@@ -329,9 +340,11 @@ export class OffertsComponent {
     if (!formData.image_bg_two) {
       delete formData.image_bg_two;
     }
+    this.loading = true;
 
     this.packageService.updatePackage(packageId, formData).subscribe({
       next: (data) => {
+        this.loading = false;
         this.toastr.success('Paquete actualizado con éxito', 'Realizado', {
           timeOut: this.timeOutmessage,
           closeButton: true,
@@ -341,6 +354,7 @@ export class OffertsComponent {
         this.closeEditPackageModal();
       },
       error: (error) => {
+        this.loading = false;
         this.toastr.error('Error al actualizar el paquete', 'Error', {
           timeOut: this.timeOutmessage,
           closeButton: true,

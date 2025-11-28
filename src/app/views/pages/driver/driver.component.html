@@ -1,4 +1,5 @@
 <div class="mb-4">
+        <app-loading [show]="loading" [message]="'Cargando conductores...'"></app-loading>
     <h2>Conductores</h2>
     <p class="text-medium-emphasis">Lista de conductores del sistema</p>
     <div class="row">
@@ -23,6 +24,8 @@
                     <th scope="col">#</th>
                     <th scope="col">Nombres</th>
                     <th scope="col">Correo</th>
+                    <th scope="col">Nro Placa</th>
+                    <th scope="col">Nro Documento</th>
                     <th scope="col">Teléfono</th>
                     <th scope="col">Fecha de creación</th>
                     <th scope="col">Acciones</th>
@@ -34,6 +37,8 @@
                     <td>{{user?.name}}</td>
                     <td>{{user?.email}}</td>
                     <td>{{user?.cellphone}}</td>
+                    <td>{{user?.number_plate}}</td>
+                    <td>{{user?.number_document}}</td>
                     <td>{{user?.created | date: 'short'}}</td>
                     <td>
                         <button cButton color="success" size="sm" class="me-2 text-white" (click)="openDriverModal(i)">
@@ -253,7 +258,7 @@
         </c-modal-body>
         <c-modal-footer>
             <button type="button" cButton color="secondary" (click)="closeAddDriverModal()">Cancelar</button>
-            <button type="submit" cButton color="primary" [disabled]="driverForm.invalid"
+            <button type="submit" cButton color="primary" [disabled]="driverForm.invalid || loading"
                 (click)="createDriver()">Registrar conductor</button>
         </c-modal-footer>
     </form>
@@ -434,7 +439,7 @@
         </c-modal-body>
         <c-modal-footer>
             <button type="button" cButton color="secondary" (click)="closeEditDriverModal()">Cancelar</button>
-            <button type="submit" cButton color="primary" [disabled]="editDriverForm.invalid"
+            <button type="submit" cButton color="primary" [disabled]="editDriverForm.invalid || loading"
                 (click)="updateDriver()">Actualizar conductor</button>
         </c-modal-footer>
     </form>

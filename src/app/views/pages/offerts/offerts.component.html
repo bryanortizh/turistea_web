@@ -1,4 +1,5 @@
 <div class="mb-4">
+ <app-loading [show]="loading"  [message]="'Cargando paquetes...'"></app-loading>
     <h2>Paquetes</h2>
     <p class="text-medium-emphasis">Lista de paquetes turisticos</p>
 
@@ -169,7 +170,7 @@
         </c-modal-body>
         <c-modal-footer>
             <button type="button" cButton color="secondary" (click)="closeAddPackageModal()">Cancelar</button>
-            <button type="submit" cButton color="primary" [disabled]="packageForm.invalid"
+            <button type="submit" cButton color="primary" [disabled]="packageForm.invalid || loading"
                 (click)="createPackage()">Registrar paquete</button>
         </c-modal-footer>
     </form>
@@ -325,7 +326,7 @@
         </c-modal-body>
         <c-modal-footer>
             <button type="button" cButton color="secondary" (click)="closeEditPackageModal()">Cancelar</button>
-            <button type="submit" cButton color="primary" [disabled]="editPackageForm.invalid"
+            <button type="submit" cButton color="primary" [disabled]="editPackageForm.invalid || loading"
                 (click)="updatePackage()">Actualizar paquete</button>
         </c-modal-footer>
     </form>

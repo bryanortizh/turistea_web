@@ -105,7 +105,7 @@ searchDriverInput(
     );
 
     return this.http.get<DriverResponse>(
-      this.URL_BACKEND + '/api/admins/drivers/search/' + term,
+      this.URL_BACKEND + '/api/admins/drivers/' + term,
       {
         headers: headers,
         params: {
